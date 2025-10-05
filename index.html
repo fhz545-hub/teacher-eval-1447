@@ -40,7 +40,6 @@ html,body{
 .meta-item .label{font-weight:900;color:var(--label);margin-left:4px}
 .meta-item .value{font-weight:900}
 .case-total{margin-top:4px;font-size:10.8px;color:#2f4f4b}
-.model-small{margin-top:3px;font-size:9.8px;line-height:1.6;color:var(--label)}
 
 /* شريط الأدوات */
 .toolbar{position:sticky;top:0;z-index:10;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12mm;background:#fff;border-bottom:1px solid #eee}
@@ -91,13 +90,13 @@ html,body{
   margin:2mm auto 0;
   display:flex;
   flex-direction:row-reverse;
-  justify-content:flex-end; /* تحت يمين عمود الاسم */
+  justify-content:flex-end;
 }
 .civil-badge{
   width:38%;
   display:flex; align-items:center; gap:10px; justify-content:center;
   border:1.5px solid var(--moe);
-  background:#fff; /* خلفية عامة بيضاء */
+  background:#fff;
   color:#0b3340;
   border-radius:12px; min-height:9.5mm; padding:3px 6px;
 }
@@ -106,7 +105,7 @@ html,body{
   padding:2px 10px; border-radius:8px; white-space:nowrap
 }
 .civil-badge .civilValue{
-  background:#fff; /* الرقم بخلفية بيضاء */
+  background:#fff;
   padding:0 6px; border-radius:6px; min-width:42mm;
   display:inline-block; text-align:center; font-weight:900
 }
@@ -142,7 +141,6 @@ html,body{
 .rights{width:var(--content);margin:2mm auto 8mm;text-align:center;font-size:9.2px;color:#6b7280;font-weight:700}
 @media print{ .rights{display:none !important} }
 body.exporting .rights{display:none !important}
-/* إخفاء شريط اختيار النوع أثناء توليد PDF فقط */
 body.exporting .seg{display:none !important}
 
 /* طباعة */
@@ -212,12 +210,8 @@ body.exporting .seg{display:none !important}
         <div class="meta">
           <div class="meta-item"><span class="label">الرقم:</span><span class="value" id="serialNo">01</span></div>
           <div class="meta-item"><span class="label">التاريخ:</span><span class="value" id="hdrHijri">١٤٤٧/٠٤/١٣ هـ</span></div>
+          <!-- تمت إزالة سطر "اسم النموذج / رمز النموذج" نهائياً -->
           <div class="case-total">إجمالي مساءلات المعلم: <strong id="caseTotal">0</strong></div>
-          <div class="model-small">
-            <strong>اسم النموذج:</strong> تنبيه على تأخر / انصراف
-            &nbsp; • &nbsp;
-            <strong>رمز النموذج:</strong> (و.م.ع.ن.-02-03)
-          </div>
         </div>
       </div>
     </div>
@@ -260,7 +254,7 @@ body.exporting .seg{display:none !important}
           </table>
         </div>
 
-        <!-- السجل المدني — أسفل الاسم خارج الجدول (مزاح يمين) -->
+        <!-- السجل المدني أسفل الاسم خارج الجدول -->
         <div class="below-flex">
           <div class="civil-badge">
             <span class="labTag">السجل المدني</span>
@@ -268,7 +262,7 @@ body.exporting .seg{display:none !important}
           </div>
         </div>
 
-        <!-- (أ) حزمة التنبيه الأصلي -->
+        <!-- (أ) حزمة التنبيه -->
         <div id="alertPack">
           <div class="sec">
             <h3>( 1 ) خطاب التنبيه — <span class="kind" id="kindTitle">تأخر</span></h3>
@@ -351,7 +345,7 @@ body.exporting .seg{display:none !important}
           </div>
         </div>
 
-        <!-- (ب) حزمة “مساءلة غياب” -->
+        <!-- (ب) حزمة مساءلة غياب -->
         <div id="absencePack" class="abs-pack" style="display:none">
           <div class="sec" style="margin-top:0">
             <p class="para" id="absIntro">
@@ -419,7 +413,7 @@ body.exporting .seg{display:none !important}
   </div>
 </div>
 
-<!-- حوار الاستيراد (كما هو) -->
+<!-- حوار الاستيراد -->
 <div id="importDialog" role="dialog" aria-modal="true" style="display:none">
   <div id="importCard" style="background:#fff;border-radius:14px;min-width:320px;max-width:800px;width:90%;padding:16px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.2)">
     <h3 style="margin-top:0;color:#0b5e63">استيراد بيانات المعلمين</h3>
@@ -443,7 +437,7 @@ body.exporting .seg{display:none !important}
   </div>
 </div>
 
-<!-- لوحة المؤقّت (كما هي) -->
+<!-- لوحة المؤقّت -->
 <div id="timePad" style="display:none;position:fixed;background:#fff;border:1px solid #e6eeee;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:10px;z-index:200">
   <div class="display" id="timePadDisplay" style="font:700 18px ui-monospace,Consolas,monospace;text-align:center;margin-bottom:6px">--:--</div>
   <div class="grid" style="display:grid;grid-template-columns:repeat(3,44px);gap:6px;justify-content:center">
@@ -518,13 +512,13 @@ function hijriToGregorian(y,m,d){
     const hijYMD=fmtHijriYMDNoSuffix(g);
     document.getElementById('hdrHijri').textContent = `${hijYMD} هـ`;
 
-    /* سطور التنبيه (اليوم/الشهر/السنة كما كانت) */
+    /* سطور التنبيه (اليوم/الشهر/السنة) */
     const hijNo=fmtHijriNoSuffix(g);
     const dayName = wdHijri(g);
     document.getElementById('dynDay').textContent = dayName;
     document.getElementById('dynHijri').textContent = hijNo;
 
-    /* مساءلة الغياب: السنة/الشهر/اليوم */
+    /* مساءلة الغياب (السنة/الشهر/اليوم) */
     document.getElementById('absDayP').textContent  = dayName;
     document.getElementById('absDateYMD').textContent = hijYMD;
   }
@@ -613,8 +607,12 @@ async function beginImport(file){
         const keys=new Set(); obj.forEach(r=>Object.keys(r).forEach(k=>keys.add(k)));
         const heads=[...keys]; const rows=obj.map(r=>heads.map(h=>r[h]??'')); arrays['البيانات']=[heads,...rows]; sheetNames=['البيانات'];
       }else{
-        const txt=await file.text(); const sep=(ext==='tsv'||txt.includes('\t'))?'\t':','; const lines=txt.trim().split(/\r?\ن/);
-        const heads=lines.shift().split(sep).map(h=>h.trim()); const rows=lines.map(line=>line.split(sep)); arrays['البيانات']=[heads,...rows]; sheetNames=['البيانات'];
+        const txt=await file.text();
+        const sep=(ext==='tsv'||txt.includes('\t'))?'\t':','; 
+        const lines=txt.trim().split(/\r?\n/);
+        const heads=lines.shift().split(sep).map(h=>h.trim()); 
+        const rows=lines.map(line=>line.split(sep)); 
+        arrays['البيانات']=[heads,...rows]; sheetNames=['البيانات'];
       }
     }else{
       const ab=await file.arrayBuffer(); const wb2=XLSX.read(ab,{type:'array'}); wb=wb2; sheetNames=wb2.SheetNames;
@@ -736,7 +734,7 @@ document.getElementById('btnPrint')?.addEventListener('click',()=>{
 });
 
 async function exportPDFBlob(){
-  document.body.classList.add('exporting'); // تُخفي شريط الاختيار
+  document.body.classList.add('exporting');
   const sheet=document.getElementById('sheet');
   const canvas = await html2canvas(sheet,{scale:3,useCORS:true,background:'#ffffff',logging:false});
   document.body.classList.remove('exporting');
@@ -782,7 +780,7 @@ document.querySelectorAll('#timePad .grid button').forEach(b=>b.addEventListener
   if(/[0-9]/.test(k)){v+=k; if(v.length<=4){disp.textContent=(v.padEnd(4,'-').slice(0,2))+':'+(v.padEnd(4,'-').slice(2,4));}}
 }));
 const t2m=t=>{ if(!/^\d{2}:\d{2}$/.test(t||'')) return null; const [h,m]=t.split(':').map(Number); return h*60+m; };
-const fmtDur=mins=>{ mins=Math.max(0,Math.round(mins||0)); const h=Math.floor(mins/60),m=mins%60; return h?(m?`${h} ساعة و ${m} دقيقة`:`${h} ساعة`):`${m} دقيقة`; };
+const fmtDur=mins=>{ mins=Math.max(0,Math.round(mins||0)); const h=Math.floor(mins/60),m=mins%60; return h?(م?`${h} ساعة و ${m} دقيقة`:`${h} ساعة`):`${m} دقيقة`; };
 function recalc(){
   const ws=document.getElementById('workStart')?.value||'06:45';
   const we=document.getElementById('workEnd')?.value||'13:45';
