@@ -9,25 +9,17 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
 
+<!-- مكتبات -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
-:root{
-  --moe:#0b7e88; --ink:#111; --label:#064c50;
-  --bg:#f7fafc; --content:190mm; --nudgeX:0mm;
-}
+:root{ --moe:#0b7e88; --ink:#111; --label:#064c50; --bg:#f7fafc; --content:190mm; --nudgeX:0mm; }
 *{box-sizing:border-box}
-html,body{
-  margin:0;background:var(--bg);color:var(--ink);
-  font:13.8px/1.9 "Tajawal","Noto Sans Arabic","Noto Naskh Arabic",system-ui;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-}
+html,body{ margin:0;background:var(--bg);color:var(--ink);font:13.8px/1.9 "Tajawal","Noto Sans Arabic","Noto Naskh Arabic",system-ui; -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
 .sheet-wrap{display:grid;place-items:center;margin:10mm 0}
 .sheet{width:210mm;min-height:297mm;background:#fff;transform:translateX(var(--nudgeX))}
-
-/* الهيدر */
 .header{padding:9mm 12mm 6mm;border-bottom:2px solid #eaf1f1}
 .header .row{display:flex;justify-content:space-between;align-items:center;gap:10mm}
 .header .row>div{width:50%}
@@ -41,7 +33,6 @@ html,body{
 .meta-item .value{font-weight:900}
 .case-total{margin-top:4px;font-size:10.8px;color:#2f4f4b}
 
-/* شريط الأدوات */
 .toolbar{position:sticky;top:0;z-index:10;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12mm;background:#fff;border-bottom:1px solid #eee}
 .toolbar button{border:0;border-radius:10px;padding:9px 12px;cursor:pointer;background:var(--moe);color:#fff;font-weight:800}
 .toolbar .secondary{background:#eef7f7;color:#0b5e63;border:1px solid #d7ecec}
@@ -53,11 +44,8 @@ html,body{
 .controls-row .block{display:flex;align-items:center;gap:6px}
 .controls-row .pack{display:flex;align-items:center;gap:4px}
 
-/* الصفحة الداخلية */
 .page{padding:6mm 0 10mm;display:grid;place-items:center}
 .content{width:var(--content);margin:0 auto}
-
-/* عنوان */
 .notice-center{width:var(--content);margin:5mm auto 2mm;display:flex;flex-direction:column;align-items:center;gap:6px}
 .notice-center .title{font-weight:900;font-size:28px;line-height:1.1;color:#0b5e63;filter:contrast(120%)}
 .seg{display:inline-flex;background:#eef7f7;border:1px solid #d7ecec;border-radius:999px;overflow:hidden}
@@ -65,17 +53,10 @@ html,body{
 .seg label{padding:10px 16px;cursor:pointer;font-weight:800;color:#0b5e63;user-select:none}
 .seg input:checked+label{background:#0b7e88;color:#fff}
 
-/* جدول بيانات المعلم */
 .table-wrap{width:var(--content);margin:4mm auto 0;display:flex;justify-content:center}
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed}
-.tbl thead th{
-  background:#0b5e63;color:#fff;border:1.2px solid #244a4a;
-  padding:6px 7px;text-align:center;font-weight:900;font-size:13px
-}
-.tbl td{
-  border:1.2px solid #3f5b57;padding:5px 7px;vertical-align:middle;
-  height:12mm;font-size:13.2px;line-height:1.55;background:#fff;text-align:center
-}
+.tbl thead th{background:#0b5e63;color:#fff;border:1.2px solid #244a4a;padding:6px 7px;text-align:center;font-weight:900;font-size:13px}
+.tbl td{border:1.2px solid #3f5b57;padding:5px 7px;vertical-align:middle;height:12mm;font-size:13.2px;line-height:1.55;background:#fff;text-align:center}
 .tbl thead th.name,.tbl td.name{width:38%}
 .tbl thead th.spec,.tbl td.spec{width:14%}
 .tbl thead th.level,.tbl td.level{width:16%}
@@ -84,33 +65,11 @@ html,body{
 .tbl td span[contenteditable]{display:block;outline:none;overflow-wrap:anywhere;word-break:break-word;font-weight:700}
 .tbl td.name span[contenteditable]{font-size:15.5px;font-weight:900}
 
-/* السجل المدني — خارج الجدول تحت الاسم (مزاح يمين) */
-.below-flex{
-  width:var(--content);
-  margin:2mm auto 0;
-  display:flex;
-  flex-direction:row-reverse;
-  justify-content:flex-end;
-}
-.civil-badge{
-  width:38%;
-  display:flex; align-items:center; gap:10px; justify-content:center;
-  border:1.5px solid var(--moe);
-  background:#fff;
-  color:#0b3340;
-  border-radius:12px; min-height:9.5mm; padding:3px 6px;
-}
-.civil-badge .labTag{
-  background:var(--moe); color:#fff; font-weight:900;
-  padding:2px 10px; border-radius:8px; white-space:nowrap
-}
-.civil-badge .civilValue{
-  background:#fff;
-  padding:0 6px; border-radius:6px; min-width:42mm;
-  display:inline-block; text-align:center; font-weight:900
-}
+.below-flex{width:var(--content);margin:2mm auto 0;display:flex;flex-direction:row-reverse;justify-content:flex-end}
+.civil-badge{width:38%;display:flex;align-items:center;gap:10px;justify-content:center;border:1.5px solid var(--moe);background:#fff;color:#0b3340;border-radius:12px;min-height:9.5mm;padding:3px 6px}
+.civil-badge .labTag{background:var(--moe);color:#fff;font-weight:900;padding:2px 10px;border-radius:8px;white-space:nowrap}
+.civil-badge .civilValue{background:#fff;padding:0 6px;border-radius:6px;min-width:42mm;display:inline-block;text-align:center;font-weight:900}
 
-/* أقسام التنبيه الأصلي */
 .sec{width:var(--content);margin:6mm auto;padding:0}
 .sec h3{margin:0 0 8px;color:#0b5e63}
 .sec h3 .kind{color:#0b7e88}
@@ -127,23 +86,20 @@ html,body{
 .timebox{display:inline-block;min-width:28mm;text-align:center;padding:.5mm 3mm;background:#fff;color:#111;font-weight:900;border-radius:6px;border:1px solid #000;font-family:ui-monospace,Consolas,monospace}
 .timebox.empty{color:#777;border-color:#bbb}
 
-/* حزمة “مساءلة غياب” */
 .abs-pack{width:var(--content);margin:6mm auto}
 .abs-pack h3{margin:0 0 8px;color:#0b5e63}
 .abs-pack .para{margin:0 0 6px}
-.abs-pack .lines{min-height:28mm;border:1px dashed #9fb7b3;border-radius:10px;padding:8px 10px;background:#fafefe}
+.abs-pack .lines{min-height:28mm;border:1px dashed #9fb7ب3;border-radius:10px;padding:8px 10px;background:#fafefe}
 .abs-pack .lines div{height:10mm;border-bottom:1px dotted #9fb7b3}
 .abs-pack .lines div:last-child{border-bottom:0}
 .abs-pack .choices label{display:block;margin:6px 0}
 .abs-pack .note{color:#374151;font-size:11.2px;line-height:1.85;margin-top:6mm}
 
-/* تذييل مرئي فقط */
 .rights{width:var(--content);margin:2mm auto 8mm;text-align:center;font-size:9.2px;color:#6b7280;font-weight:700}
 @media print{ .rights{display:none !important} }
 body.exporting .rights{display:none !important}
 body.exporting .seg{display:none !important}
 
-/* طباعة */
 @media print{
   @page{size:A4;margin:9mm}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
@@ -156,11 +112,14 @@ body.exporting .seg{display:none !important}
   .content,.notice-center,.table-wrap,.below-flex,.sec,.abs-pack{width:var(--content) !important;margin:0 auto !important}
   .tbl td,.tbl th{border-color:#000 !important}
 }
+
+/* حوار الاستيراد (طبقة غطاء) */
+#importDialog{display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,.25);z-index:300}
 </style>
 </head>
 <body>
 
-<!-- شريط الأدوات -->
+<!-- الأدوات -->
 <div class="toolbar">
   <div class="toolbar-row">
     <button id="btnPrint">🖨️ طباعة / حفظ PDF</button>
@@ -210,7 +169,6 @@ body.exporting .seg{display:none !important}
         <div class="meta">
           <div class="meta-item"><span class="label">الرقم:</span><span class="value" id="serialNo">01</span></div>
           <div class="meta-item"><span class="label">التاريخ:</span><span class="value" id="hdrHijri">١٤٤٧/٠٤/١٣ هـ</span></div>
-          <!-- تمت إزالة سطر "اسم النموذج / رمز النموذج" نهائياً -->
           <div class="case-total">إجمالي مساءلات المعلم: <strong id="caseTotal">0</strong></div>
         </div>
       </div>
@@ -254,7 +212,7 @@ body.exporting .seg{display:none !important}
           </table>
         </div>
 
-        <!-- السجل المدني أسفل الاسم خارج الجدول -->
+        <!-- السجل المدني تحت خلية الاسم -->
         <div class="below-flex">
           <div class="civil-badge">
             <span class="labTag">السجل المدني</span>
@@ -372,9 +330,7 @@ body.exporting .seg{display:none !important}
             <p class="para"><strong>المكرم / مدير المدرسة</strong> وفقه الله</p>
             <p class="para"><strong>السلام عليكم ورحمة الله وبركاته</strong> وبعد:</p>
             <p class="para">أفيدكم أن غيابي كان للأسباب التالية:</p>
-            <div class="lines">
-              <div></div><div></div><div></div>
-            </div>
+            <div class="lines"><div></div><div></div><div></div></div>
             <p class="para">وسأقوم بتقديم ما يثبت ذلك خلال أسبوع من تاريخه.</p>
             <p class="para">
               <strong>اسم المعلم :</strong> <span id="abs-teacher-name">—</span>
@@ -414,8 +370,8 @@ body.exporting .seg{display:none !important}
 </div>
 
 <!-- حوار الاستيراد -->
-<div id="importDialog" role="dialog" aria-modal="true" style="display:none">
-  <div id="importCard" style="background:#fff;border-radius:14px;min-width:320px;max-width:800px;width:90%;padding:16px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+<div id="importDialog" role="dialog" aria-modal="true">
+  <div id="importCard" style="background:#fff;border-radius:14px;min-width:320px;max-width:900px;width:90%;padding:16px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.2)">
     <h3 style="margin-top:0;color:#0b5e63">استيراد بيانات المعلمين</h3>
     <div class="map-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
       <label>ورقة العمل (Sheet)</label><select id="sheetSelect"></select>
@@ -427,7 +383,7 @@ body.exporting .seg{display:none !important}
       <label>عمود العمل الحالي</label><select id="mapWork"></select>
       <label>عمود المدرسة (اختياري)</label><select id="mapSchool"></select>
     </div>
-    <div class="preview" style="max-height:220px;overflow:auto;border:1px solid #e5efef;border-radius:10px;margin-top:8px">
+    <div class="preview" style="max-height:260px;overflow:auto;border:1px solid #e5efef;border-radius:10px;margin-top:8px">
       <table id="previewTable" style="width:100%;border-collapse:collapse"></table>
     </div>
     <div class="dlg-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
@@ -459,14 +415,14 @@ const en2ar = s => (s+'').replace(/[0-9]/g,d=>AR[d]);
 const ar2en = s => (s+'').replace(/[٠-٩]/g,d=>EN[AR.indexOf(d)]);
 
 /* Hijri (Umm Al-Qura) */
-function fmtHijriNoSuffix(d){  // DD/MM/YYYY
+function fmtHijriNoSuffix(d){
   const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
   const DD=en2ar(parts.find(p=>p.type==='day').value.padStart(2,'0'));
   const MM=en2ar(parts.find(p=>p.type==='month').value.padStart(2,'0'));
   const YY=en2ar(parts.find(p=>p.type==='year').value);
   return `${DD}/${MM}/${YY}`;
 }
-function fmtHijriYMDNoSuffix(d){ // YYYY/MM/DD
+function fmtHijriYMDNoSuffix(d){
   const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
   const DD=en2ar(parts.find(p=>p.type==='day').value.padStart(2,'0'));
   const MM=en2ar(parts.find(p=>p.type==='month').value.padStart(2,'0'));
@@ -507,18 +463,12 @@ function hijriToGregorian(y,m,d){
   function update(){
     const y=+ySel.value,m=+mSel.value,d=+dSel.value;
     const g=hijriToGregorian(y,m,d); if(!g){ alert('تعذّر تحويل التاريخ الهجري'); return; }
-
-    /* الهيدر: السنة/الشهر/اليوم */
     const hijYMD=fmtHijriYMDNoSuffix(g);
     document.getElementById('hdrHijri').textContent = `${hijYMD} هـ`;
-
-    /* سطور التنبيه (اليوم/الشهر/السنة) */
     const hijNo=fmtHijriNoSuffix(g);
     const dayName = wdHijri(g);
     document.getElementById('dynDay').textContent = dayName;
     document.getElementById('dynHijri').textContent = hijNo;
-
-    /* مساءلة الغياب (السنة/الشهر/اليوم) */
     document.getElementById('absDayP').textContent  = dayName;
     document.getElementById('absDateYMD').textContent = hijYMD;
   }
@@ -552,17 +502,15 @@ function refillSelect(){
 refillSelect();
 const selEl=document.getElementById('teacherSelect');
 const searchEl=document.getElementById('teacherSearch');
-selEl && selEl.addEventListener('change',e=>{const i=+e.target.value; if(Number.isInteger(i)&&TEACHERS[i]) applyTeacher(TEACHERS[i], i);});
-searchEl && searchEl.addEventListener('input',()=>{const q=searchEl.value.trim(); for(const o of selEl.options){ if(!o.value){o.hidden=false;continue;} o.hidden=q && !o.text.includes(q); }});
+selEl?.addEventListener('change',e=>{const i=+e.target.value; if(Number.isInteger(i)&&TEACHERS[i]) applyTeacher(TEACHERS[i], i);});
+searchEl?.addEventListener('input',()=>{const q=searchEl.value.trim(); for(const o of selEl.options){ if(!o.value){o.hidden=false;continue;} o.hidden=q && !o.text.includes(q); }});
 ['t_name','t_spec','t_level','t_job','t_work','t_civil'].forEach(id=>{
   const el=document.getElementById(id); if(!el) return;
   el.addEventListener('blur',()=>{
     if(currentIdx==null || !TEACHERS[currentIdx]) return;
     const v=el.textContent.trim();
-    if(id==='t_name'){ TEACHERS[currentIdx].name=v; document.getElementById('afadaName').textContent=v||'—';
-      document.getElementById('abs-name-top').textContent=v||'—';
-      document.getElementById('abs-teacher-name').textContent=v||'—';
-    } else if(id==='t_spec'){ TEACHERS[currentIdx].spec=v; }
+    if(id==='t_name'){ TEACHERS[currentIdx].name=v; document.getElementById('afadaName').textContent=v||'—'; document.getElementById('abs-name-top').textContent=v||'—'; document.getElementById('abs-teacher-name').textContent=v||'—'; }
+    else if(id==='t_spec'){ TEACHERS[currentIdx].spec=v; }
     else if(id==='t_level'){ TEACHERS[currentIdx].level=v; }
     else if(id==='t_job'){ TEACHERS[currentIdx].job=v; }
     else if(id==='t_work'){ TEACHERS[currentIdx].work=v; }
@@ -575,62 +523,107 @@ searchEl && searchEl.addEventListener('input',()=>{const q=searchEl.value.trim()
 document.getElementById('btnClearImport')?.addEventListener('click', ()=>{
   if(!confirm('تأكيد تصفير بيانات الاستيراد والأسماء؟')) return;
   TEACHERS=[]; localStorage.removeItem('teachersCache'); refillSelect();
-  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name'].forEach(id=>{
-    const el=document.getElementById(id); if(!el) return; el.textContent='';
-  });
-  document.getElementById('afadaName').textContent='—';
-  document.getElementById('abs-name-top').textContent='—';
-  document.getElementById('abs-teacher-name').textContent='—';
+  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name'].forEach(id=>{ const el=document.getElementById(id); if(el) el.textContent=''; });
+  document.getElementById('afadaName').textContent='—'; document.getElementById('abs-name-top').textContent='—'; document.getElementById('abs-teacher-name').textContent='—';
 });
 
-/* الاستيراد متعدد الصيغ */
+/* ==== الاستيراد المُحسَّن لكل الصيغ ==== */
 const fileInput=document.getElementById('fileInput');
 const drop=document.getElementById('dropZone');
 const importDialog=document.getElementById('importDialog');
 document.getElementById('btnImport')?.addEventListener('click',()=>fileInput.click());
 ['dragenter','dragover'].forEach(ev=>drop?.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
 ['dragleave','drop'].forEach(ev=>drop?.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
-drop?.addEventListener('drop',e=>{e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) beginImport(f);});
+drop?.addEventListener('drop',e=>{e.preventDefault(); const f=e.dataTransfer.files?.[0]; if(f) beginImport(f);});
 fileInput?.addEventListener('change',e=>{if(e.target.files[0]) beginImport(e.target.files[0]);});
 
 let IMPORT_CTX = {workbook:null, sheets:[], arrays:{}, headers:{}};
+
+/* كشف فاصل CSV تلقائي */
+function detectSeparator(txt){
+  const cTab=(txt.match(/\t/g)||[]).length, cSemi=(txt.match(/;/g)||[]).length, cComma=(txt.match(/,/g)||[]).length;
+  if(cTab>cSemi && cTab>cComma) return '\t';
+  if(cSemi>cComma) return ';';
+  return ',';
+}
+/* قراءة نص مع دعم UTF-8 و Windows-1256 */
+async function readTextAllEnc(file){
+  // جرّب UTF-8 أولاً
+  let buf=await file.arrayBuffer();
+  try{ return new TextDecoder('utf-8',{fatal:false}).decode(buf); }catch{}
+  try{ return new TextDecoder('windows-1256',{fatal:false}).decode(buf); }catch{}
+  try{ return new TextDecoder('iso-8859-6',{fatal:false}).decode(buf); }catch{}
+  // كحل أخير
+  return await file.text();
+}
+
+/* تحويل مصفوفة أوراق SheetJS إلى صفيف ثنائي الأبعاد */
+function sheetToAOA(ws){
+  return XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''});
+}
+
+/* اختيار صف العناوين تلقائيًا من أول 5 صفوف */
+function pickHeaderRow(A){
+  const rowsToCheck = Math.min(5, A.length);
+  let bestIdx = 0, bestScore = -1;
+  const keywords = ['الاسم','اسم','name','المعلم','الموظف','السجل','الهوية','التخصص','المرتبة','المستوى','رقم الوظيفة','العمل'];
+  for(let r=0;r<rowsToCheck;r++){
+    const row=(A[r]||[]).join(' ').toLowerCase();
+    let score=0; keywords.forEach(k=>{ if(row.includes(k)) score++; });
+    if(score>bestScore){ bestScore=score; bestIdx=r; }
+  }
+  return bestIdx;
+}
+
+/* بدء الاستيراد */
 async function beginImport(file){
-  const name=file.name||''; const ext=(name.split('.').pop()||'').toLowerCase();
   try{
+    const name=file.name||''; const ext=(name.split('.').pop()||'').toLowerCase();
     let wb=null, sheetNames=[], arrays={};
+
     if(['xlsx','xls','xlsm','xlsb','xltx','xltm','ods'].includes(ext)){
-      const ab=await file.arrayBuffer(); wb=XLSX.read(ab,{type:'array'}); sheetNames=wb.SheetNames;
-      for(const sh of sheetNames){ const ws=wb.Sheets[sh]; arrays[sh]=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''}); }
-    }else if(['csv','tsv','json'].includes(ext) || !ext){
-      if(ext==='json'){
-        const txt=await file.text(); const obj=JSON.parse(txt);
-        const keys=new Set(); obj.forEach(r=>Object.keys(r).forEach(k=>keys.add(k)));
-        const heads=[...keys]; const rows=obj.map(r=>heads.map(h=>r[h]??'')); arrays['البيانات']=[heads,...rows]; sheetNames=['البيانات'];
+      const ab=await file.arrayBuffer();
+      wb = XLSX.read(ab,{type:'array',cellDates:true,cellNF:false,raw:false});
+      sheetNames = wb.SheetNames;
+      for(const sh of sheetNames){ arrays[sh]=sheetToAOA(wb.Sheets[sh]); }
+    }else if(['csv','tsv','txt','json'].includes(ext) || !ext){
+      const text = await readTextAllEnc(file);
+      if(ext==='json' || (text.trim().startsWith('[') && text.includes('{'))){
+        let obj = [];
+        try{ obj = JSON.parse(text); }catch(e){ alert('صيغة JSON غير صحيحة.'); return; }
+        const keys=new Set(); obj.forEach(r=>Object.keys(r||{}).forEach(k=>keys.add(k)));
+        const heads=[...keys]; const rows=obj.map(r=>heads.map(h=>(r||{})[h]??'')); arrays['البيانات']=[heads,...rows]; sheetNames=['البيانات'];
       }else{
-        const txt=await file.text();
-        const sep=(ext==='tsv'||txt.includes('\t'))?'\t':','; 
-        const lines=txt.trim().split(/\r?\n/);
-        const heads=lines.shift().split(sep).map(h=>h.trim()); 
-        const rows=lines.map(line=>line.split(sep)); 
-        arrays['البيانات']=[heads,...rows]; sheetNames=['البيانات'];
+        const FS = (ext==='tsv')?'\t':detectSeparator(text);
+        wb = XLSX.read(text,{type:'string',raw:true,FS});
+        sheetNames = wb.SheetNames;
+        for(const sh of sheetNames){ arrays[sh]=sheetToAOA(wb.Sheets[sh]); }
       }
     }else{
-      const ab=await file.arrayBuffer(); const wb2=XLSX.read(ab,{type:'array'}); wb=wb2; sheetNames=wb2.SheetNames;
-      for(const sh of sheetNames){ const ws=wb2.Sheets[sh]; arrays[sh]=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''}); }
+      // محاولة عامة لأي امتداد آخر ممكن أن يكون جدولاً
+      const ab=await file.arrayBuffer();
+      wb = XLSX.read(ab,{type:'array',cellDates:true,raw:false});
+      sheetNames = wb.SheetNames;
+      for(const sh of sheetNames){ arrays[sh]=sheetToAOA(wb.Sheets[sh]); }
     }
+
+    // تنظيف قيم التاريخ (تحويل Date إلى نص)
+    for(const sh of Object.keys(arrays)){
+      arrays[sh] = (arrays[sh]||[]).map(row => row.map(v=>{
+        if(v instanceof Date){ return v.toLocaleDateString('ar-SA'); }
+        return v==null? '': v;
+      }));
+    }
+
     IMPORT_CTX={workbook:wb,sheets:sheetNames,arrays:arrays,headers:{}};
     openImportDialog();
-  }catch(err){ console.error(err); alert('تعذّر قراءة الملف.'); }
+  }catch(err){
+    console.error(err);
+    alert('تعذّر قراءة الملف. يرجى التأكد أن الملف غير محمي بكلمة مرور وأنه محفوظ بصيغة معتمدة.');
+  }
 }
-function openImportDialog(){
-  const sheetSel=document.getElementById('sheetSelect'); sheetSel.innerHTML='';
-  IMPORT_CTX.sheets.forEach(sh=>sheetSel.add(new Option(sh,sh)));
-  sheetSel.onchange=refreshMappingUI;
-  ['mapName','mapCivil','mapSpec','mapLevel','mapJob','mapWork','mapSchool'].forEach(id=>document.getElementById(id).innerHTML='');
-  refreshMappingUI(); importDialog.style.display='flex';
-  document.getElementById('btnCancelImport').onclick=()=>{ importDialog.style.display='none'; };
-  document.getElementById('btnConfirmImport').onclick=confirmImport;
-}
+
+/* تخمين الحقول */
 function guess(header){
   const h=(header||'').toString().trim().toLowerCase();
   const norm=h.replace(/[^\u0600-\u06FFa-z0-9 ]/g,'');
@@ -639,21 +632,43 @@ function guess(header){
     civil:['civil','national','id','identity','السجل','السجل المدني','رقم الهوية','الهوية','هوية','رقم السجل'],
     spec:['التخصص','تخصص','subject','spec','specialty'],
     level:['المرتبة','رتبة','rank','grade','level','المستوى','مستوى'],
-    job:['رقم الوظيفة','وظيفة','job','employee id','كود'],
+    job:['رقم الوظيفة','وظيفة','job','employee id','كود','رقم وظيفي'],
     work:['العمل الحالي','العمل','work','job title','المسمى'],
     school:['المدرسة','school']
   };
   for(const k in tests){ if(tests[k].some(key=>norm.includes(key))) return k; }
   return null;
 }
+
+/* فتح واجهة التعيين والمعاينة */
+function openImportDialog(){
+  const sheetSel=document.getElementById('sheetSelect');
+  sheetSel.innerHTML='';
+  (IMPORT_CTX.sheets.length?IMPORT_CTX.sheets:['البيانات']).forEach(sh=>sheetSel.add(new Option(sh,sh)));
+  sheetSel.onchange=refreshMappingUI;
+
+  ['mapName','mapCivil','mapSpec','mapLevel','mapJob','mapWork','mapSchool'].forEach(id=>document.getElementById(id).innerHTML='');
+  refreshMappingUI();
+  importDialog.style.display='flex';
+  document.getElementById('btnCancelImport').onclick=()=>{ importDialog.style.display='none'; };
+  document.getElementById('btnConfirmImport').onclick=confirmImport;
+}
+
+/* تحديث خرائط الأعمدة + معاينة */
 function refreshMappingUI(){
   const sheetSel=document.getElementById('sheetSelect');
-  const sh=sheetSel.value || IMPORT_CTX.sheets[0]; const A=IMPORT_CTX.arrays[sh]||[];
-  const heads=(A[0]||[]).map(x=>String(x||'').trim()); const rows=A.slice(1,1+10);
-  const fillSel=id=>{ const el=document.getElementById(id); el.innerHTML='<option value="">— اختر عمودًا —</option>'; heads.forEach((h,i)=>el.add(new Option(h||`عمود ${i+1}`, i))); return el; };
-  const sName=fillSel('mapName'), sCivil=fillSel('mapCivil'), sSpec=fillSel('mapSpec'),
-        sLevel=fillSel('mapLevel'), sJob=fillSel('mapJob'), sWork=fillSel('mapWork'), sSchool=fillSel('mapSchool');
-  const idxByRole={}; heads.forEach((h,i)=>{ const r=guess(h); if(r && idxByRole[r]==null) idxByRole[r]=i; });
+  const sh=sheetSel.value || IMPORT_CTX.sheets[0] || 'البيانات';
+  const A=(IMPORT_CTX.arrays[sh]||[]).slice(); if(!A.length){ return; }
+
+  // تحديد صف العنوان تلقائيًا
+  const headerRowIdx = pickHeaderRow(A);
+  const HEADS = (A[headerRowIdx]||[]).map(x=>String(x||'').trim());
+  const ROWS  = A.slice(headerRowIdx+1, headerRowIdx+1+20);
+
+  const fillSel=id=>{ const el=document.getElementById(id); el.innerHTML='<option value="">— اختر عمودًا —</option>'; HEADS.forEach((h,i)=>el.add(new Option(h||`عمود ${i+1}`, i))); return el; };
+  const sName=fillSel('mapName'), sCivil=fillSel('mapCivil'), sSpec=fillSel('mapSpec'), sLevel=fillSel('mapLevel'), sJob=fillSel('mapJob'), sWork=fillSel('mapWork'), sSchool=fillSel('mapSchool');
+
+  const idxByRole={}; HEADS.forEach((h,i)=>{ const r=guess(h); if(r && idxByRole[r]==null) idxByRole[r]=i; });
   if(idxByRole.name!=null) sName.value=idxByRole.name;
   if(idxByRole.civil!=null) sCivil.value=idxByRole.civil;
   if(idxByRole.spec!=null) sSpec.value=idxByRole.spec;
@@ -662,33 +677,44 @@ function refreshMappingUI(){
   if(idxByRole.work!=null) sWork.value=idxByRole.work;
   if(idxByRole.school!=null) sSchool.value=idxByRole.school;
 
+  // معاينة
   const table=document.getElementById('previewTable');
   table.innerHTML='';
   const thead=document.createElement('thead'); const hr=document.createElement('tr');
-  heads.forEach(h=>{const th=document.createElement('th'); th.textContent=h||''; hr.appendChild(th);});
+  HEADS.forEach(h=>{const th=document.createElement('th'); th.textContent=h||''; hr.appendChild(th);});
   thead.appendChild(hr); table.appendChild(thead);
   const tbody=document.createElement('tbody');
-  rows.forEach(r=>{
+  ROWS.forEach(r=>{
     const tr=document.createElement('tr');
-    heads.forEach((_,i)=>{const td=document.createElement('td'); td.textContent=(r[i]!=null?r[i]:''); tr.appendChild(td);});
+    HEADS.forEach((_,i)=>{const td=document.createElement('td'); td.textContent=(r[i]!=null?r[i]:''); tr.appendChild(td);});
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
+
+  // حفظ للسياق
+  IMPORT_CTX.headers={sheet:sh, headerRowIdx, heads:HEADS};
 }
+
+/* اعتماد الاستيراد */
 function confirmImport(){
-  const sheetSel=document.getElementById('sheetSelect');
-  const sh=sheetSel.value || IMPORT_CTX.sheets[0]; const A=IMPORT_CTX.arrays[sh]||[]; if(A.length<2){ alert('لا توجد بيانات.'); return; }
+  const {sheet, headerRowIdx, heads}=IMPORT_CTX.headers||{};
+  const A=IMPORT_CTX.arrays[sheet]||[];
+  if(!A.length){ alert('لا توجد بيانات في الورقة المحددة.'); return; }
+
   const getIdx = id => { const v=document.getElementById(id).value; return v? parseInt(v,10): -1; };
-  const ixName=getIdx('mapName'), ixCivil=getIdx('mapCivil'), ixSpec=getIdx('mapSpec'),
-        ixLevel=getIdx('mapLevel'), ixJob=getIdx('mapJob'), ixWork=getIdx('mapWork'), ixSchool=getIdx('mapSchool');
+  const ixName=getIdx('mapName'), ixCivil=getIdx('mapCivil'), ixSpec=getIdx('mapSpec'), ixLevel=getIdx('mapLevel'), ixJob=getIdx('mapJob'), ixWork=getIdx('mapWork'), ixSchool=getIdx('mapSchool');
+
+  const start = (headerRowIdx!=null? headerRowIdx+1 : 1);
   const out=[];
-  for(let r=1;r<A.length;r++){
-    const row=A[r]||[]; const pick=i=> (i>=0 && i<row.length)? String(row[i]??'').trim() : '';
+  for(let r=start;r<A.length;r++){
+    const row=A[r]||[]; if(!row.some(c=>String(c||'').trim())) continue; // تخطّي الصفوف الفارغة
+    const pick=i=> (i>=0 && i<row.length)? String(row[i]??'').trim() : '';
     out.push({name:pick(ixName),civil:pick(ixCivil),spec:pick(ixSpec),level:pick(ixLevel),job:pick(ixJob),work:pick(ixWork),school:pick(ixSchool)});
   }
   TEACHERS=out.filter(t=> (t.name||t.civil||t.spec||t.level||t.job||t.work));
   localStorage.setItem('teachersCache', JSON.stringify(TEACHERS));
-  refillSelect(); importDialog.style.display='none';
+  refillSelect();
+  importDialog.style.display='none';
 }
 
 /* تبديل الوضع (غياب / تنبيه) */
@@ -703,14 +729,8 @@ const rowAbs   = document.getElementById('lineAbs');
 const rowEarly = document.getElementById('lineEarly');
 
 function setNotice(kind){
-  if(kind==='gaib'){
-    mainTitle.textContent = 'مساءلة غياب';
-    alertPack.style.display = 'none';
-    absencePack.style.display = 'block';
-  }else{
-    mainTitle.textContent = 'تنبيه';
-    alertPack.style.display = 'block';
-    absencePack.style.display = 'none';
+  if(kind==='gaib'){ mainTitle.textContent = 'مساءلة غياب'; alertPack.style.display = 'none'; absencePack.style.display = 'block'; }
+  else{ mainTitle.textContent = 'تنبيه'; alertPack.style.display = 'block'; absencePack.style.display = 'none';
     kindLbl.textContent = (kind==='late') ? 'تأخر' : (kind==='absent' ? 'عدم تواجد' : 'انصراف مبكر');
     rowLate.style.display  = (kind==='late')   ? 'flex' : 'none';
     rowAbs.style.display   = (kind==='absent') ? 'flex' : 'none';
@@ -732,7 +752,6 @@ document.getElementById('btnPrint')?.addEventListener('click',()=>{
   const hj=(document.getElementById('hdrHijri').textContent||'').replace(/\s+/g,' ').trim();
   const old=document.title; document.title=`${mainTitle.textContent} — ${name||'بدون اسم'} — ${hj}`; window.print(); setTimeout(()=>document.title=old,500);
 });
-
 async function exportPDFBlob(){
   document.body.classList.add('exporting');
   const sheet=document.getElementById('sheet');
@@ -766,7 +785,7 @@ document.getElementById('btnWA')?.addEventListener('click', async ()=>{
   window.open(`https://wa.me/${DEFAULT_WA}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* مؤقت الساعة والحسابات */
+/* مؤقّت وحسابات */
 let active=null; const pad=document.getElementById('timePad'),disp=document.getElementById('timePadDisplay');
 document.querySelectorAll('.timebox').forEach(el=>el.addEventListener('click',()=>openPad(el)));
 function openPad(el){active=el;disp.textContent=el.dataset.value||'--:--';pad.style.display='block';const r=el.getBoundingClientRect();pad.style.left=Math.min(window.innerWidth-220,r.left)+'px';pad.style.top=(r.bottom+8)+'px';}
@@ -780,7 +799,7 @@ document.querySelectorAll('#timePad .grid button').forEach(b=>b.addEventListener
   if(/[0-9]/.test(k)){v+=k; if(v.length<=4){disp.textContent=(v.padEnd(4,'-').slice(0,2))+':'+(v.padEnd(4,'-').slice(2,4));}}
 }));
 const t2m=t=>{ if(!/^\d{2}:\d{2}$/.test(t||'')) return null; const [h,m]=t.split(':').map(Number); return h*60+m; };
-const fmtDur=mins=>{ mins=Math.max(0,Math.round(mins||0)); const h=Math.floor(mins/60),m=mins%60; return h?(م?`${h} ساعة و ${m} دقيقة`:`${h} ساعة`):`${m} دقيقة`; };
+const fmtDur=mins=>{ mins=Math.max(0,Math.round(mins||0)); const h=Math.floor(mins/60),m=mins%60; return h?(m?`${h} ساعة و ${m} دقيقة`:`${h} ساعة`):`${m} دقيقة`; };
 function recalc(){
   const ws=document.getElementById('workStart')?.value||'06:45';
   const we=document.getElementById('workEnd')?.value||'13:45';
