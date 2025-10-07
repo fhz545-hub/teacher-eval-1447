@@ -149,6 +149,26 @@ body.exporting .seg{display:none !important}
   .content,.notice-center,.table-wrap,.below-flex,.sec,.abs-pack{width:var(--content) !important;margin:0 auto !important}
   .tbl td,.tbl th{border-color:#000 !important}
 }
+
+/* نافذة الاستيراد — تم جعلها طبقة Overlay */
+#importDialog{display:none;position:fixed;inset:0;z-index:400;align-items:center;justify-content:center;background:rgba(0,0,0,.35);padding:12px}
+#importCard{background:#fff;border-radius:14px;min-width:320px;max-width:900px;width:90%;padding:16px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+#previewTable th,#previewTable td{border:1px solid #e5efef;padding:6px 8px;text-align:center}
+#previewTable{border-collapse:collapse;width:100%}
+
+/* نافذة الإحصائيات */
+#statsDialog{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;align-items:center;justify-content:center;padding:12px}
+#statsCard{background:#fff;border-radius:14px;min-width:320px;max-width:1100px;width:96%;padding:14px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+#statsCard h3{margin:0 0 8px;color:#0b5e63}
+.stats-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:6px 0 10px}
+.stats-actions button{border:0;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer}
+.stats-actions .primary{background:var(--moe);color:#fff}
+.stats-actions .ghost{background:#eef7f7;color:#0b5e63;border:1px solid #d7ecec}
+.stats-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.stats-table{width:100%;border-collapse:collapse}
+.stats-table th{background:#0b5e63;color:#fff;border:1px solid #2e4a4a;padding:6px 7px}
+.stats-table td{border:1px solid #3f5b57;padding:5px 7px;background:#fff;text-align:center}
+@media (min-width:900px){ .stats-grid{grid-template-columns: 1fr 1fr;}}
 </style>
 </head>
 <body>
@@ -158,10 +178,10 @@ body.exporting .seg{display:none !important}
   <div class="toolbar-row">
     <button id="btnMakePDF" class="secondary">📄 إنشاء PDF</button>
     <button id="btnWA" class="secondary">📲 واتساب</button>
-    <button id="btnResetCases" class="secondary">↺ تصفير المساءلات</button>
+    <button id="btnOpenStats" class="secondary" title="إحصائيات وأرشيف">📊 إحصائيات</button>
     <button id="btnClearImport" class="secondary" title="مسح الأسماء/البيانات">🧹 تصفير الاستيراد</button>
 
-    <div class="drop" id="dropZone">
+    <div class="drop" id="dropZone" style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px dashed #d7ecec;border-radius:10px;cursor:pointer">
       <button id="btnImport" class="secondary">⬆️ استيراد ملفات</button>
       <input id="fileInput" type="file" accept=".xlsx,.xls,.xlsm,.xlsb,.xltx,.xltm,.ods,.csv,.tsv,.txt,.json">
       <span class="hint">أفلت الملف هنا أو اضغط للاستيراد</span>
@@ -403,8 +423,8 @@ body.exporting .seg{display:none !important}
 </div>
 
 <!-- حوار الاستيراد -->
-<div id="importDialog" role="dialog" aria-modal="true" style="display:none">
-  <div id="importCard" style="background:#fff;border-radius:14px;min-width:320px;max-width:900px;width:90%;padding:16px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+<div id="importDialog" role="dialog" aria-modal="true">
+  <div id="importCard">
     <h3 style="margin-top:0;color:#0b5e63">استيراد بيانات المعلمين</h3>
     <div class="map-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0">
       <label>ورقة العمل (Sheet)</label><select id="sheetSelect"></select>
@@ -418,11 +438,60 @@ body.exporting .seg{display:none !important}
       <label>عمود الجوال / واتساب</label><select id="mapPhone"></select>
     </div>
     <div class="preview" style="max-height:260px;overflow:auto;border:1px solid #e5efef;border-radius:10px;margin-top:8px">
-      <table id="previewTable" style="width:100%;border-collapse:collapse"></table>
+      <table id="previewTable"></table>
     </div>
     <div class="dlg-actions" style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
       <button class="btn-ghost" id="btnCancelImport" style="border:1px solid #d7ecec;background:#eef7f7;color:#0b5e63;border-radius:10px;padding:9px 12px;font-weight:800">إلغاء</button>
       <button class="btn-primary" id="btnConfirmImport" style="background:#0b7e88;color:#fff;border:0;border-radius:10px;padding:9px 12px;font-weight:800">اعتماد الاستيراد</button>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة الإحصائيات -->
+<div id="statsDialog" role="dialog" aria-modal="true">
+  <div id="statsCard">
+    <h3>إحصائيات وإرشيف المساءلات والتنبيهات</h3>
+    <div class="stats-actions">
+      <button id="btnExportArchive" class="ghost">💾 نسخ احتياطي</button>
+      <label class="ghost" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+        ⤴️ استعادة
+        <input id="restoreInput" type="file" accept=".json" style="display:none">
+      </label>
+      <button id="btnResetAll" class="ghost">↺ تصفير المساءلات</button>
+      <span class="hint">يمكن تصفية الأرشيف باسم المعلم:</span>
+      <input id="statsFilter" class="search" placeholder="اكتب اسم معلم…">
+      <button id="btnCloseStats" class="primary">إغلاق</button>
+    </div>
+
+    <div class="stats-grid">
+      <div>
+        <h3 style="margin-top:0">الأرشيف (تفصيلي)</h3>
+        <table class="stats-table" id="tblArchive">
+          <thead><tr>
+            <th>التاريخ (هجري)</th>
+            <th>اسم المعلم</th>
+            <th>السجل المدني</th>
+            <th>نوع الإجراء</th>
+            <th>رقم الإجراء</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <h3 style="margin-top:0">ملخص حسب المعلم</h3>
+        <table class="stats-table" id="tblSummary">
+          <thead><tr>
+            <th>المعلم</th>
+            <th>السجل المدني</th>
+            <th>مساءلة غياب</th>
+            <th>تنبيه تأخر</th>
+            <th>تنبيه عدم تواجد</th>
+            <th>تنبيه انصراف مبكر</th>
+            <th>الإجمالي</th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -524,10 +593,51 @@ function hijriToGregorian(y,m,d){
 let TEACHERS=JSON.parse(localStorage.getItem('teachersCache')||'[]');
 let currentIdx = null;
 function pad2(n){return String(n).padStart(2,'0');}
-function refreshCaseNo(name){ const key='cases_'+(name||''); const total=parseInt(localStorage.getItem(key)||'0',10);
-  document.getElementById('serialNo').textContent = pad2(total+1);
-  document.getElementById('caseTotal').textContent = total;
+
+/* ===== أرشيف الإجراءات (دائم + نسخ احتياطي) ===== */
+const ARCHIVE_KEY='caseArchive_v1';
+let ARCHIVE = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
+
+function teacherKeyFromObj(obj){
+  const civil=(obj.civil||'').trim();
+  const name=(obj.name||'').trim();
+  return civil? ('id:'+civil) : ('name:'+name);
 }
+function getCurrentTeacher(){ if(currentIdx==null) return null; return TEACHERS[currentIdx] || null; }
+function computeCountsFor(key){
+  let total=0, byType={gaib:0, late:0, absent:0, early:0};
+  for(const e of ARCHIVE){ if(e.tkey===key){ total++; if(byType[e.kind]!=null) byType[e.kind]++; } }
+  return {total, byType};
+}
+function nextSerialFor(key){ return computeCountsFor(key).total + 1; }
+function refreshHeaderCounts(){
+  const t=getCurrentTeacher(); 
+  if(!t){ document.getElementById('serialNo').textContent='01'; document.getElementById('caseTotal').textContent='0'; return; }
+  const key=teacherKeyFromObj(t);
+  document.getElementById('serialNo').textContent = pad2(nextSerialFor(key));
+  document.getElementById('caseTotal').textContent = computeCountsFor(key).total;
+}
+function saveArchive(){ localStorage.setItem(ARCHIVE_KEY, JSON.stringify(ARCHIVE)); refreshHeaderCounts(); }
+
+/* تسجيل إجراء جديد في الأرشيف */
+function recordCase(kind, source){
+  const t=getCurrentTeacher();
+  if(!t){ alert('يرجى اختيار معلّم أولاً.'); return; }
+  const key=teacherKeyFromObj(t);
+  const serial = nextSerialFor(key);
+  const hj=document.getElementById('hdrHijri').textContent.replace('هـ','').trim();
+  const day=document.getElementById('dynDay').textContent.trim();
+  ARCHIVE.push({
+    ts: Date.now(), hj, day, kind, serial, source: source || 'manual',
+    tkey: key, name: (t.name||'').trim(), civil: (t.civil||'').trim()
+  });
+  saveArchive();
+}
+
+/* ربط الرقم والإجمالي بالمعلم الحالي */
+function refreshCaseNo(){ refreshHeaderCounts(); }
+
+/* تطبيق المعلم المختار */
 function applyTeacher(t, idx){
   currentIdx = idx;
   document.getElementById('schoolNameHdr').textContent = t.school || 'مدرسة اليعقوبي الثانوية';
@@ -537,7 +647,7 @@ function applyTeacher(t, idx){
   document.getElementById('afadaName').textContent = t.name || '—';
   document.getElementById('abs-name-top').textContent = t.name || '—';
   document.getElementById('abs-teacher-name').textContent = t.name || '—';
-  refreshCaseNo(t.name||'');
+  refreshCaseNo();
 }
 function refillSelect(){
   const sel=document.getElementById('teacherSelect');
@@ -567,6 +677,7 @@ document.getElementById('teacherSearch').addEventListener('input',e=>{
     else if(id==='t_work'){ TEACHERS[currentIdx].work=v; }
     else if(id==='t_civil'){ TEACHERS[currentIdx].civil=v; }
     localStorage.setItem('teachersCache', JSON.stringify(TEACHERS));
+    refreshCaseNo();
   });
 });
 
@@ -581,6 +692,7 @@ document.getElementById('btnClearImport').addEventListener('click', ()=>{
   document.getElementById('abs-name-top').textContent='—';
   document.getElementById('abs-teacher-name').textContent='—';
   currentIdx=null;
+  refreshCaseNo();
 });
 
 /* ===== الاستيراد (يدعم كل الصيغ الشائعة) ===== */
@@ -588,10 +700,13 @@ const fileInput=document.getElementById('fileInput');
 const drop=document.getElementById('dropZone');
 const importDialog=document.getElementById('importDialog');
 document.getElementById('btnImport').addEventListener('click',()=>fileInput.click());
-['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
-['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
-drop.addEventListener('drop',e=>{e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) beginImport(f);});
-fileInput.addEventListener('change',e=>{if(e.target.files[0]) beginImport(e.target.files[0]);});
+drop.addEventListener('click', (e)=>{ // النقر على المنطقة كلها
+  if(e.target.id!=='btnImport') fileInput.click();
+});
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.background='#f7ffff';}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.background='transparent';}));
+drop.addEventListener('drop',e=>{e.preventDefault(); const f=e.dataTransfer.files?.[0]; if(f) beginImport(f);});
+fileInput.addEventListener('change',e=>{if(e.target.files && e.target.files[0]) beginImport(e.target.files[0]);});
 
 let IMPORT_CTX = {workbook:null, sheets:[], arrays:{}, headers:{}};
 
@@ -742,36 +857,42 @@ function normalizePhone(raw){
   return s;
 }
 function confirmImport(){
-  const ctx=IMPORT_CTX.headers||{};
-  const A=IMPORT_CTX.arrays[ctx.sheet]||[];
-  if(!A.length){ alert('لا توجد بيانات في الورقة المحددة.'); return; }
+  try{
+    const ctx=IMPORT_CTX.headers||{};
+    const A=IMPORT_CTX.arrays[ctx.sheet]||[];
+    if(!A.length){ alert('لا توجد بيانات في الورقة المحددة.'); return; }
 
-  const getIdx = id => { const v=document.getElementById(id).value; return v? parseInt(v,10): -1; };
-  const ixName=getIdx('mapName'), ixCivil=getIdx('mapCivil'), ixSpec=getIdx('mapSpec'),
-        ixLevel=getIdx('mapLevel'), ixJob=getIdx('mapJob'), ixWork=getIdx('mapWork'),
-        ixSchool=getIdx('mapSchool'), ixPhone=getIdx('mapPhone');
+    const getIdx = id => { const v=document.getElementById(id).value; return v? parseInt(v,10): -1; };
+    const ixName=getIdx('mapName'), ixCivil=getIdx('mapCivil'), ixSpec=getIdx('mapSpec'),
+          ixLevel=getIdx('mapLevel'), ixJob=getIdx('mapJob'), ixWork=getIdx('mapWork'),
+          ixSchool=getIdx('mapSchool'), ixPhone=getIdx('mapPhone');
 
-  const start = (ctx.headerRowIdx!=null? ctx.headerRowIdx+1 : 1);
-  const out=[];
-  for(let r=start;r<A.length;r++){
-    const row=A[r]||[]; if(!row.some(c=>String(c||'').trim())) continue;
-    const pick=i=> (i>=0 && i<row.length)? String(row[i]??'').trim() : '';
-    out.push({
-      name:pick(ixName),
-      civil:pick(ixCivil),
-      spec:pick(ixSpec),
-      level:pick(ixLevel),
-      job:pick(ixJob),
-      work:pick(ixWork),
-      school:pick(ixSchool),
-      phone:normalizePhone(pick(ixPhone))
-    });
+    const start = (ctx.headerRowIdx!=null? ctx.headerRowIdx+1 : 1);
+    const out=[];
+    for(let r=start;r<A.length;r++){
+      const row=A[r]||[]; if(!row.some(c=>String(c||'').trim())) continue;
+      const pick=i=> (i>=0 && i<row.length)? String(row[i]??'').trim() : '';
+      out.push({
+        name:pick(ixName),
+        civil:pick(ixCivil),
+        spec:pick(ixSpec),
+        level:pick(ixLevel),
+        job:pick(ixJob),
+        work:pick(ixWork),
+        school:pick(ixSchool),
+        phone:normalizePhone(pick(ixPhone))
+      });
+    }
+    TEACHERS=out.filter(t=> (t.name||t.civil||t.spec||t.level||t.job||t.work||t.phone));
+    localStorage.setItem('teachersCache', JSON.stringify(TEACHERS));
+    refillSelect();
+    importDialog.style.display='none';
+    if(TEACHERS.length){ document.getElementById('teacherSelect').value='0'; applyTeacher(TEACHERS[0],0); }
+    else alert('تم الاستيراد، ولكن لم يتم العثور على صفوف بيانات صالحة بعد التحقق من الخرائط.');
+  }catch(err){
+    console.error(err);
+    alert('حدث خطأ أثناء اعتماد الاستيراد: ' + (err.message||err));
   }
-  TEACHERS=out.filter(t=> (t.name||t.civil||t.spec||t.level||t.job||t.work||t.phone));
-  localStorage.setItem('teachersCache', JSON.stringify(TEACHERS));
-  refillSelect();
-  importDialog.style.display='none';
-  if(TEACHERS.length){ document.getElementById('teacherSelect').value='0'; applyTeacher(TEACHERS[0],0); }
 }
 
 /* ===== تبديل نوع الإجراء ===== */
@@ -800,7 +921,7 @@ function setNotice(kind){
     rowEarly.style.display = (kind==='early')  ? 'flex' : 'none';
   }
 }
-radios.forEach(r => r.addEventListener('change', e => setNotice(e.target.value)));
+radios.forEach(r => r.addEventListener('change', e => { setNotice(e.target.value); refreshCaseNo(); }));
 setNotice(segEl.querySelector('input[name="nt"]:checked')?.value || 'late');
 
 /* ===== PDF بجودة عالية ===== */
@@ -820,6 +941,8 @@ async function exportPDFBlob(){
   return pdf.output('blob');
 }
 document.getElementById('btnMakePDF').addEventListener('click', async ()=>{
+  const kind=document.querySelector('input[name="nt"]:checked')?.value || 'late';
+  recordCase(kind,'PDF');
   const blob=await exportPDFBlob();
   const name=(document.getElementById('t_name').textContent||'بدون اسم').trim();
   const hj=(document.getElementById('hdrHijri').textContent||'التاريخ الهجري').trim();
@@ -961,24 +1084,83 @@ function getCurrentTeacherPhone(){
 }
 document.getElementById('btnWA').addEventListener('click', ()=>{
   if(currentIdx==null){ alert('يرجى اختيار معلّم أولاً من القائمة.'); return; }
+  const kind=document.querySelector('input[name="nt"]:checked')?.value || 'late';
+  recordCase(kind,'WA');
+
   let phone = getCurrentTeacherPhone();
   if(!phone){
     alert('لا يوجد رقم جوال للمعلّم في الملف؛ سيُستخدم الرقم الافتراضي مؤقتًا.');
     phone = DEFAULT_WA;
   }
   const msg=buildWhatsAppMessage();
-  // فتح واتساب بالرسالة المكتملة
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* تصفير عدّادات المساءلات */
-document.getElementById('btnResetCases').addEventListener('click',()=>{
-  if(!confirm('تأكيد تصفير جميع عدّادات المساءلات؟')) return;
-  const keys=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i); if(k && k.startsWith('cases_')) keys.push(k);}
-  keys.forEach(k=>localStorage.removeItem(k));
-  document.getElementById('caseTotal').textContent='0';
-  document.getElementById('serialNo').textContent='01';
+/* ===== إحصائيات وأرشيف ===== */
+const dlgStats=document.getElementById('statsDialog');
+const btnOpenStats=document.getElementById('btnOpenStats');
+const btnCloseStats=document.getElementById('btnCloseStats');
+const statsFilter=document.getElementById('statsFilter');
+const tblArchiveBody=document.querySelector('#tblArchive tbody');
+const tblSummaryBody=document.querySelector('#tblSummary tbody');
+
+btnOpenStats.addEventListener('click',()=>{ renderStatsTables(); dlgStats.style.display='flex'; });
+btnCloseStats.addEventListener('click',()=>{ dlgStats.style.display='none'; });
+
+document.getElementById('btnExportArchive').addEventListener('click', ()=>{
+  const blob=new Blob([JSON.stringify(ARCHIVE,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ارشيف_مساءلات_المعلمين.json'; a.click(); URL.revokeObjectURL(a.href);
 });
+document.getElementById('restoreInput').parentElement.addEventListener('click', ()=> document.getElementById('restoreInput').click());
+document.getElementById('restoreInput').addEventListener('change', e=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const data=JSON.parse(r.result);
+      if(Array.isArray(data)){ ARCHIVE=data; saveArchive(); renderStatsTables(); alert('تمت الاستعادة بنجاح.'); }
+      else alert('الملف غير صالح.');
+    }catch{ alert('تعذر قراءة الملف.'); }
+  };
+  r.readAsText(f);
+});
+document.getElementById('btnResetAll').addEventListener('click', ()=>{
+  if(!confirm('سيتم حذف كل الأرشيف وجميع العدادات. هل أنت متأكد؟')) return;
+  ARCHIVE=[]; saveArchive(); renderStatsTables(); alert('تم التصفير.');
+});
+statsFilter.addEventListener('input', renderStatsTables);
+
+function renderStatsTables(){
+  const q=(statsFilter.value||'').trim();
+  const filtered = ARCHIVE.slice().sort((a,b)=>b.ts-a.ts).filter(e=> !q || (e.name||'').includes(q));
+
+  // أرشيف تفصيلي
+  tblArchiveBody.innerHTML='';
+  filtered.forEach(e=>{
+    const tr=document.createElement('tr');
+    const typeText = e.kind==='gaib'?'مساءلة غياب': e.kind==='late'?'تنبيه تأخر': e.kind==='absent'?'تنبيه عدم تواجد':'تنبيه انصراف مبكر';
+    tr.innerHTML = `<td>${e.hj}</td><td>${e.name||''}</td><td>${e.civil||''}</td><td>${typeText}</td><td>${pad2(e.serial)}</td>`;
+    tblArchiveBody.appendChild(tr);
+  });
+
+  // ملخص حسب المعلم
+  const map=new Map();
+  for(const e of ARCHIVE){
+    const k=e.tkey; if(!map.has(k)) map.set(k,{name:e.name||'',civil:e.civil||'',gaib:0,late:0,absent:0,early:0,total:0});
+    const row=map.get(k); row[e.kind]=(row[e.kind]||0)+1; row.total++;
+  }
+  const rows=[...map.values()].sort((a,b)=> b.total-a.total);
+  tblSummaryBody.innerHTML='';
+  for(const r of rows){
+    const tr=document.createElement('tr');
+    tr.innerHTML = `<td>${r.name}</td><td>${r.civil}</td><td>${r.gaib||0}</td><td>${r.late||0}</td><td>${r.absent||0}</td><td>${r.early||0}</td><td><strong>${r.total||0}</strong></td>`;
+    tblSummaryBody.appendChild(tr);
+  }
+  refreshHeaderCounts();
+}
+
+/* ===== عند البدء ===== */
+refreshHeaderCounts();
 </script>
 </body>
 </html>
