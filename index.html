@@ -130,6 +130,15 @@ html,body{
 .abs-pack .choices label{display:block;margin:6px 0}
 .abs-pack .note{color:#374151;font-size:11.2px;line-height:1.85;margin-top:6mm}
 
+/* لفت النظر — قائمة السبب بدون إطار */
+.reason-wrap{display:inline-block;border-bottom:1px dotted #9fb7b3;padding:0 2mm}
+.reason-wrap select{
+  border:none;outline:none;background:transparent;appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  font:inherit;color:inherit;padding:0;margin:0;cursor:pointer
+}
+.reason-wrap select:focus{outline:none}
+#noteReasonText{font-weight:900}
+
 /* ملاحظة (لا تُطبع) */
 .rights{width:var(--content);margin:2mm auto 8mm;text-align:center;font-size:9.2px;color:#6b7280;font-weight:700}
 @media print{ .rights{display:none !important} }
@@ -234,6 +243,7 @@ body.exporting .seg{display:none !important}
         <div class="notice-center">
           <div class="title" id="mainTitle">تنبيه</div>
           <div class="seg" id="noticeSeg">
+            <input type="radio" name="nt" id="nt-note"  value="note"><label for="nt-note">لفت نظر</label>
             <input type="radio" name="nt" id="nt-gaib"  value="gaib"><label for="nt-gaib">غياب</label>
             <input type="radio" name="nt" id="nt-late"  value="late" checked><label for="nt-late">تأخر</label>
             <input type="radio" name="nt" id="nt-abs"   value="absent"><label for="nt-abs">عدم تواجد</label>
@@ -326,7 +336,7 @@ body.exporting .seg{display:none !important}
 
             <p style="margin-top:8px">
               <strong>مدير المدرسة :</strong>
-              <span class="dotfield" style="min-width:45mm">فهد حامد علي الزهراني</span>
+              <span id="managerName1" class="dotfield" style="min-width:45mm">فهد حامد علي الزهراني</span>
               &nbsp;&nbsp; <strong>التوقيع :</strong> <span class="dotfield" style="min-width:30mm"></span>
               &nbsp;&nbsp; <strong>التاريخ :</strong> <span class="dotfield" style="min-width:22mm"></span> هـ
             </p>
@@ -334,7 +344,7 @@ body.exporting .seg{display:none !important}
 
           <div class="sec">
             <h3>( 2 ) الإفادة</h3>
-            <p><strong>مدير المدرسة :</strong> فهد حامد علي الزهراني</p>
+            <p><strong>مدير المدرسة :</strong> <span id="managerName2">فهد حامد علي الزهراني</span></p>
             <p><strong>المكرم / مدير مدرسة.</strong></p>
             <p>السلام عليكم ورحمة الله وبركاته وبعد :</p>
             <div style="min-height:38mm;border:1px dashed #9fb7b3;border-radius:10px;padding:8px 10px;background:#fafefe">
@@ -351,7 +361,7 @@ body.exporting .seg{display:none !important}
             <h3>( 3 ) رأي مدير المدرسة</h3>
             <p><label><input type="radio" name="opinion"> عذره مقبول</label>
                &nbsp;&nbsp;<label><input type="radio" name="opinion"> عذره غير مقبول ويُحسم عليه</label></p>
-            <p><strong>مدير المدرسة :</strong> فهد حامد علي الزهراني</p>
+            <p><strong>مدير المدرسة :</strong> <span id="managerName3">فهد حامد علي الزهراني</span></p>
             <p><span>التوقيع :</span> ____________________ &nbsp;&nbsp; <span>التاريخ :</span> ____________________ هـ</p>
           </div>
         </div>
@@ -372,7 +382,7 @@ body.exporting .seg{display:none !important}
               وعليكم تقديم ما يؤيد عذركم خلال أسبوع فقط من تاريخه، علماً بأنه في حالة عدم الإلتزام سيتم اتخاذ اللازم حسب التعليمات.
             </p>
             <p class="para">
-              <strong>اسم الرئيس المباشر :</strong> فهد بن حامد علي الزهراني
+              <strong>اسم الرئيس المباشر :</strong> <span id="managerName4">فهد بن حامد علي الزهراني</span>
               &nbsp;&nbsp;&nbsp; <strong>التوقيع :</strong> ____________________
               &nbsp;&nbsp;&nbsp; <strong>التاريخ :</strong> ______ / ______ / ______ هـ
             </p>
@@ -400,7 +410,7 @@ body.exporting .seg{display:none !important}
               <label><input type="checkbox"> يعتمد الحسم لعدم قبول عذره.</label>
             </div>
             <p class="para">
-              <strong>اسم الرئيس المباشر :</strong> فهد بن حامد علي الزهراني
+              <strong>اسم الرئيس المباشر :</strong> <span id="managerName5">فهد بن حامد علي الزهراني</span>
               &nbsp;&nbsp;&nbsp; <strong>التوقيع :</strong> ____________________
               &nbsp;&nbsp;&nbsp; <strong>التاريخ :</strong> ______ / ______ / ______ هـ
             </p>
@@ -412,6 +422,62 @@ body.exporting .seg{display:none !important}
             2- إذا سبق العطل الرسمية غياب ولحقها غياب تُحتسب مدة الغياب كاملة بما فيها العطل الرسمية.<br>
             3- يجب أن يوضح المتغيب أسباب غيابه فور تسلمه الاستمارة ويعيدها لرئيسه.<br>
             4- يُعطى المتغيب مدة أسبوع لتقديم ما يؤيد عذره فإذا انقضت المدة الزمنية تُستكمل الاستمارة ويتم الحسم.
+          </div>
+        </div>
+
+        <!-- (ج) نموذج لفت النظر -->
+        <div id="notePack" class="sec" style="display:none">
+          <h3>نموذج لفت النظر</h3>
+
+          <p style="margin:0 0 4px">
+            سعادة المكرم المعلّم /
+            <span id="noteTeacherName" contenteditable="true" style="font-weight:900"></span>
+            حفظه الله
+          </p>
+          <p style="margin:0 0 6px"><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
+
+          <p id="noteParagraph" style="margin:0 0 8px">
+            لوحظ عدم التزامكم بأداء
+            <span id="noteReasonText">المهمة المحددة</span>
+            وفق التعليمات المنظمة، ونأمل منكم الحرص على الالتزام بها مستقبلًا تعزيزًا للانضباط المهني وجودة الأداء.
+          </p>
+
+          <!-- القائمة المنسدلة (بدون إطار، أسفلها خط منقط) -->
+          <div class="reason-wrap" title="اختر سبب لفت النظر">
+            <select id="noteReasonSelect">
+              <option value="">— اختر السبب —</option>
+              <option>عدم المشاركة في الإشراف الصباحي المكلّف به وفق جدول المناوبة المعتمد، مما أثّر على انتظام سير الطابور الصباحي وانضباط الطلاب.</option>
+              <option>عدم أداء مهام المناوبة في نهاية الدوام المدرسي، وما يترتب عليه من ضعف في تنظيم خروج الطلاب وضمان سلامتهم.</option>
+              <option>التقصير في الإشراف أثناء فترة الفسحة، مما نتج عنه غياب المتابعة السلوكية اللازمة للطلاب داخل الساحة المدرسية.</option>
+              <option>عدم الإشراف على أداء صلاة الظهر في المصلى المدرسي رغم إدراجه ضمن المهام الموكلة.</option>
+              <option>عدم الالتزام بإعداد الدروس أو التحضير الإلكتروني في منصة مدرستي وفق المتطلبات التربوية المعتمدة.</option>
+              <option>الخروج من الحصة الدراسية قبل انتهاء وقتها المحدد دون مبرر نظامي، مما يؤثر على انضباط العملية التعليمية.</option>
+              <option>التأخر في دخول الحصة الدراسية عن الوقت المحدد في الجدول الزمني، مما يخل بانضباط الجدول اليومي للمدرسة.</option>
+              <option>عدم الحضور للطابور الصباحي دون عذر رسمي، وهو ما يعد تقصيرًا في أداء الواجبات اليومية المناطة بالمعلم.</option>
+              <option>عدم حضور مجلس أولياء الأمور بالرغم من توجيه الدعوة الرسمية، مما فوت فرصة التواصل الفعّال مع أولياء الأمور ودعم الشراكة المدرسية.</option>
+              <option>التغيب عن اجتماع المدرسة الرسمي دون عذر نظامي، وهو ما يعد مخالفة للأنظمة والتعليمات الإدارية.</option>
+              <option>عدم الرد على المساءلة الإدارية الموجهة له في الوقت المحدد، مما يدل على عدم تجاوب مع الإجراءات النظامية.</option>
+              <option>رفض التوقيع على النماذج أو المحاضر الرسمية الصادرة من إدارة المدرسة، وهو ما يخالف مقتضى التعاون الإداري والمهني.</option>
+              <option>رفض تنفيذ التوجيه الإداري أو التربوي الصادر من قائد المدرسة أو المشرف التربوي دون مبرر نظامي.</option>
+              <option>عدم رفع بيانات الغياب على منصة (فارس) في الوقت المحدد وفق التعليمات المنظمة.</option>
+            </select>
+          </div>
+
+          <p style="margin:10px 0 8px">
+            نأمل منكم تلافي ذلك مستقبلًا، والحرص على التقيد بالتعليمات والمهام الوظيفية المعتمدة، تعزيزًا لجودة الأداء وتحقيقًا لمصلحة العمل المدرسي،
+            متمنين لكم دوام التوفيق والسداد في أداء رسالتكم التعليمية. وتقبلوا خالص التحية والتقدير،، 
+          </p>
+
+          <!-- التوقيعات -->
+          <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+            <div style="flex:1">
+              <p style="margin:0 0 4px"><strong>توقيع الموظف بالاطلاع:</strong> ...............................</p>
+              <p style="margin:0 0 4px"><strong>الاسم:</strong> ...............................</p>
+              <p style="margin:0"><strong>التاريخ:</strong> ______ / ______ / 14هـ</p>
+            </div>
+            <div style="flex:1">
+              <p style="margin:0 0 4px"><strong>توقيع قائد المدرسة:</strong> <span id="managerNameNote">فهد حامد علي الزهراني</span></p>
+            </div>
           </div>
         </div>
 
@@ -487,6 +553,7 @@ body.exporting .seg{display:none !important}
             <th>تنبيه تأخر</th>
             <th>تنبيه عدم تواجد</th>
             <th>تنبيه انصراف مبكر</th>
+            <th>لفت نظر</th>
             <th>الإجمالي</th>
           </tr></thead>
           <tbody></tbody>
@@ -594,6 +661,18 @@ let TEACHERS=JSON.parse(localStorage.getItem('teachersCache')||'[]');
 let currentIdx = null;
 function pad2(n){return String(n).padStart(2,'0');}
 
+/* اسم المدير — يسمح بتعديل الآلية (cache) */
+const MANAGER_KEY='managerName';
+function getManagerName(){
+  return localStorage.getItem(MANAGER_KEY) || 'فهد حامد علي الزهراني';
+}
+function setManagerName(v){
+  if(!v) return; localStorage.setItem(MANAGER_KEY, v);
+  ['managerName1','managerName2','managerName3','managerName4','managerName5','managerNameNote'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent=v;
+  });
+}
+
 /* ===== أرشيف الإجراءات (دائم + نسخ احتياطي) ===== */
 const ARCHIVE_KEY='caseArchive_v1';
 let ARCHIVE = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
@@ -605,7 +684,7 @@ function teacherKeyFromObj(obj){
 }
 function getCurrentTeacher(){ if(currentIdx==null) return null; return TEACHERS[currentIdx] || null; }
 function computeCountsFor(key){
-  let total=0, byType={gaib:0, late:0, absent:0, early:0};
+  let total=0, byType={gaib:0, late:0, absent:0, early:0, note:0};
   for(const e of ARCHIVE){ if(e.tkey===key){ total++; if(byType[e.kind]!=null) byType[e.kind]++; } }
   return {total, byType};
 }
@@ -647,6 +726,8 @@ function applyTeacher(t, idx){
   document.getElementById('afadaName').textContent = t.name || '—';
   document.getElementById('abs-name-top').textContent = t.name || '—';
   document.getElementById('abs-teacher-name').textContent = t.name || '—';
+  /* لفت نظر — الاسم */
+  document.getElementById('noteTeacherName').textContent = t.name || '';
   refreshCaseNo();
 }
 function refillSelect(){
@@ -662,12 +743,15 @@ document.getElementById('teacherSearch').addEventListener('input',e=>{
   const q=e.target.value.trim(); const sel=document.getElementById('teacherSelect');
   for(const o of sel.options){ if(!o.value){o.hidden=false;continue;} o.hidden=q && !o.text.includes(q); }
 });
-['t_name','t_spec','t_level','t_job','t_work','t_civil'].forEach(id=>{
+['t_name','t_spec','t_level','t_job','t_work','t_civil','noteTeacherName'].forEach(id=>{
   const el=document.getElementById(id);
   el.addEventListener('blur',()=>{
     if(currentIdx==null || !TEACHERS[currentIdx]) return;
     const v=el.textContent.trim();
-    if(id==='t_name'){ TEACHERS[currentIdx].name=v;
+    if(id==='t_name' || id==='noteTeacherName'){ 
+      TEACHERS[currentIdx].name=v;
+      document.getElementById('t_name').textContent=v;
+      document.getElementById('noteTeacherName').textContent=v;
       document.getElementById('afadaName').textContent=v||'—';
       document.getElementById('abs-name-top').textContent=v||'—';
       document.getElementById('abs-teacher-name').textContent=v||'—';
@@ -681,11 +765,20 @@ document.getElementById('teacherSearch').addEventListener('input',e=>{
   });
 });
 
+/* تمكين تعديل اسم المدير يدوياً (نقرة مزدوجة) */
+['managerName1','managerName2','managerName3','managerName4','managerName5','managerNameNote'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(!el) return;
+  el.setAttribute('contenteditable','true');
+  el.addEventListener('blur', ()=> setManagerName(el.textContent.trim()||''));
+});
+setManagerName(getManagerName());
+
 /* تصفير الاستيراد */
 document.getElementById('btnClearImport').addEventListener('click', ()=>{
   if(!confirm('تأكيد تصفير بيانات الاستيراد والأسماء؟')) return;
   TEACHERS=[]; localStorage.removeItem('teachersCache'); refillSelect();
-  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name'].forEach(id=>{
+  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name','noteTeacherName'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.textContent='';
   });
   document.getElementById('afadaName').textContent='—';
@@ -695,14 +788,12 @@ document.getElementById('btnClearImport').addEventListener('click', ()=>{
   refreshCaseNo();
 });
 
-/* ===== الاستيراد (يدعم كل الصيغ الشائعة) ===== */
+/* ===== الاستيراد (كما هو) ===== */
 const fileInput=document.getElementById('fileInput');
 const drop=document.getElementById('dropZone');
 const importDialog=document.getElementById('importDialog');
 document.getElementById('btnImport').addEventListener('click',()=>fileInput.click());
-drop.addEventListener('click', (e)=>{ // النقر على المنطقة كلها
-  if(e.target.id!=='btnImport') fileInput.click();
-});
+drop.addEventListener('click', (e)=>{ if(e.target.id!=='btnImport') fileInput.click();});
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.background='#f7ffff';}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.background='transparent';}));
 drop.addEventListener('drop',e=>{e.preventDefault(); const f=e.dataTransfer.files?.[0]; if(f) beginImport(f);});
@@ -753,7 +844,7 @@ function guess(header){
   return null;
 }
 
-/* === beginImport: يدعم xlsx/xls/xlsm/xlsb/xltx/xltm/ods/csv/tsv/txt/json === */
+/* === beginImport (كما هو) === */
 async function beginImport(file){
   try{
     const lower=(file.name||'').toLowerCase();
@@ -764,14 +855,16 @@ async function beginImport(file){
       const sep = detectSeparator(text);
       const rows = text.split(/\r?\n/).map(line=> line.split(sep));
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'البيانات');
+      const wbNew = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wbNew, ws, 'البيانات');
+      wb = wbNew;
     } else if(/\.json$/.test(lower)){
       const text=await readTextAllEnc(file);
       const data = JSON.parse(text);
       const ws = XLSX.utils.json_to_sheet(Array.isArray(data)? data : []);
-      wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'البيانات');
+      const wbNew = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wbNew, ws, 'البيانات');
+      wb = wbNew;
     } else {
       const buf=await file.arrayBuffer();
       wb = XLSX.read(buf, {type:'array'});
@@ -902,29 +995,40 @@ const kindLbl = document.getElementById('kindTitle');
 const mainTitle = document.getElementById('mainTitle');
 const alertPack = document.getElementById('alertPack');
 const absencePack = document.getElementById('absencePack');
+const notePack = document.getElementById('notePack');
 const rowLate  = document.getElementById('lineLate');
 const rowAbs   = document.getElementById('lineAbs');
 const rowEarly = document.getElementById('lineEarly');
 
 function setNotice(kind){
+  // إظهار الصفحة المطلوبة دون إخفاء دائم لأي صفحة — التنقّل آمن
+  alertPack.style.display   = (kind==='late' || kind==='absent' || kind==='early') ? 'block':'none';
+  absencePack.style.display = (kind==='gaib') ? 'block':'none';
+  notePack.style.display    = (kind==='note') ? 'block':'none';
+
   if(kind==='gaib'){
     mainTitle.textContent = 'مساءلة غياب';
-    alertPack.style.display = 'none';
-    absencePack.style.display = 'block';
+  }else if(kind==='note'){
+    mainTitle.textContent = 'لفت نظر';
   }else{
     mainTitle.textContent = 'تنبيه';
-    alertPack.style.display = 'block';
-    absencePack.style.display = 'none';
-    kindLbl.textContent = (kind==='late') ? 'تأخر' : (kind==='absent' ? 'عدم تواجد' : 'انصراف مبكر');
-    rowLate.style.display  = (kind==='late')   ? 'flex' : 'none';
-    rowAbs.style.display   = (kind==='absent') ? 'flex' : 'none';
-    rowEarly.style.display = (kind==='early')  ? 'flex' : 'none';
   }
+
+  // عنوان النوع داخل خطاب التنبيه
+  if(kind==='late'){ kindLbl.textContent='تأخر'; }
+  else if(kind==='absent'){ kindLbl.textContent='عدم تواجد'; }
+  else if(kind==='early'){ kindLbl.textContent='انصراف مبكر'; }
+
+  rowLate.style.display  = (kind==='late')   ? 'flex' : 'none';
+  rowAbs.style.display   = (kind==='absent') ? 'flex' : 'none';
+  rowEarly.style.display = (kind==='early')  ? 'flex' : 'none';
+
+  refreshCaseNo();
 }
-radios.forEach(r => r.addEventListener('change', e => { setNotice(e.target.value); refreshCaseNo(); }));
+radios.forEach(r => r.addEventListener('change', e => setNotice(e.target.value)));
 setNotice(segEl.querySelector('input[name="nt"]:checked')?.value || 'late');
 
-/* ===== PDF بجودة عالية ===== */
+/* ===== PDF بجودة عالية (يحافظ على العربية/RTL) ===== */
 async function exportPDFBlob(){
   const root=document.documentElement;
   const prevScale = getComputedStyle(root).getPropertyValue('--scale');
@@ -943,14 +1047,14 @@ async function exportPDFBlob(){
 document.getElementById('btnMakePDF').addEventListener('click', async ()=>{
   const kind=document.querySelector('input[name="nt"]:checked')?.value || 'late';
   recordCase(kind,'PDF');
-  const blob=await exportPDFBlob();
-  const name=(document.getElementById('t_name').textContent||'بدون اسم').trim();
+  const name=(document.getElementById('t_name').textContent||document.getElementById('noteTeacherName').textContent||'بدون اسم').trim();
   const hj=(document.getElementById('hdrHijri').textContent||'التاريخ الهجري').trim();
-  const fileName=`${BASE_TITLE} — ${mainTitle.textContent} — ${name} — ${hj}.pdf`;
+  const fileName=`${BASE_TITLE} — ${document.getElementById('mainTitle').textContent} — ${name} — ${hj}.pdf`;
+  const blob=await exportPDFBlob();
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fileName; a.click(); URL.revokeObjectURL(url);
 });
 
-/* ===== مؤقّت وحسابات ===== */
+/* ===== مؤقّت وحسابات (كما هو) ===== */
 let active=null; const pad=document.getElementById('timePad'),disp=document.getElementById('timePadDisplay');
 document.querySelectorAll('.timebox').forEach(el=>el.addEventListener('click',()=>openPad(el)));
 function openPad(el){active=el;disp.textContent=el.dataset.value||'--:--';pad.style.display='block';const r=el.getBoundingClientRect();pad.style.left=Math.min(window.innerWidth-220,r.left)+'px';pad.style.top=(r.bottom+8)+'px';}
@@ -982,11 +1086,11 @@ function recalc(){
 }
 recalc();
 
-/* ===== رسالة واتساب التربوية (مُعزَّزة) ===== */
+/* ===== رسالة واتساب — دعم «لفت نظر» أيضاً ===== */
 function beautifyTime(t){ return en2ar((t||'--:--')); }
 function buildWhatsAppMessage(){
   const school = (document.getElementById('schoolNameHdr').textContent||'مدرسة اليعقوبي الثانوية').trim();
-  const name   = (document.getElementById('t_name').textContent||'—').trim();
+  const name   = (document.getElementById('t_name').textContent||document.getElementById('noteTeacherName').textContent||'—').trim();
   const kind   = document.querySelector('input[name="nt"]:checked')?.value || 'late';
   const hj     = (document.getElementById('hdrHijri').textContent||'—').replace(/\s+/g,' ').trim();
   const dayName= (document.getElementById('dynDay').textContent||'—').trim();
@@ -995,27 +1099,41 @@ function buildWhatsAppMessage(){
   const ws     = beautifyTime(document.getElementById('workStart')?.value||'--:--');
   const we     = beautifyTime(document.getElementById('workEnd')?.value||'--:--');
 
-  let title='', body='';
+  if(kind==='note'){
+    const reason = document.getElementById('noteReasonText').textContent.trim();
+    return `السلام عليكم ورحمة الله وبركاته
 
+الأستاذ/ ${name} حفظه الله،
+
+نفيدكم بصدور «لفت نظر» رقم (${en2ar(serial)}) في ${school} يوم ${dayName} الموافق ${hj}.
+النص: لوحظ عدم التزامكم بأداء ${reason} وفق التعليمات المنظمة.
+
+نأمل تلافي ذلك مستقبلًا والالتزام بالمهام الوظيفية. مع الشكر والتقدير.
+
+مدير المدرسة:
+${getManagerName()}
+
+إجمالي الإجراءات حتى تاريخه: ${en2ar(total)}.`;
+  }
+
+  let body='';
   if(kind==='gaib'){
-    title='مساءلة غياب';
     body =
 `السلام عليكم ورحمة الله وبركاته
 
 الأستاذ/ ${name} وفقه الله،
 
-نفيدكم بوجود ${title} برقم (${en2ar(serial)}) في ${school}.
+نفيدكم بوجود مساءلة غياب برقم (${en2ar(serial)}) في ${school}.
 وذلك يوم ${dayName} الموافق ${hj}؛ وقد تم تسجيل غيابكم عن العمل في ذلك اليوم.
 
-نأمل التكرّم بمراجعة مدير المدرسة وتقديم إفادتكم مرفقًا ما يؤيد العذر خلال المدة النظامية (٧ أيام)؛ شاكرين تعاونكم.
+نأمل التكرّم بمراجعة مدير المدرسة وتقديم إفادتكم خلال المدة النظامية (٧ أيام).
 
 مدير المدرسة:
-فهد حامد علي الزهراني
+${getManagerName()}
 
 إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
   }
   else if(kind==='late'){
-    title='تنبيه تأخر';
     const tIn = beautifyTime(document.getElementById('tLateIn').dataset.value||'--:--');
     const dur = (document.getElementById('lateTotal').textContent||'—');
     body =
@@ -1023,19 +1141,18 @@ function buildWhatsAppMessage(){
 
 الأستاذ/ ${name} وفقه الله،
 
-نفيدكم بوجود ${title} برقم (${en2ar(serial)}) في ${school}.
+نفيدكم بوجود تنبيه تأخر برقم (${en2ar(serial)}) في ${school}.
 يوم ${dayName} الموافق ${hj}.
 بداية الدوام: (${ws}) — وقت حضوركم: (${tIn}) — إجمالي التأخر: ${dur}.
 
-نأمل التكرّم بمراجعة مدير المدرسة وتقديم إفادتكم مرفقًا ما يؤيد العذر خلال المدة النظامية (٧ أيام).
+نأمل مراجعة الإدارة وتقديم الإفادة خلال (٧ أيام).
 
 مدير المدرسة:
-فهد حامد علي الزهراني
+${getManagerName()}
 
 إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
   }
   else if(kind==='absent'){
-    title='تنبيه عدم تواجد';
     const from = beautifyTime(document.getElementById('tAbsFrom').dataset.value||'--:--');
     const to   = beautifyTime(document.getElementById('tAbsTo').dataset.value||'--:--');
     const dur  = (document.getElementById('absTotal').textContent||'—');
@@ -1044,19 +1161,18 @@ function buildWhatsAppMessage(){
 
 الأستاذ/ ${name} وفقه الله،
 
-نفيدكم بوجود ${title} برقم (${en2ar(serial)}) في ${school}.
+نفيدكم بوجود تنبيه عدم تواجد برقم (${en2ar(serial)}) في ${school}.
 يوم ${dayName} الموافق ${hj}.
 مدة عدم التواجد من (${from}) إلى (${to}) — الإجمالي: ${dur}.
 
-نأمل التكرّم بمراجعة مدير المدرسة وتقديم إفادتكم مرفقًا ما يؤيد العذر خلال المدة النظامية (٧ أيام).
+نأمل مراجعة الإدارة وتقديم الإفادة خلال (٧ أيام).
 
 مدير المدرسة:
-فهد حامد علي الزهراني
+${getManagerName()}
 
 إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
   }
   else { // early
-    title='تنبيه انصراف مبكر';
     const from = beautifyTime(document.getElementById('tEarlyFrom').dataset.value||'--:--');
     const dur  = (document.getElementById('earlyTotal').textContent||'—');
     body =
@@ -1064,14 +1180,14 @@ function buildWhatsAppMessage(){
 
 الأستاذ/ ${name} وفقه الله،
 
-نفيدكم بوجود ${title} برقم (${en2ar(serial)}) في ${school}.
+نفيدكم بوجود تنبيه انصراف مبكر برقم (${en2ar(serial)}) في ${school}.
 يوم ${dayName} الموافق ${hj}.
 وقت الانصراف: (${from}) — نهاية الدوام النظامية: (${we}) — مدة الانصراف المبكر: ${dur}.
 
-نأمل التكرّم بمراجعة مدير المدرسة وتقديم إفادتكم مرفقًا ما يؤيد العذر خلال المدة النظامية (٧ أيام).
+نأمل مراجعة الإدارة وتقديم الإفادة خلال (٧ أيام).
 
 مدير المدرسة:
-فهد حامد علي الزهراني
+${getManagerName()}
 
 إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
   }
@@ -1096,7 +1212,7 @@ document.getElementById('btnWA').addEventListener('click', ()=>{
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* ===== إحصائيات وأرشيف ===== */
+/* ===== إحصائيات وأرشيف — دعم نوع note ===== */
 const dlgStats=document.getElementById('statsDialog');
 const btnOpenStats=document.getElementById('btnOpenStats');
 const btnCloseStats=document.getElementById('btnCloseStats');
@@ -1138,26 +1254,38 @@ function renderStatsTables(){
   tblArchiveBody.innerHTML='';
   filtered.forEach(e=>{
     const tr=document.createElement('tr');
-    const typeText = e.kind==='gaib'?'مساءلة غياب': e.kind==='late'?'تنبيه تأخر': e.kind==='absent'?'تنبيه عدم تواجد':'تنبيه انصراف مبكر';
+    const typeText = e.kind==='gaib'?'مساءلة غياب': e.kind==='late'?'تنبيه تأخر': e.kind==='absent'?'تنبيه عدم تواجد': e.kind==='early'?'تنبيه انصراف مبكر':'لفت نظر';
     tr.innerHTML = `<td>${e.hj}</td><td>${e.name||''}</td><td>${e.civil||''}</td><td>${typeText}</td><td>${pad2(e.serial)}</td>`;
     tblArchiveBody.appendChild(tr);
   });
 
-  // ملخص حسب المعلم
+  // ملخص حسب المعلم (أضفنا عمود لفت نظر)
   const map=new Map();
   for(const e of ARCHIVE){
-    const k=e.tkey; if(!map.has(k)) map.set(k,{name:e.name||'',civil:e.civil||'',gaib:0,late:0,absent:0,early:0,total:0});
+    const k=e.tkey; if(!map.has(k)) map.set(k,{name:e.name||'',civil:e.civil||'',gaib:0,late:0,absent:0,early:0,note:0,total:0});
     const row=map.get(k); row[e.kind]=(row[e.kind]||0)+1; row.total++;
   }
   const rows=[...map.values()].sort((a,b)=> b.total-a.total);
   tblSummaryBody.innerHTML='';
   for(const r of rows){
     const tr=document.createElement('tr');
-    tr.innerHTML = `<td>${r.name}</td><td>${r.civil}</td><td>${r.gaib||0}</td><td>${r.late||0}</td><td>${r.absent||0}</td><td>${r.early||0}</td><td><strong>${r.total||0}</strong></td>`;
+    tr.innerHTML = `<td>${r.name}</td><td>${r.civil}</td><td>${r.gaib||0}</td><td>${r.late||0}</td><td>${r.absent||0}</td><td>${r.early||0}</td><td>${r.note||0}</td><td><strong>${r.total||0}</strong></td>`;
     tblSummaryBody.appendChild(tr);
   }
   refreshHeaderCounts();
 }
+
+/* ===== لفت النظر — منطق دمج السبب ===== */
+const noteSelect = document.getElementById('noteReasonSelect');
+const noteText   = document.getElementById('noteReasonText');
+noteSelect.addEventListener('change', ()=>{
+  const v = noteSelect.value.trim();
+  if(v){
+    noteText.textContent = v; // دمج النص مباشرة دون أقواس/رموز
+  }else{
+    noteText.textContent = 'المهمة المحددة';
+  }
+});
 
 /* ===== عند البدء ===== */
 refreshHeaderCounts();
