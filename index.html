@@ -130,14 +130,14 @@ html,body{
 .abs-pack .choices label{display:block;margin:6px 0}
 .abs-pack .note{color:#374151;font-size:11.2px;line-height:1.85;margin-top:6mm}
 
-/* لفت النظر — قائمة السبب بدون إطار */
-.reason-wrap{display:inline-block;border-bottom:1px dotted #9fb7b3;padding:0 2mm}
-.reason-wrap select{
-  border:none;outline:none;background:transparent;appearance:none;-webkit-appearance:none;-moz-appearance:none;
-  font:inherit;color:inherit;padding:0;margin:0;cursor:pointer
-}
-.reason-wrap select:focus{outline:none}
-#noteReasonText{font-weight:900}
+/* لفت النظر — (تعديل) اجعل سبب لفت النظر داخل السطر وبدون خطوط */ /* MOD */
+.reason-wrap{display:inline;padding:0;border:0;vertical-align:middle} /* MOD */
+.reason-wrap select{ /* MOD */
+  width:22px;height:22px;border:none;background:transparent;color:transparent;
+  appearance:auto;-webkit-appearance:auto;-moz-appearance:auto;
+  vertical-align:-2px;cursor:pointer;padding:0;margin-inline-start:6px;
+} /* MOD */
+#noteReasonText{font-weight:900} /* إبراز السبب فقط */
 
 /* ملاحظة (لا تُطبع) */
 .rights{width:var(--content);margin:2mm auto 8mm;text-align:center;font-size:9.2px;color:#6b7280;font-weight:700}
@@ -157,6 +157,7 @@ body.exporting .seg{display:none !important}
   :root{--content:190mm}
   .content,.notice-center,.table-wrap,.below-flex,.sec,.abs-pack{width:var(--content) !important;margin:0 auto !important}
   .tbl td,.tbl th{border-color:#000 !important}
+  .reason-wrap{display:none !important} /* MOD: إخفاء أداة الاختيار في الطباعة */
 }
 
 /* نافذة الاستيراد — تم جعلها طبقة Overlay */
@@ -289,9 +290,9 @@ body.exporting .seg{display:none !important}
             <h3>( 1 ) خطاب التنبيه — <span class="kind" id="kindTitle">تأخر</span></h3>
 
             <div class="rule-row">
-              <span class="label">الأستاذ الفاضل :</span>
+              <span class="label">المكرم المعلم :</span>
               <span class="dots"></span>
-              <span class="leftnote">حفظه الله</span>
+              <span class="leftnote">وفقه الله</span>
             </div>
 
             <p style="margin:6px 0 2px"><strong>السلام عليكم ورحمة الله وبركاته</strong></p>
@@ -345,7 +346,7 @@ body.exporting .seg{display:none !important}
           <div class="sec">
             <h3>( 2 ) الإفادة</h3>
             <p><strong>مدير المدرسة :</strong> <span id="managerName2">فهد حامد علي الزهراني</span></p>
-            <p><strong>الأستاذ الفاضل / مدير المدرسة.</strong></p>
+            <p><strong>المكرم / مدير مدرسة.</strong></p>
             <p>السلام عليكم ورحمة الله وبركاته وبعد :</p>
             <div style="min-height:38mm;border:1px dashed #9fb7b3;border-radius:10px;padding:8px 10px;background:#fafefe">
               <div style="height:10mm;border-bottom:1px dotted #9fb7b3"></div>
@@ -375,7 +376,7 @@ body.exporting .seg{display:none !important}
               تغيبت عن العمل.
             </p>
             <h3>( 1 ) طلب الإفادة</h3>
-            <p class="para"><strong>الأستاذ الفاضل /</strong> <span id="abs-name-top">—</span> <span>حفظه الله</span></p>
+            <p class="para"><strong>المكرم /</strong> <span id="abs-name-top">—</span> <span>وفقه الله</span></p>
             <p class="para"><strong>السلام عليكم ورحمة الله وبركاته</strong> وبعد ،،،</p>
             <p class="para">
               من خلال متابعة سجل الدوام تبين غيابكم خلال الفترة الموضحة بعالية، آمل الإفادة عن سبب ذلك
@@ -390,7 +391,7 @@ body.exporting .seg{display:none !important}
 
           <div class="sec">
             <h3>( 2 ) الإفادة</h3>
-            <p class="para"><strong>الأستاذ الفاضل / مدير المدرسة</strong> حفظه الله</p>
+            <p class="para"><strong>المكرم / مدير المدرسة</strong> وفقه الله</p>
             <p class="para"><strong>السلام عليكم ورحمة الله وبركاته</strong> وبعد:</p>
             <p class="para">أفيدكم أن غيابي كان للأسباب التالية:</p>
             <div class="lines"><div></div><div></div><div></div></div>
@@ -430,50 +431,40 @@ body.exporting .seg{display:none !important}
           <h3>نموذج لفت النظر</h3>
 
           <p style="margin:0 0 4px">
-            <span><strong>الأستاذ الفاضل/</strong></span>
+            الأستاذ الفاضل/
             <span id="noteTeacherName" contenteditable="true" style="font-weight:900"></span>
-            <span>حفظه الله</span>
+            حفظه الله
           </p>
           <p style="margin:0 0 6px"><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
 
-          <!-- الفقرة الرئيسة باستدعاء السبب من القائمة -->
-          <p id="noteParagraph" style="margin:0 0 8px">
-            إشارةً إلى التعليمات والأنظمة المعتمدة؛ لوحِظ 
-            <span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>
-            وفق الجدول والتعليمات المنظمة. ونأمل منكم المبادرة بمعالجة ذلك، والالتزام التام دعمًا للانضباط المهني ورفعًا لجودة الأداء.
-          </p>
-
-          <!-- القائمة المنسدلة (بدون إطار، أسفلها خط منقط) -->
-          <div class="reason-wrap" title="اختر سبب لفت النظر">
-            <select id="noteReasonSelect">
-              <option value="">— اختر السبب —</option>
-              <option>عدم المشاركة في الإشراف الصباحي المكلّف به وفق جدول المناوبة المعتمد، مما أثّر على انتظام سير الطابور الصباحي وانضباط الطلاب.</option>
-              <option>عدم أداء مهام المناوبة في نهاية الدوام المدرسي، وما يترتب عليه من ضعف في تنظيم خروج الطلاب وضمان سلامتهم.</option>
-              <option>التقصير في الإشراف أثناء فترة الفسحة، مما نتج عنه غياب المتابعة السلوكية اللازمة للطلاب داخل الساحة المدرسية.</option>
-              <option>عدم الإشراف على أداء صلاة الظهر في المصلى المدرسي رغم إدراجه ضمن المهام الموكلة.</option>
-              <option>عدم الالتزام بإعداد الدروس أو التحضير الإلكتروني في منصة مدرستي وفق المتطلبات التربوية المعتمدة.</option>
-              <option>الخروج من الحصة الدراسية قبل انتهاء وقتها المحدد دون مبرر نظامي، مما يؤثر على انضباط العملية التعليمية.</option>
-              <option>التأخر في دخول الحصة الدراسية عن الوقت المحدد في الجدول الزمني، مما يخلُّ بانضباط الجدول اليومي للمدرسة.</option>
-              <option>عدم الحضور للطابور الصباحي دون عذر رسمي، وهو ما يُعد تقصيرًا في أداء الواجبات اليومية المناطة بالمعلم.</option>
-              <option>عدم حضور مجلس أولياء الأمور بالرغم من توجيه الدعوة الرسمية، مما فوّت فرصة التواصل الفعّال مع أولياء الأمور ودعم الشراكة المدرسية.</option>
-              <option>التغيب عن اجتماع المدرسة الرسمي دون عذر نظامي، وهو ما يُعد مخالفة للأنظمة والتعليمات الإدارية.</option>
-              <option>عدم الرد على المساءلة الإدارية الموجهة في الوقت المحدد، مما يدل على عدم تجاوب مع الإجراءات النظامية.</option>
-              <option>رفض التوقيع على النماذج أو المحاضر الرسمية الصادرة من إدارة المدرسة، وهو ما يخالف مقتضى التعاون الإداري والمهني.</option>
-              <option>رفض تنفيذ التوجيه الإداري أو التربوي الصادر من قائد المدرسة أو المشرف التربوي دون مبرر نظامي.</option>
-              <option>عدم رفع بيانات الغياب على منصة (فارس) في الوقت المحدد وفق التعليمات المنظمة.</option>
-
-              <!-- إضافات بصياغة رسمية تربوية (الانتظار) -->
-              <option>عدم دخولكم حصة الانتظار المكلَّف بها ، وما ترتّب على ذلك من إخلال بانضباط سير اليوم الدراسي ومتابعة الطلاب.</option>
-              <option>تأخُّركم عن مباشرة حصة الانتظار المكلَّف بها في وقتها المحدد، بما يؤثّر في انضباط الحصص وتسلسلها واستمرارية التعلّم.</option>
-            </select>
-          </div>
-
-          <!-- ختام -->
-          <p style="margin:10px 0 8px">
-           حرصًا على الانضباط المهني ورفع كفاءة الممارسة داخل المدرسة، نأمل تلافي ما ورد مستقبلاً، والالتزام التام بالتعليمات والمهام الوظيفية المعتمدة؛ دعمًا لجودة الأداء وتحقيقًا لمصلحة العمل المدرسي.
-           تبليغ لا يشترط الإفادة.
-            وتقبّلوا خالص التحية والتقدير،،
-          </p>
+          <!-- فقرة واحدة فقط + السبب داخلها بدون خطوط وتكرار --> <!-- MOD -->
+          <p id="noteParagraph" style="margin:0 0 8px"> <!-- MOD -->
+            إشارةً إلى التعليمات والأنظمة المعتمدة في المدرسة؛ لوحِظ
+            <span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>. <!-- MOD -->
+            ونأمل منكم المبادرة بمعالجة ذلك، والالتزام التام بما يُوكل إليكم من مهام؛ دعمًا للانضباط المهني ورفعًا لجودة الأداء.
+            <span class="reason-wrap" title="اختر سبب لفت النظر"> <!-- MOD -->
+              <select id="noteReasonSelect"> <!-- MOD -->
+                <option value="">— اختر السبب —</option>
+                <option>عدم المشاركة في الإشراف الصباحي المكلّف به وفق جدول المناوبة المعتمد، مما أثّر على انتظام سير الطابور الصباحي وانضباط الطلاب.</option>
+                <option>عدم أداء مهام المناوبة في نهاية الدوام المدرسي، وما يترتب عليه من ضعف في تنظيم خروج الطلاب وضمان سلامتهم.</option>
+                <option>التقصير في الإشراف أثناء فترة الفسحة، مما نتج عنه غياب المتابعة السلوكية اللازمة للطلاب داخل الساحة المدرسية.</option>
+                <option>عدم الإشراف على أداء صلاة الظهر في المصلى المدرسي رغم إدراجه ضمن المهام الموكلة.</option>
+                <option>عدم الالتزام بإعداد الدروس أو التحضير الإلكتروني في منصة مدرستي وفق المتطلبات التربوية المعتمدة.</option>
+                <option>الخروج من الحصة الدراسية قبل انتهاء وقتها المحدد دون مبرر نظامي، مما يؤثر على انضباط العملية التعليمية.</option>
+                <option>التأخر في دخول الحصة الدراسية عن الوقت المحدد في الجدول الزمني، مما يخلُّ بانضباط الجدول اليومي للمدرسة.</option>
+                <option>عدم الحضور للطابور الصباحي دون عذر رسمي، وهو ما يُعد تقصيرًا في أداء الواجبات اليومية المناطة بالمعلم.</option>
+                <option>عدم حضور مجلس أولياء الأمور بالرغم من توجيه الدعوة الرسمية، مما فوّت فرصة التواصل الفعّال مع أولياء الأمور ودعم الشراكة المدرسية.</option>
+                <option>التغيب عن اجتماع المدرسة الرسمي دون عذر نظامي، وهو ما يُعد مخالفة للأنظمة والتعليمات الإدارية.</option>
+                <option>عدم الرد على المساءلة الإدارية الموجهة في الوقت المحدد، مما يدل على عدم تجاوب مع الإجراءات النظامية.</option>
+                <option>رفض التوقيع على النماذج أو المحاضر الرسمية الصادرة من إدارة المدرسة، وهو ما يخالف مقتضى التعاون الإداري والمهني.</option>
+                <option>رفض تنفيذ التوجيه الإداري أو التربوي الصادر من قائد المدرسة أو المشرف التربوي دون مبرر نظامي.</option>
+                <option>عدم رفع بيانات الغياب على منصة (فارس) في الوقت المحدد وفق التعليمات المنظمة.</option>
+                <!-- الانتظار -->
+                <option>عدم دخولكم حصة الانتظار المكلَّف بها وفق الجدول المعتمد والتعليمات المنظمة، وما ترتّب على ذلك من تأثيرٍ في انضباط سير اليوم الدراسي ومتابعة الطلاب.</option>
+                <option>تأخُّركم عن مباشرة حصة الانتظار المكلَّف بها في وقتها المحدد وفق الجدول المعتمد، بما يؤثّر في انضباط الحصص وتسلسلها واستمرارية التعلّم.</option>
+              </select>
+            </span>
+          </p> <!-- MOD -->
 
           <!-- التوقيعات -->
           <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
@@ -795,7 +786,7 @@ document.getElementById('btnClearImport').addEventListener('click', ()=>{
   refreshCaseNo();
 });
 
-/* ===== الاستيراد (كما هو) ===== */
+/* ===== الاستيراد ===== */
 const fileInput=document.getElementById('fileInput');
 const drop=document.getElementById('dropZone');
 const importDialog=document.getElementById('importDialog');
@@ -851,7 +842,7 @@ function guess(header){
   return null;
 }
 
-/* === beginImport (كما هو) === */
+/* === beginImport === */
 async function beginImport(file){
   try{
     const lower=(file.name||'').toLowerCase();
@@ -1035,7 +1026,7 @@ function setNotice(kind){
 radios.forEach(r => r.addEventListener('change', e => setNotice(e.target.value)));
 setNotice(segEl.querySelector('input[name="nt"]:checked')?.value || 'late');
 
-/* ===== PDF بجودة عالية (يحافظ على العربية/RTL) ===== */
+/* ===== PDF بجودة عالية ===== */
 async function exportPDFBlob(){
   const root=document.documentElement;
   const prevScale = getComputedStyle(root).getPropertyValue('--scale');
@@ -1061,7 +1052,7 @@ document.getElementById('btnMakePDF').addEventListener('click', async ()=>{
   const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fileName; a.click(); URL.revokeObjectURL(url);
 });
 
-/* ===== مؤقّت وحسابات (كما هو) ===== */
+/* ===== مؤقّت وحسابات ===== */
 let active=null; const pad=document.getElementById('timePad'),disp=document.getElementById('timePadDisplay');
 document.querySelectorAll('.timebox').forEach(el=>el.addEventListener('click',()=>openPad(el)));
 function openPad(el){active=el;disp.textContent=el.dataset.value||'--:--';pad.style.display='block';const r=el.getBoundingClientRect();pad.style.left=Math.min(window.innerWidth-220,r.left)+'px';pad.style.top=(r.bottom+8)+'px';}
@@ -1113,7 +1104,7 @@ function buildWhatsAppMessage(){
 الأستاذ/ ${name} حفظه الله،
 
 نفيدكم بصدور «لفت نظر» رقم (${en2ar(serial)}) في ${school} يوم ${dayName} الموافق ${hj}.
-النص: لوحظ عدم مباشرتكم أداء ${reason} وفق التعليمات المعتمدة.
+النص: لوحظ ${reason}.
 
 نأمل تلافي ذلك مستقبلًا والالتزام بالمهام الوظيفية. مع الشكر والتقدير.
 
@@ -1282,14 +1273,13 @@ function renderStatsTables(){
   refreshHeaderCounts();
 }
 
-/* ===== لفت النظر — منطق دمج السبب ===== */
+/* ===== لفت النظر — منطق دمج السبب داخل الفقرة ===== */
 const noteSelect = document.getElementById('noteReasonSelect');
 const noteText   = document.getElementById('noteReasonText');
 noteSelect.addEventListener('change', ()=>{
   const v = noteSelect.value.trim();
   noteText.textContent = v ? v : 'المهمة المحددة';
 });
-
 /* ===== عند البدء ===== */
 refreshHeaderCounts();
 </script>
