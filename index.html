@@ -16,40 +16,51 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
-:root{
-  --moe:#0b7e88; --ink:#111; --label:#064c50;
-  --bg:#f7fafc; --content:190mm; --nudgeX:0mm; --scale:1;
-}
+:root{ --moe:#0b7e88; --ink:#111; --label:#064c50; --bg:#f7fafc; --content:190mm; --nudgeX:0mm; --scale:1; }
 *{box-sizing:border-box}
-html,body{
-  margin:0;background:var(--bg);color:var(--ink);
+html,body{ margin:0;background:var(--bg);color:var(--ink);
   font:13.8px/1.9 "Tajawal","Noto Sans Arabic","Noto Naskh Arabic",system-ui;
-  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-}
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility; }
 .sheet-wrap{display:grid;place-items:center;margin:10mm 0;padding:8px}
-.sheet{
-  width:210mm;min-height:297mm;background:#fff;
+.sheet{ width:210mm;min-height:297mm;background:#fff;
   transform:translateX(var(--nudgeX)) scale(var(--scale));
-  transform-origin: top center;
-  filter: contrast(1.06);
+  transform-origin: top center; filter: contrast(1.06); }
+
+/* ===== الهيدر (يسار: المملكة | وسط: الشعار | يمين: التاريخ) ===== */
+.header{padding:8mm 12mm 6mm;border-bottom:2px solid #eaf1f1}
+.hdr-grid{
+  display:grid;
+  grid-template-columns: 1fr 150px 1fr; /* يسار | وسط | يمين */
+  align-items:center; gap:12mm;
 }
 
-/* الهيدر */
-.header{padding:9mm 12mm 6mm;border-bottom:2px solid #eaf1f1}
-.header .row{display:flex;justify-content:space-between;align-items:center;gap:10mm}
-.header .row>div{width:50%}
-.org{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  text-align:center;color:var(--label);transform:translateX(12mm)
+/* يسار: المملكة/الوزارة/الإدارة/المدرسة — (تم التوسيط والتصغير) */
+.hdr-left-org{
+  justify-self:start;
+  display:flex; align-items:center; justify-content:center; /* توسيط داخل المربع */
+  text-align:center;
 }
-.org .l1{font-weight:900;font-size:16px}
-.org .l2{font-weight:900}
-.org .l3{font-weight:800}
-.meta{text-align:left}
+.org{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  color:var(--label); line-height:1.2; max-width:100%;
+}
+.org .l1{font-weight:900;font-size:13.2px}
+.org .l2{font-weight:900;font-size:12.2px}
+.org .l3{font-weight:800;font-size:12.2px}
+
+/* وسط: الشعار (كما هو) */
+.hdr-center{ justify-self:center; text-align:center; }
+.hdr-center img{
+  width:150px;height:150px;object-fit:contain;display:block;margin:0 auto;
+  image-rendering:-webkit-optimize-contrast;
+}
+
+/* يمين: الرقم + التاريخ + الإجمالي (مزاح قليلاً لليسار) — كما هو */
+.hdr-right-info{ justify-self:end; text-align:right; transform: translateX(-8mm); }
 .meta-item{display:block;white-space:nowrap;margin:0 0 2px}
 .meta-item .label{font-weight:900;color:var(--label);margin-left:4px}
 .meta-item .value{font-weight:900}
-.case-total{margin-top:4px;font-size:10.8px;color:#2f4f4b}
+.case-total{margin-top:4px;font-size:12px;color:#2f4f4b}
 
 /* شريط الأدوات */
 .toolbar{position:sticky;top:0;z-index:10;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;background:#fff;border-bottom:1px solid #eee}
@@ -78,14 +89,10 @@ html,body{
 /* جدول بيانات المعلم */
 .table-wrap{width:var(--content);margin:4mm auto 0;display:flex;justify-content:center;overflow-x:auto}
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed}
-.tbl thead th{
-  background:#0b5e63;color:#fff;border:1.2px solid #244a4a;
-  padding:6px 7px;text-align:center;font-weight:900;font-size:13px
-}
-.tbl td{
-  border:1.2px solid #3f5b57;padding:5px 7px;vertical-align:middle;
-  height:12mm;font-size:13.2px;line-height:1.55;background:#fff;text-align:center
-}
+.tbl thead th{ background:#0b5e63;color:#fff;border:1.2px solid #244a4a;
+  padding:6px 7px;text-align:center;font-weight:900;font-size:13px}
+.tbl td{ border:1.2px solid #3f5b57;padding:5px 7px;vertical-align:middle;
+  height:12mm;font-size:13.2px;line-height:1.55;background:#fff;text-align:center}
 .tbl thead th.name,.tbl td.name{width:38%}
 .tbl thead th.spec,.tbl td.spec{width:14%}
 .tbl thead th.level,.tbl td.level{width:16%}
@@ -94,12 +101,10 @@ html,body{
 .tbl td span[contenteditable]{display:block;outline:none;overflow-wrap:anywhere;word-break:break-word;font-weight:700}
 .tbl td.name span[contenteditable]{font-size:15.5px;font-weight:900}
 
-/* السجل المدني — خارج الجدول أسفل الاسم */
+/* السجل المدني — خارج الجدول */
 .below-flex{width:var(--content);margin:2mm auto 0;display:flex;flex-direction:row-reverse;justify-content:flex-end}
-.civil-badge{
-  width:38%;display:flex;align-items:center;gap:10px;justify-content:center;
-  border:1.5px solid var(--moe);background:#fff;color:#0b3340;border-radius:12px;min-height:9.5mm;padding:3px 6px
-}
+.civil-badge{ width:38%;display:flex;align-items:center;gap:10px;justify-content:center;
+  border:1.5px solid var(--moe);background:#fff;color:#0b3340;border-radius:12px;min-height:9.5mm;padding:3px 6px}
 .civil-badge .labTag{background:var(--moe);color:#fff;font-weight:900;padding:2px 10px;border-radius:8px;white-space:nowrap}
 .civil-badge .civilValue{background:#fff;padding:0 6px;border-radius:6px;min-width:42mm;display:inline-block;text-align:center;font-weight:900}
 
@@ -120,7 +125,7 @@ html,body{
 .timebox{display:inline-block;min-width:28mm;text-align:center;padding:.5mm 3mm;background:#fff;color:#111;font-weight:900;border-radius:6px;border:1px solid #000;font-family:ui-monospace,Consolas,monospace}
 .timebox.empty{color:#777;border-color:#bbb}
 
-/* حزمة مساءلة الغياب */
+/* مساءلة غياب */
 .abs-pack{width:var(--content);margin:6mm auto}
 .abs-pack h3{margin:0 0 8px;color:#0b5e63}
 .abs-pack .para{margin:0 0 6px}
@@ -130,16 +135,18 @@ html,body{
 .abs-pack .choices label{display:block;margin:6px 0}
 .abs-pack .note{color:#374151;font-size:11.2px;line-height:1.85;margin-top:6mm}
 
-/* لفت النظر — (تعديل) اجعل سبب لفت النظر داخل السطر وبدون خطوط */ /* MOD */
-.reason-wrap{display:inline;padding:0;border:0;vertical-align:middle} /* MOD */
-.reason-wrap select{ /* MOD */
+/* لفت النظر */
+.reason-wrap{display:inline;padding:0;border:0;vertical-align:middle}
+.reason-wrap select{
   width:22px;height:22px;border:none;background:transparent;color:transparent;
-  appearance:auto;-webkit-appearance:auto;-moz-appearance:auto;
-  vertical-align:-2px;cursor:pointer;padding:0;margin-inline-start:6px;
-} /* MOD */
-#noteReasonText{font-weight:900} /* إبراز السبب فقط */
+  appearance:auto;-webkit-appearance:auto;-moz-appearance:auto;vertical-align:-2px;cursor:pointer;padding:0;margin-inline-start:6px;
+}
+#noteReasonText{font-weight:900}
 
-/* ملاحظة (لا تُطبع) */
+/* ملاحظة صغيرة */
+.small-muted{font-size:11px;color:#6b7280;margin-top:6px}
+
+/* لا تُطبع */
 .rights{width:var(--content);margin:2mm auto 8mm;text-align:center;font-size:9.2px;color:#6b7280;font-weight:700}
 @media print{ .rights{display:none !important} }
 body.exporting .rights{display:none !important}
@@ -157,10 +164,10 @@ body.exporting .seg{display:none !important}
   :root{--content:190mm}
   .content,.notice-center,.table-wrap,.below-flex,.sec,.abs-pack{width:var(--content) !important;margin:0 auto !important}
   .tbl td,.tbl th{border-color:#000 !important}
-  .reason-wrap{display:none !important} /* MOD: إخفاء أداة الاختيار في الطباعة */
+  .reason-wrap{display:none !important}
 }
 
-/* نافذة الاستيراد — تم جعلها طبقة Overlay */
+/* حوار الاستيراد */
 #importDialog{display:none;position:fixed;inset:0;z-index:400;align-items:center;justify-content:center;background:rgba(0,0,0,.35);padding:12px}
 #importCard{background:#fff;border-radius:14px;min-width:320px;max-width:900px;width:90%;padding:16px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 #previewTable th,#previewTable td{border:1px solid #e5efef;padding:6px 8px;text-align:center}
@@ -220,22 +227,35 @@ body.exporting .seg{display:none !important}
 
 <div class="sheet-wrap">
   <div class="sheet" id="sheet">
-    <!-- الهيدر -->
+    <!-- ===== الهيدر ===== -->
     <div class="header">
-      <div class="row">
-        <div class="org">
-          <div class="l1">المملكة العربية السعودية</div>
-          <div class="l2">وزارة التعليم</div>
-          <div class="l3">الإدارة العامة للتعليم بالمنطقة الشرقية</div>
-          <div class="l3" id="schoolNameHdr">مدرسة اليعقوبي الثانوية</div>
+      <div class="hdr-grid">
+
+        <!-- يسار: المملكة / الوزارة / الإدارة / المدرسة -->
+        <div class="hdr-left-org">
+          <div class="org">
+            <div class="l1">المملكة العربية السعودية</div>
+            <div class="l2">وزارة التعليم</div>
+            <div class="l3">الإدارة العامة للتعليم بالمنطقة الشرقية</div>
+            <div class="l3" id="schoolNameHdr">مدرسة اليعقوبي الثانوية</div>
+          </div>
         </div>
-        <div class="meta">
+
+        <!-- الوسط: شعار الوزارة -->
+        <div class="hdr-center">
+          <img src="وزارة التعليم.png" alt="شعار وزارة التعليم" id="moeLogo" draggable="false" crossOrigin="anonymous">
+        </div>
+
+        <!-- يمين: الرقم + التاريخ + الإجمالي -->
+        <div class="hdr-right-info meta">
           <div class="meta-item"><span class="label">الرقم:</span><span class="value" id="serialNo">01</span></div>
-          <div class="meta-item"><span class="label">التاريخ:</span><span class="value" id="hdrHijri">١٤٤٧/٠٤/١٣ هـ</span></div>
-          <div class="case-total">إجمالي مساءلات المعلم: <strong id="caseTotal">0</strong></div>
+          <div class="meta-item"><span class="label">تاريخ أمّ القرى:</span><span class="value" id="hdrHijri">١٤٤٧/٠٤/١٣ هـ</span></div>
+          <div class="case-total">إجمالي مساءلات المعلّم: <strong id="caseTotal">0</strong></div>
         </div>
+
       </div>
     </div>
+    <!-- ===== نهاية الهيدر ===== -->
 
     <div class="page">
       <div class="content">
@@ -276,7 +296,7 @@ body.exporting .seg{display:none !important}
           </table>
         </div>
 
-        <!-- السجل المدني أسفل الاسم خارج الجدول -->
+        <!-- السجل المدني -->
         <div class="below-flex">
           <div class="civil-badge">
             <span class="labTag">السجل المدني</span>
@@ -437,13 +457,12 @@ body.exporting .seg{display:none !important}
           </p>
           <p style="margin:0 0 6px"><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
 
-          <!-- فقرة واحدة فقط + السبب داخلها بدون خطوط وتكرار --> <!-- MOD -->
-          <p id="noteParagraph" style="margin:0 0 8px"> <!-- MOD -->
+          <p id="noteParagraph" style="margin:0 0 8px">
             إشارةً إلى التعليمات والأنظمة المعتمدة في المدرسة؛ لوحِظ
-            <span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>. <!-- MOD -->
+            <span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>.
             ونأمل منكم المبادرة بمعالجة ذلك، والالتزام التام بما يُوكل إليكم من مهام؛ دعمًا للانضباط المهني ورفعًا لجودة الأداء.
-            <span class="reason-wrap" title="اختر سبب لفت النظر"> <!-- MOD -->
-              <select id="noteReasonSelect"> <!-- MOD -->
+            <span class="reason-wrap" title="اختر سبب لفت النظر">
+              <select id="noteReasonSelect">
                 <option value="">— اختر السبب —</option>
                 <option>عدم المشاركة في الإشراف الصباحي المكلّف به وفق جدول المناوبة المعتمد، مما أثّر على انتظام سير الطابور الصباحي وانضباط الطلاب.</option>
                 <option>عدم أداء مهام المناوبة في نهاية الدوام المدرسي، وما يترتب عليه من ضعف في تنظيم خروج الطلاب وضمان سلامتهم.</option>
@@ -459,12 +478,11 @@ body.exporting .seg{display:none !important}
                 <option>رفض التوقيع على النماذج أو المحاضر الرسمية الصادرة من إدارة المدرسة، وهو ما يخالف مقتضى التعاون الإداري والمهني.</option>
                 <option>رفض تنفيذ التوجيه الإداري أو التربوي الصادر من قائد المدرسة أو المشرف التربوي دون مبرر نظامي.</option>
                 <option>عدم رفع بيانات الغياب على منصة (فارس) في الوقت المحدد وفق التعليمات المنظمة.</option>
-                <!-- الانتظار -->
                 <option>عدم دخولكم حصة الانتظار المكلَّف بها وفق الجدول المعتمد والتعليمات المنظمة، وما ترتّب على ذلك من تأثيرٍ في انضباط سير اليوم الدراسي ومتابعة الطلاب.</option>
                 <option>تأخُّركم عن مباشرة حصة الانتظار المكلَّف بها في وقتها المحدد وفق الجدول المعتمد، بما يؤثّر في انضباط الحصص وتسلسلها واستمرارية التعلّم.</option>
               </select>
             </span>
-          </p> <!-- MOD -->
+          </p>
 
           <!-- التوقيعات -->
           <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
@@ -472,6 +490,7 @@ body.exporting .seg{display:none !important}
               <p style="margin:0 0 4px"><strong>توقيع الموظف بالاطلاع:</strong> ...............................</p>
               <p style="margin:0 0 4px"><strong>الاسم:</strong> ...............................</p>
               <p style="margin:0"><strong>التاريخ:</strong> ______ / ______ / 14هـ</p>
+              <p class="small-muted">هذا التبليغ لا يحتاج إلى رد.</p>
             </div>
             <div style="flex:1">
               <p style="margin:0 0 4px"><strong>توقيع قائد المدرسة:</strong> <span id="managerNameNote">فهد حامد علي الزهراني</span></p>
@@ -576,14 +595,14 @@ body.exporting .seg{display:none !important}
 </div>
 
 <script>
-/* ===== هوية وتوافق ===== */
+/* ===== هوية وثوابت ===== */
 const BASE_TITLE='الشؤون الإدارية والمتابعة';
 const DEFAULT_WA='966504532489';
 const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
 const en2ar = s => (s+'').replace(/[0-9]/g,d=>AR[d]);
 const ar2en = s => (s+'').replace(/[٠-٩]/g,d=>EN[AR.indexOf(d)]);
 
-/* ===== تناسب تلقائي لكل الأجهزة ===== */
+/* ===== تناسب تلقائي ===== */
 function fitSheet(){
   const sheet=document.getElementById('sheet');
   if(!sheet) return;
@@ -595,7 +614,7 @@ addEventListener('resize', fitSheet);
 addEventListener('orientationchange', fitSheet);
 document.addEventListener('DOMContentLoaded', fitSheet);
 
-/* ===== تاريخ هجري (أم القرى) ===== */
+/* ===== تاريخ أمّ القرى ===== */
 function fmtHijriNoSuffix(d){
   const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
   const DD=en2ar(parts.find(p=>p.type==='day').value.padStart(2,'0'));
@@ -659,11 +678,9 @@ let TEACHERS=JSON.parse(localStorage.getItem('teachersCache')||'[]');
 let currentIdx = null;
 function pad2(n){return String(n).padStart(2,'0');}
 
-/* اسم المدير — يسمح بتعديل الآلية (cache) */
+/* اسم المدير — تخزين */
 const MANAGER_KEY='managerName';
-function getManagerName(){
-  return localStorage.getItem(MANAGER_KEY) || 'فهد حامد علي الزهراني';
-}
+function getManagerName(){ return localStorage.getItem(MANAGER_KEY) || 'فهد حامد علي الزهراني'; }
 function setManagerName(v){
   if(!v) return; localStorage.setItem(MANAGER_KEY, v);
   ['managerName1','managerName2','managerName3','managerName4','managerName5','managerNameNote'].forEach(id=>{
@@ -671,7 +688,7 @@ function setManagerName(v){
   });
 }
 
-/* ===== أرشيف الإجراءات (دائم + نسخ احتياطي) ===== */
+/* ===== أرشيف الإجراءات ===== */
 const ARCHIVE_KEY='caseArchive_v1';
 let ARCHIVE = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
 
@@ -696,7 +713,7 @@ function refreshHeaderCounts(){
 }
 function saveArchive(){ localStorage.setItem(ARCHIVE_KEY, JSON.stringify(ARCHIVE)); refreshHeaderCounts(); }
 
-/* تسجيل إجراء جديد في الأرشيف */
+/* تسجيل إجراء جديد */
 function recordCase(kind, source){
   const t=getCurrentTeacher();
   if(!t){ alert('يرجى اختيار معلّم أولاً.'); return; }
@@ -724,7 +741,6 @@ function applyTeacher(t, idx){
   document.getElementById('afadaName').textContent = t.name || '—';
   document.getElementById('abs-name-top').textContent = t.name || '—';
   document.getElementById('abs-teacher-name').textContent = t.name || '—';
-  /* لفت نظر — الاسم */
   document.getElementById('noteTeacherName').textContent = t.name || '';
   refreshCaseNo();
 }
@@ -763,7 +779,7 @@ document.getElementById('teacherSearch').addEventListener('input',e=>{
   });
 });
 
-/* تمكين تعديل اسم المدير يدوياً (نقرة مزدوجة) */
+/* تعديل اسم المدير — يدوي */
 ['managerName1','managerName2','managerName3','managerName4','managerName5','managerNameNote'].forEach(id=>{
   const el=document.getElementById(id);
   if(!el) return;
@@ -774,7 +790,7 @@ setManagerName(getManagerName());
 
 /* تصفير الاستيراد */
 document.getElementById('btnClearImport').addEventListener('click', ()=>{
-  if(!confirm('تأكيد تصفير بيانات الاستيراد والأسماء؟')) return;
+  if(!confirm('سيتم تصفير بيانات الاستيراد والأسماء. هل أنت متأكد؟')) return;
   TEACHERS=[]; localStorage.removeItem('teachersCache'); refillSelect();
   ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name','noteTeacherName'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.textContent='';
@@ -858,8 +874,8 @@ async function beginImport(file){
       wb = wbNew;
     } else if(/\.json$/.test(lower)){
       const text=await readTextAllEnc(file);
-      const data = JSON.parse(text);
-      const ws = XLSX.utils.json_to_sheet(Array.isArray(data)? data : []);
+      const data = Array.isArray(JSON.parse(text)) ? JSON.parse(text) : [];
+      const ws = XLSX.utils.json_to_sheet(data);
       const wbNew = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wbNew, ws, 'البيانات');
       wb = wbNew;
@@ -999,20 +1015,14 @@ const rowAbs   = document.getElementById('lineAbs');
 const rowEarly = document.getElementById('lineEarly');
 
 function setNotice(kind){
-  // إظهار الصفحة المطلوبة دون إخفاء دائم لأي صفحة — التنقّل آمن
   alertPack.style.display   = (kind==='late' || kind==='absent' || kind==='early') ? 'block':'none';
   absencePack.style.display = (kind==='gaib') ? 'block':'none';
   notePack.style.display    = (kind==='note') ? 'block':'none';
 
-  if(kind==='gaib'){
-    mainTitle.textContent = 'مساءلة غياب';
-  }else if(kind==='note'){
-    mainTitle.textContent = 'لفت نظر';
-  }else{
-    mainTitle.textContent = 'تنبيه';
-  }
+  if(kind==='gaib'){ mainTitle.textContent = 'مساءلة غياب'; }
+  else if(kind==='note'){ mainTitle.textContent = 'لفت نظر'; }
+  else{ mainTitle.textContent = 'تنبيه'; }
 
-  // عنوان النوع داخل خطاب التنبيه
   if(kind==='late'){ kindLbl.textContent='تأخر'; }
   else if(kind==='absent'){ kindLbl.textContent='عدم تواجد'; }
   else if(kind==='early'){ kindLbl.textContent='انصراف مبكر'; }
@@ -1043,13 +1053,17 @@ async function exportPDFBlob(){
   return pdf.output('blob');
 }
 document.getElementById('btnMakePDF').addEventListener('click', async ()=>{
-  const kind=document.querySelector('input[name="nt"]:checked')?.value || 'late';
-  recordCase(kind,'PDF');
-  const name=(document.getElementById('t_name').textContent||document.getElementById('noteTeacherName').textContent||'بدون اسم').trim();
-  const hj=(document.getElementById('hdrHijri').textContent||'التاريخ الهجري').trim();
-  const fileName=`${BASE_TITLE} — ${document.getElementById('mainTitle').textContent} — ${name} — ${hj}.pdf`;
-  const blob=await exportPDFBlob();
-  const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fileName; a.click(); URL.revokeObjectURL(url);
+  try{
+    const kind=document.querySelector('input[name="nt"]:checked')?.value || 'late';
+    recordCase(kind,'PDF');
+    const name=(document.getElementById('t_name').textContent||document.getElementById('noteTeacherName').textContent||'بدون اسم').trim();
+    const hj=(document.getElementById('hdrHijri').textContent||'التاريخ الهجري').trim();
+    const fileName=`${BASE_TITLE} — ${document.getElementById('mainTitle').textContent} — ${name} — ${hj}.pdf`;
+    const blob=await exportPDFBlob();
+    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fileName; a.click(); URL.revokeObjectURL(url);
+  }catch(err){
+    alert('تعذر إنشاء PDF. حاول مجددًا.\nالتفاصيل: ' + (err.message||err));
+  }
 });
 
 /* ===== مؤقّت وحسابات ===== */
@@ -1058,7 +1072,7 @@ document.querySelectorAll('.timebox').forEach(el=>el.addEventListener('click',()
 function openPad(el){active=el;disp.textContent=el.dataset.value||'--:--';pad.style.display='block';const r=el.getBoundingClientRect();pad.style.left=Math.min(window.innerWidth-220,r.left)+'px';pad.style.top=(r.bottom+8)+'px';}
 function closePad(){pad.style.display='none';active=null;}
 document.getElementById('timePadClose').addEventListener('click',closePad);
-document.getElementById('timePadSave').addEventListener('click',()=>{if(!active) return; const v=disp.textContent; active.textContent=v; active.classList.toggle('empty',!/\d\d:\d\d/.test(v)); active.dataset.value=v; recalc(); closePad();});
+document.getElementById('timePadSave').addEventListener('click',()=>{if(!active) return; const v=disp.textContent; active.textContent=v; active.classList.toggle('empty',!/\d{2}:\d{2}/.test(v)); active.dataset.value=v; recalc(); closePad();});
 document.querySelectorAll('#timePad .grid button').forEach(b=>b.addEventListener('click',()=>{
   if(b.classList.contains('del')){disp.textContent=disp.textContent.slice(0,-1)||'--:--';return;}
   const k=b.dataset.k; let v=disp.textContent.replace(/-/g,'').replace(/:/g,''); if(disp.textContent==='--:--') v='';
@@ -1084,7 +1098,7 @@ function recalc(){
 }
 recalc();
 
-/* ===== رسالة واتساب — دعم «لفت نظر» أيضاً ===== */
+/* ===== واتساب ===== */
 function beautifyTime(t){ return en2ar((t||'--:--')); }
 function buildWhatsAppMessage(){
   const school = (document.getElementById('schoolNameHdr').textContent||'مدرسة اليعقوبي الثانوية').trim();
@@ -1122,9 +1136,7 @@ ${getManagerName()}
 الأستاذ/ ${name} وفقه الله،
 
 نفيدكم بوجود مساءلة غياب برقم (${en2ar(serial)}) في ${school}.
-وذلك يوم ${dayName} الموافق ${hj}؛ وقد تم تسجيل غيابكم عن العمل في ذلك اليوم.
-
-نأمل التكرّم بمراجعة مدير المدرسة وتقديم إفادتكم خلال المدة النظامية (٧ أيام).
+يوم ${dayName} الموافق ${hj}.
 
 مدير المدرسة:
 ${getManagerName()}
@@ -1139,11 +1151,8 @@ ${getManagerName()}
 
 الأستاذ/ ${name} وفقه الله،
 
-نفيدكم بوجود تنبيه تأخر برقم (${en2ar(serial)}) في ${school}.
-يوم ${dayName} الموافق ${hj}.
-بداية الدوام: (${ws}) — وقت حضوركم: (${tIn}) — إجمالي التأخر: ${dur}.
-
-نأمل مراجعة الإدارة وتقديم الإفادة خلال (٧ أيام).
+تنبيه تأخر رقم (${en2ar(serial)}) في ${school}.
+بداية الدوام: (${ws}) — حضوركم: (${tIn}) — إجمالي التأخر: ${dur}.
 
 مدير المدرسة:
 ${getManagerName()}
@@ -1159,11 +1168,8 @@ ${getManagerName()}
 
 الأستاذ/ ${name} وفقه الله،
 
-نفيدكم بوجود تنبيه عدم تواجد برقم (${en2ar(serial)}) في ${school}.
-يوم ${dayName} الموافق ${hj}.
-مدة عدم التواجد من (${from}) إلى (${to}) — الإجمالي: ${dur}.
-
-نأمل مراجعة الإدارة وتقديم الإفادة خلال (٧ أيام).
+تنبيه عدم تواجد رقم (${en2ar(serial)}) في ${school}.
+من (${from}) إلى (${to}) — الإجمالي: ${dur}.
 
 مدير المدرسة:
 ${getManagerName()}
@@ -1178,11 +1184,8 @@ ${getManagerName()}
 
 الأستاذ/ ${name} وفقه الله،
 
-نفيدكم بوجود تنبيه انصراف مبكر برقم (${en2ar(serial)}) في ${school}.
-يوم ${dayName} الموافق ${hj}.
-وقت الانصراف: (${from}) — نهاية الدوام النظامية: (${we}) — مدة الانصراف المبكر: ${dur}.
-
-نأمل مراجعة الإدارة وتقديم الإفادة خلال (٧ أيام).
+تنبيه انصراف مبكر رقم (${en2ar(serial)}) في ${school}.
+وقت الانصراف: (${from}) — مدة الانصراف المبكر: ${dur}.
 
 مدير المدرسة:
 ${getManagerName()}
@@ -1210,7 +1213,7 @@ document.getElementById('btnWA').addEventListener('click', ()=>{
   window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* ===== إحصائيات وأرشيف — دعم نوع note ===== */
+/* ===== إحصائيات وأرشيف ===== */
 const dlgStats=document.getElementById('statsDialog');
 const btnOpenStats=document.getElementById('btnOpenStats');
 const btnCloseStats=document.getElementById('btnCloseStats');
@@ -1257,7 +1260,7 @@ function renderStatsTables(){
     tblArchiveBody.appendChild(tr);
   });
 
-  // ملخص حسب المعلم (أضفنا عمود لفت نظر)
+  // ملخص حسب المعلم
   const map=new Map();
   for(const e of ARCHIVE){
     const k=e.tkey; if(!map.has(k)) map.set(k,{name:e.name||'',civil:e.civil||'',gaib:0,late:0,absent:0,early:0,note:0,total:0});
@@ -1273,13 +1276,14 @@ function renderStatsTables(){
   refreshHeaderCounts();
 }
 
-/* ===== لفت النظر — منطق دمج السبب داخل الفقرة ===== */
+/* ===== لفت النظر — مزامنة السبب ===== */
 const noteSelect = document.getElementById('noteReasonSelect');
 const noteText   = document.getElementById('noteReasonText');
 noteSelect.addEventListener('change', ()=>{
-  const v = noteSelect.value.trim();
+  const v = (noteSelect.value||'').trim();
   noteText.textContent = v ? v : 'المهمة المحددة';
 });
+
 /* ===== عند البدء ===== */
 refreshHeaderCounts();
 </script>
