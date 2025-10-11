@@ -34,7 +34,7 @@ html,body{ margin:0;background:var(--bg);color:var(--ink);
   align-items:center; gap:12mm;
 }
 
-/* يسار: المملكة/الوزارة/الإدارة/المدرسة — (تم التوسيط والتصغير) */
+/* يسار: المملكة/الوزارة/الإدارة/المدرسة — (توسيط + تباعد متناسق) */
 .hdr-left-org{
   justify-self:start;
   display:flex; align-items:center; justify-content:center; /* توسيط داخل المربع */
@@ -42,11 +42,15 @@ html,body{ margin:0;background:var(--bg);color:var(--ink);
 }
 .org{
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  color:var(--label); line-height:1.2; max-width:100%;
+  color:var(--label);
+  line-height:1.25;           /* ارتفاع سطر ألطف */
+  gap: 2mm;                   /* مسافة متناسقة بين الأسطر */
+  max-width:100%;
 }
 .org .l1{font-weight:900;font-size:13.2px}
-.org .l2{font-weight:900;font-size:12.2px}
-.org .l3{font-weight:800;font-size:12.2px}
+.org .l2{font-weight:900;font-size:12.8px}
+.org .l3{font-weight:800;font-size:12.4px}
+.org .l4{font-weight:800;font-size:12.4px}
 
 /* وسط: الشعار (كما هو) */
 .hdr-center{ justify-self:center; text-align:center; }
