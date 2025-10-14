@@ -18,7 +18,6 @@
 <style>
 :root{
   --moe:#0b7e88; --ink:#111; --label:#064c50; --bg:#f7fafc;
-  /* عرض المحتوى داخل الصفحة — مصغر ليتسع كل شيء في A4 مع هوامش مريحة */
   --content:186mm;
   --nudgeX:0mm; --scale:1;
 }
@@ -53,9 +52,10 @@ html,body{
 .meta-item{display:block;white-space:nowrap;margin:0 0 2px}
 .meta-item .label{font-weight:900;color:var(--label);margin-left:4px}
 .meta-item .value{font-weight:900}
-.case-total{margin-top:4px;font-size:11px;color:#2f4f4b}
+/* أزلنا سطر إجمالي مساءلات المعلّم */
+.case-total{display:none}
 
-/* ===== شريط الأدوات (صف واحد متقارب) ===== */
+/* ===== شريط الأدوات ===== */
 .toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #eee;padding:6px 8px}
 .toolbar-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between}
 .toolbar .left,.toolbar .right{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
@@ -268,6 +268,22 @@ body.exporting .seg{display:none !important}
       <span class="hint">بداية الدوام:</span><input id="workStart" class="t" type="time" value="06:45" step="60">
       <span class="hint">نهاية الدوام:</span><input id="workEnd" class="t" type="time" value="13:45" step="60">
     </div>
+
+    <!-- الإضافات: العذر + فارس -->
+    <div class="pack">
+      <span class="hint">العذر:</span>
+      <select id="excuseSel" class="select" title="حالة العذر">
+        <option value="unknown">— غير محدد —</option>
+        <option value="with">بعذر</option>
+        <option value="without">بلا عذر</option>
+      </select>
+      <span class="hint">فارس:</span>
+      <select id="farisSel" class="select" title="حالة الرفع في فارس">
+        <option value="na">— غير محدد —</option>
+        <option value="raised">مرفوع</option>
+        <option value="not">لم يُرفع</option>
+      </select>
+    </div>
   </div>
 </div>
 
@@ -321,7 +337,7 @@ body.exporting .seg{display:none !important}
         <div class="hdr-right-info meta">
           <div class="meta-item"><span class="label">الرقم:</span><span class="value" id="serialNo">01</span></div>
           <div class="meta-item"><span class="label"> التاريخ :</span><span class="value" id="hdrHijri">—</span></div>
-          <div class="case-total">إجمالي مساءلات المعلّم: <strong id="caseTotal">0</strong></div>
+          <!-- أزلنا caseTotal -->
         </div>
       </div>
     </div>
@@ -378,9 +394,10 @@ body.exporting .seg{display:none !important}
           <div class="sec">
             <h3>( 1 ) خطاب التنبيه — <span class="kind" id="kindTitle">تأخر</span></h3>
 
+            <!-- المكرم المعلم + الاسم -->
             <div class="rule-row">
               <span class="label">المكرم المعلم :</span>
-              <span class="dots"></span>
+              <strong id="teacherNameInline" style="min-width:38mm;text-align:center;border-bottom:1px dotted #9fb7b3;display:inline-block;padding:0 2mm"></strong>
               <span class="leftnote">وفقه الله</span>
             </div>
 
@@ -526,6 +543,12 @@ body.exporting .seg{display:none !important}
           </p>
           <p style="margin:0 0 5px"><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
 
+          <!-- اليوم/التاريخ داخل الخطاب وقابل للتعديل -->
+          <p style="margin:0 0 6px">
+            في يوم <span id="noteDay" contenteditable="true" style="font-weight:900; border-bottom:1px dotted #9fb7b3; padding:0 3mm">—</span>
+            الموافق <span id="noteHijri" contenteditable="true" style="font-weight:900; border-bottom:1px dotted #9fb7b3; padding:0 3mm">—</span> هـ
+          </p>
+
           <p id="noteParagraph" style="margin:0 0 6px">
             إشارةً إلى التعليمات والأنظمة المعتمدة في المدرسة؛ لوحِظ
             <span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>.
@@ -635,6 +658,8 @@ body.exporting .seg{display:none !important}
                 <th>اسم المعلم</th>
                 <th>السجل المدني</th>
                 <th>نوع الإجراء</th>
+                <th>عذر</th>
+                <th>فارس</th>
                 <th>المدة (دقائق)</th>
                 <th>المدة (ساعات:دقائق)</th>
                 <th>رقم الإجراء</th>
@@ -653,13 +678,19 @@ body.exporting .seg{display:none !important}
               <tr>
                 <th>المعلم</th>
                 <th>السجل المدني</th>
-                <th>مساءلة غياب</th>
-                <th>تنبيه تأخر</th>
+                <th>غياب (بعذر)</th>
+                <th>غياب (بلا عذر)</th>
+                <th>مرفوع في فارس</th>
+                <th>لم يُرفع</th>
+                <th>تأخر (بعذر)</th>
+                <th>تأخر (بلا عذر)</th>
                 <th>دقائق التأخر</th>
                 <th>ساعات التأخر</th>
                 <th>عدم تواجد</th>
                 <th>انصراف مبكر</th>
                 <th>لفت نظر</th>
+                <th>إجمالي (غياب+تأخر)</th>
+                <th>تواريخ بارزة</th>
                 <th>الإجمالي</th>
               </tr>
             </thead>
@@ -803,6 +834,9 @@ function buildHijriPicker(){
     document.getElementById('dynHijri').textContent = hijDMY;
     document.getElementById('absDayP').textContent = dayName;
     document.getElementById('absDateYMD').textContent = hijYMD;
+    // لفت النظر (اليوم/التاريخ)
+    document.getElementById('noteDay').textContent = dayName;
+    document.getElementById('noteHijri').textContent = hijDMY;
     setGregFromDate(g);
   }
   dSel.onchange = mSel.onchange = ySel.onchange = update;
@@ -856,6 +890,9 @@ function updateFromGreg(){
   document.getElementById('dynHijri').textContent = hijDMY;
   document.getElementById('absDayP').textContent = dayName;
   document.getElementById('absDateYMD').textContent = hijYMD;
+  // لفت النظر
+  document.getElementById('noteDay').textContent = dayName;
+  document.getElementById('noteHijri').textContent = hijDMY;
 
   const fmt = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'numeric',day:'numeric'});
   const ps = fmt.formatToParts(g);
@@ -889,7 +926,7 @@ function setManagerName(v){
 }
 
 /* ========= الأرشيف ========= */
-const ARCHIVE_KEY = 'caseArchive_v3';
+const ARCHIVE_KEY = 'caseArchive_v4'; // ترقية الإصدار لإضافة العذر/فارس
 let ARCHIVE = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
 
 function teacherKeyFromObj(obj){
@@ -900,36 +937,28 @@ function getCurrentTeacher(){
   if(currentIdx === null) return null;
   return TEACHERS[currentIdx] || null;
 }
+/* الحصر السابق مع المحافظة عليه لرقم الإجراء */
 function computeCountsFor(key){
-  let total = 0, lateMins=0;
-  const byType = {gaib:0, late:0, absent:0, early:0, note:0};
-  for(const e of ARCHIVE){
-    if(e.tkey === key){
-      total++;
-      if(byType[e.kind] != null) byType[e.kind]++;
-      if(e.kind==='late') lateMins += (e.mins||0);
-    }
-  }
-  return { total, byType, lateMins };
+  let total = 0;
+  for(const e of ARCHIVE){ if(e.tkey === key) total++; }
+  return { total };
 }
 function nextSerialFor(key){ return computeCountsFor(key).total + 1; }
 function refreshHeaderCounts(){
   const t = getCurrentTeacher();
   if(!t){
     document.getElementById('serialNo').textContent = '01';
-    document.getElementById('caseTotal').textContent = '0';
     return;
   }
   const key = teacherKeyFromObj(t);
   document.getElementById('serialNo').textContent = pad2(nextSerialFor(key));
-  document.getElementById('caseTotal').textContent = computeCountsFor(key).total;
 }
 function saveArchive(){
   localStorage.setItem(ARCHIVE_KEY, JSON.stringify(ARCHIVE));
   refreshHeaderCounts();
 }
 
-/* تسجيل الإجراء */
+/* تسجيل الإجراء (مع العذر/فارس) */
 function recordCase(kind, source, mins){
   const t = getCurrentTeacher();
   if(!t){ alert('يرجى اختيار معلّم أولاً.'); return false; }
@@ -938,8 +967,13 @@ function recordCase(kind, source, mins){
   const hj = (document.getElementById('hdrHijri').textContent || '').replace('هـ','').trim();
   const day = (document.getElementById('dynDay').textContent || '').trim();
   const ts = Date.now();
-  ARCHIVE.push({ ts, hj, day, kind, serial, source: source || 'manual', tkey: key,
-                 name: (t.name||'').trim(), civil: (t.civil||'').trim(), mins: Math.max(0, mins|0) });
+  const excuse = document.getElementById('excuseSel').value || 'unknown'; // with / without / unknown
+  const faris  = document.getElementById('farisSel').value  || 'na';      // raised / not / na
+  ARCHIVE.push({
+    ts, hj, day, kind, serial, source: source || 'manual', tkey: key,
+    name: (t.name||'').trim(), civil: (t.civil||'').trim(),
+    mins: Math.max(0, mins|0), excuse, faris
+  });
   saveArchive();
   return true;
 }
@@ -955,6 +989,7 @@ function applyTeacher(t, idx){
   document.getElementById('abs-name-top').textContent = t.name || '—';
   document.getElementById('abs-teacher-name').textContent = t.name || '—';
   document.getElementById('noteTeacherName').textContent = t.name || '';
+  document.getElementById('teacherNameInline').textContent = t.name || '';
   refreshHeaderCounts();
 }
 function refillSelect(){
@@ -987,6 +1022,7 @@ document.getElementById('teacherSearch').addEventListener('input', e=>{
       document.getElementById('afadaName').textContent = v || '—';
       document.getElementById('abs-name-top').textContent = v || '—';
       document.getElementById('abs-teacher-name').textContent = v || '—';
+      document.getElementById('teacherNameInline').textContent = v || '';
     } else if(id === 't_spec'){ TEACHERS[currentIdx].spec = v; }
     else if(id === 't_level'){ TEACHERS[currentIdx].level = v; }
     else if(id === 't_job'){ TEACHERS[currentIdx].job = v; }
@@ -1009,7 +1045,7 @@ setManagerName(getManagerName());
 document.getElementById('btnClearImport').addEventListener('click', ()=>{
   if(!confirm('سيتم تصفير بيانات المعلمين والأرشيف. هل أنت متأكد؟')) return;
   TEACHERS = []; localStorage.removeItem('teachersCache'); refillSelect();
-  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name','noteTeacherName']
+  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name','noteTeacherName','teacherNameInline']
     .forEach(id=>{ const el = document.getElementById(id); if(el) el.textContent = ''; });
   currentIdx = null; ARCHIVE = []; saveArchive();
 });
@@ -1224,6 +1260,12 @@ function setPack(kind){
   const lineAbs = document.getElementById('lineAbs');
   const lineEarly = document.getElementById('lineEarly');
 
+  // إظهار/إخفاء حقول العذر/فارس بحسب النوع
+  const showExcuse = (kind==='late' || kind==='gaib');
+  const showFaris  = (kind==='gaib'); // فارس يهم الغياب غالباً
+  document.getElementById('excuseSel').parentElement.style.display = showExcuse ? '' : 'none';
+  document.getElementById('farisSel').parentElement.style.display  = showFaris ? '' : 'none';
+
   if(kind === 'gaib'){
     alertPack.style.display = 'none';
     absencePack.style.display = '';
@@ -1368,8 +1410,17 @@ document.getElementById('noteReasonSelect').addEventListener('change', e=>{
 function buildKPI(){
   const total = ARCHIVE.length;
   const by = { gaib:0, late:0, absent:0, early:0, note:0 };
-  let lateMins = 0;
-  ARCHIVE.forEach(e=>{ if(by[e.kind] != null) by[e.kind]++; if(e.kind==='late') lateMins += (e.mins||0); });
+  let lateMins = 0, gaibRaised=0, gaibNot=0, gaibWith=0, gaibWithout=0, lateWith=0, lateWithout=0;
+  ARCHIVE.forEach(e=>{
+    if(by[e.kind] != null) by[e.kind]++;
+    if(e.kind==='late'){ lateMins += (e.mins||0); if(e.excuse==='with') lateWith++; if(e.excuse==='without') lateWithout++; }
+    if(e.kind==='gaib'){
+      if(e.faris==='raised') gaibRaised++;
+      if(e.faris==='not') gaibNot++;
+      if(e.excuse==='with') gaibWith++;
+      if(e.excuse==='without') gaibWithout++;
+    }
+  });
   const row = document.getElementById('kpiRow'); row.innerHTML = '';
   const add = (label, val)=>{
     const d = document.createElement('div');
@@ -1377,9 +1428,17 @@ function buildKPI(){
     d.textContent = `${label}: ${en2ar(val)}`;
     row.appendChild(d);
   };
-  add('الإجمالي', total); add('مساءلة غياب', by.gaib); add('تنبيه تأخر', by.late);
-  add('عدم تواجد', by.absent); add('انصراف مبكر', by.early); add('لفت نظر', by.note);
-  add('مجمّع دقائق التأخر', lateMins); add('ساعات التأخر', fmtHM(lateMins));
+  add('الإجمالي', total);
+  add('غياب (بعذر)', gaibWith);
+  add('غياب (بلا عذر)', gaibWithout);
+  add('مرفوع في فارس', gaibRaised);
+  add('لم يُرفع', gaibNot);
+  add('تأخر (بعذر)', lateWith);
+  add('تأخر (بلا عذر)', lateWithout);
+  add('مجمّع دقائق التأخر', lateMins);
+  add('ساعات التأخر', fmtHM(lateMins));
+  // عداد مُبتكر لإجمالي (غياب+تأخر)
+  add('إجمالي (غياب+تأخر)', gaibWith+gaibWithout + by.late);
 }
 
 function withinRange(hj, from, to){
@@ -1412,6 +1471,8 @@ function renderArchive(){
          <td>${e.name || ''}</td>
          <td>${e.civil || ''}</td>
          <td>${({gaib:'مساءلة غياب', late:'تنبيه تأخر', absent:'عدم تواجد', early:'انصراف مبكر', note:'لفت نظر'})[e.kind] || e.kind}</td>
+         <td>${({with:'بعذر', without:'بلا عذر'})[e.excuse] || '—'}</td>
+         <td>${({raised:'مرفوع', not:'لم يُرفع'})[e.faris] || '—'}</td>
          <td>${en2ar(mins)}</td>
          <td>${fmtHM(mins)}</td>
          <td>${en2ar(String(e.serial).padStart(2,'0'))}</td>`;
@@ -1425,27 +1486,53 @@ function renderArchive(){
     .forEach(e=>{
       const k = e.tkey;
       if(!map.has(k)){
-        map.set(k, { name: e.name || '', civil: e.civil || '', gaib:0, late:0, absent:0, early:0, note:0, lateMins:0 });
+        map.set(k, { name: e.name || '', civil: e.civil || '',
+          gaibWith:0, gaibWithout:0, gaibRaised:0, gaibNot:0,
+          lateWith:0, lateWithout:0, lateMins:0, absent:0, early:0, note:0,
+          dates: new Set()
+        });
       }
-      map.get(k)[e.kind] = (map.get(k)[e.kind] || 0) + 1;
-      if(e.kind==='late') map.get(k).lateMins += (e.mins||0);
+      const r = map.get(k);
+      if(e.kind==='gaib'){
+        if(e.excuse==='with') r.gaibWith++;
+        if(e.excuse==='without') r.gaibWithout++;
+        if(e.faris==='raised') r.gaibRaised++;
+        if(e.faris==='not') r.gaibNot++;
+      }
+      if(e.kind==='late'){
+        if(e.excuse==='with') r.lateWith++;
+        if(e.excuse==='without') r.lateWithout++;
+        r.lateMins += (e.mins||0);
+      }
+      if(e.kind==='absent') r.absent++;
+      if(e.kind==='early') r.early++;
+      if(e.kind==='note') r.note++;
+      if(e.hj) r.dates.add(e.hj);
     });
 
   const tb2 = document.querySelector('#tblSummary tbody');
   tb2.innerHTML = '';
   for(const r of map.values()){
-    const total = r.gaib + r.late + r.absent + r.early + r.note;
+    const total = r.gaibWith + r.gaibWithout + r.lateWith + r.lateWithout + r.absent + r.early + r.note;
+    const totalGL = r.gaibWith + r.gaibWithout + r.lateWith + r.lateWithout; // غياب+تأخر
+    const datesList = Array.from(r.dates).sort().slice(0,5).join('، ');
     const tr = document.createElement('tr');
     tr.innerHTML =
       `<td>${r.name}</td>
        <td>${r.civil}</td>
-       <td>${en2ar(r.gaib)}</td>
-       <td>${en2ar(r.late)}</td>
+       <td>${en2ar(r.gaibWith)}</td>
+       <td>${en2ar(r.gaibWithout)}</td>
+       <td>${en2ar(r.gaibRaised)}</td>
+       <td>${en2ar(r.gaibNot)}</td>
+       <td>${en2ar(r.lateWith)}</td>
+       <td>${en2ar(r.lateWithout)}</td>
        <td>${en2ar(r.lateMins)}</td>
        <td>${fmtHM(r.lateMins)}</td>
        <td>${en2ar(r.absent)}</td>
        <td>${en2ar(r.early)}</td>
        <td>${en2ar(r.note)}</td>
+       <td><span class="badge">${en2ar(totalGL)}</span></td>
+       <td style="text-align:right">${datesList ? datesList : '—'}</td>
        <td><span class="badge">${en2ar(total)}</span></td>`;
     tb2.appendChild(tr);
   }
@@ -1456,7 +1543,7 @@ document.getElementById('btnCloseStats').addEventListener('click', ()=> document
 document.getElementById('btnApplyRange').addEventListener('click', renderArchive);
 document.getElementById('statsFilter').addEventListener('input', renderArchive);
 document.getElementById('btnExportArchive').addEventListener('click', ()=>{
-  const obj = { ver:3, date: new Date().toISOString(), archive: ARCHIVE };
+  const obj = { ver:4, date: new Date().toISOString(), archive: ARCHIVE };
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1491,21 +1578,18 @@ async function exportSheetToPDF(){
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF({ orientation:'p', unit:'mm', format:'a4' });
 
-  // أبعاد الصورة بالميليمتر بناءً على عرض A4 (210mm)
-  const pxToMm = 210 / canvas.width;            // كم مم لكل بكسل عند وضعها بعرض A4 كامل
-  const imgWmm = 210;                           // نبدأ على كامل العرض
-  const imgHmm = canvas.height * pxToMm;        // الارتفاع الناتج لو عرضناها 210mm
+  const pxToMm = 210 / canvas.width;
+  const imgWmm = 210;
+  const imgHmm = canvas.height * pxToMm;
   const pageHmm = 297;
 
-  // إن كان الارتفاع أطول من الصفحة، نقلّص العرض بنسبة مناسبة لكي تحتمل صفحة واحدة
   let drawW = imgWmm;
   let drawH = imgHmm;
   if (imgHmm > pageHmm){
-    const s = pageHmm / imgHmm; // عامل التصغير
+    const s = pageHmm / imgHmm;
     drawW = imgWmm * s;
     drawH = imgHmm * s;
   }
-  // توسيط أفقياً إذا صغّرنا العرض
   const x = (210 - drawW) / 2;
   const y = 0;
 
@@ -1519,7 +1603,7 @@ async function exportSheetToPDF(){
   document.body.classList.remove('exporting');
 }
 
-/* زر PDF مع أرشفة المدة */
+/* زر PDF مع أرشفة المدة/الحالة */
 document.getElementById('btnMakePDF').addEventListener('click', ()=>{
   const kind = document.querySelector('#noticeSeg input[name="nt"]:checked')?.value || 'late';
   let mins = 0;
