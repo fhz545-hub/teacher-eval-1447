@@ -17,68 +17,62 @@
 
 <style>
 :root{ --moe:#0b7e88; --ink:#111; --label:#064c50; --bg:#f7fafc; --content:190mm; --nudgeX:0mm; --scale:1; }
+
 *{box-sizing:border-box}
 html,body{ margin:0;background:var(--bg);color:var(--ink);
   font:13.8px/1.9 "Tajawal","Noto Sans Arabic","Noto Naskh Arabic",system-ui;
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility; }
+
 .sheet-wrap{display:grid;place-items:center;margin:10mm 0;padding:8px}
 .sheet{ width:210mm;min-height:297mm;background:#fff;
   transform:translateX(var(--nudgeX)) scale(var(--scale));
   transform-origin: top center; filter: contrast(1.06); }
 
-/* ===== الهيدر (يسار: المملكة | وسط: الشعار | يمين: التاريخ) ===== */
+/* ===== الهيدر ===== */
 .header{padding:8mm 12mm 6mm;border-bottom:2px solid #eaf1f1}
-.hdr-grid{
-  display:grid;
-  grid-template-columns: 1fr 150px 1fr; /* يسار | وسط | يمين */
-  align-items:center; gap:12mm;
-}
-
-/* يسار: المملكة/الوزارة/الإدارة/المدرسة — (توسيط + تباعد متناسق) */
-.hdr-left-org{
-  justify-self:start;
-  display:flex; align-items:center; justify-content:center; /* توسيط داخل المربع */
-  text-align:center;
-}
-.org{
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  color:var(--label);
-  line-height:1.25;           /* ارتفاع سطر ألطف */
-  gap: 2mm;                   /* مسافة متناسقة بين الأسطر */
-  max-width:100%;
-}
+.hdr-grid{ display:grid; grid-template-columns: 1fr 150px 1fr; align-items:center; gap:12mm; }
+.hdr-left-org{ justify-self:start; display:flex; align-items:center; justify-content:center; text-align:center; }
+.org{ display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--label); line-height:1.25; gap: 2mm; max-width:100%; }
 .org .l1{font-weight:900;font-size:13.2px}
 .org .l2{font-weight:900;font-size:12.8px}
 .org .l3{font-weight:800;font-size:12.4px}
 .org .l4{font-weight:800;font-size:12.4px}
-
-/* وسط: الشعار (كما هو) */
 .hdr-center{ justify-self:center; text-align:center; }
-.hdr-center img{
-  width:150px;height:150px;object-fit:contain;display:block;margin:0 auto;
-  image-rendering:-webkit-optimize-contrast;
-}
-
-/* يمين: الرقم + التاريخ + الإجمالي (مزاح قليلاً لليسار) — كما هو */
+.hdr-center img{ width:150px;height:150px;object-fit:contain;display:block;margin:0 auto; image-rendering:-webkit-optimize-contrast; }
 .hdr-right-info{ justify-self:end; text-align:right; transform: translateX(-8mm); }
 .meta-item{display:block;white-space:nowrap;margin:0 0 2px}
 .meta-item .label{font-weight:900;color:var(--label);margin-left:4px}
 .meta-item .value{font-weight:900}
 .case-total{margin-top:4px;font-size:12px;color:#2f4f4b}
 
-/* شريط الأدوات */
-.toolbar{position:sticky;top:0;z-index:10;display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 12px;background:#fff;border-bottom:1px solid #eee}
-.toolbar button{border:0;border-radius:10px;padding:9px 12px;cursor:pointer;background:var(--moe);color:#fff;font-weight:800}
-.toolbar .secondary{background:#eef7f7;color:#0b5e63;border:1px solid #d7ecec}
-.toolbar input[type=file]{display:none}
-.toolbar .hint{font-size:12px;color:#6b7280}
-.select,.search,.t{padding:8px 10px;border:1px solid #d7ecec;border-radius:10px;background:#fff}
-.toolbar-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;width:100%}
-.controls-row{width:100%;display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:8px;padding-top:6px;border-top:1px dashed #e5efef}
-.controls-row .block{display:flex;align-items:center;gap:6px}
-.controls-row .pack{display:flex;align-items:center;gap:4px}
+/* ===== شريط الأدوات (صف واحد متقارب) ===== */
+.toolbar{position:sticky;top:0;z-index:10;background:#fff;border-bottom:1px solid #eee;padding:8px 10px}
+.toolbar-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.toolbar .left,.toolbar .right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hint{font-size:12px;color:#6b7280}
+.search,.select,.t{padding:9px 12px;border:1px solid #d7ecec;border-radius:12px;background:#fff}
+.search{min-width:160px}
+.select{min-width:160px}
 
-/* الصفحة الداخلية */
+/* Chips + Ripple */
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{
+  --bg:#eef7f7; --fg:#0b5e63;
+  border:1px solid #d7ecec;background:var(--bg);color:var(--fg);
+  padding:8px 12px;border-radius:12px;font-weight:900;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;position:relative;overflow:hidden;user-select:none
+}
+.chip.primary{ --bg:var(--moe); --fg:#fff; border:0; }
+.chip.warn{ --bg:#fff5f5; --fg:#b91c1c; border-color:#fecaca; }
+.chip .ico{font-size:16px;line-height:1}
+.chip input[type=file]{display:none}
+.ripple{position:absolute;border-radius:50%;transform:scale(0);animation:ripple .6s linear;background:rgba(255,255,255,.5);pointer-events:none}
+@keyframes ripple{to{transform:scale(12);opacity:0}}
+
+.split{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:6px;padding-top:6px;border-top:1px dashed #e5efef}
+.pack{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* الصفحة */
 .page{padding:6mm 0 10mm;display:grid;place-items:center}
 .content{width:var(--content);margin:0 auto}
 
@@ -105,7 +99,7 @@ html,body{ margin:0;background:var(--bg);color:var(--ink);
 .tbl td span[contenteditable]{display:block;outline:none;overflow-wrap:anywhere;word-break:break-word;font-weight:700}
 .tbl td.name span[contenteditable]{font-size:15.5px;font-weight:900}
 
-/* السجل المدني — خارج الجدول */
+/* السجل المدني */
 .below-flex{width:var(--content);margin:2mm auto 0;display:flex;flex-direction:row-reverse;justify-content:flex-end}
 .civil-badge{ width:38%;display:flex;align-items:center;gap:10px;justify-content:center;
   border:1.5px solid var(--moe);background:#fff;color:#0b3340;border-radius:12px;min-height:9.5mm;padding:3px 6px}
@@ -147,10 +141,8 @@ html,body{ margin:0;background:var(--bg);color:var(--ink);
 }
 #noteReasonText{font-weight:900}
 
-/* ملاحظة صغيرة */
+/* ملاحظات + حقوق */
 .small-muted{font-size:11px;color:#6b7280;margin-top:6px}
-
-/* لا تُطبع */
 .rights{width:var(--content);margin:2mm auto 8mm;text-align:center;font-size:9.2px;color:#6b7280;font-weight:700}
 @media print{ .rights{display:none !important} }
 body.exporting .rights{display:none !important}
@@ -177,7 +169,7 @@ body.exporting .seg{display:none !important}
 #previewTable th,#previewTable td{border:1px solid #e5efef;padding:6px 8px;text-align:center}
 #previewTable{border-collapse:collapse;width:100%}
 
-/* نافذة الإحصائيات */
+/* نافذة الإحصائيات (مُحسّنة) */
 #statsDialog{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;align-items:center;justify-content:center;padding:12px}
 #statsCard{background:#fff;border-radius:14px;min-width:320px;max-width:1100px;width:96%;padding:14px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.25)}
 #statsCard h3{margin:0 0 8px;color:#0b5e63}
@@ -185,47 +177,111 @@ body.exporting .seg{display:none !important}
 .stats-actions button{border:0;border-radius:10px;padding:8px 12px;font-weight:800;cursor:pointer}
 .stats-actions .primary{background:var(--moe);color:#fff}
 .stats-actions .ghost{background:#eef7f7;color:#0b5e63;border:1px solid #d7ecec}
-.stats-grid{display:grid;grid-template-columns:1fr;gap:10px}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:899px){ .stats-grid{grid-template-columns:1fr;} }
+
+.stats-box{max-height:60vh;overflow:auto;border:1px solid #e6eeee;border-radius:10px}
 .stats-table{width:100%;border-collapse:collapse}
-.stats-table th{background:#0b5e63;color:#fff;border:1px solid #2e4a4a;padding:6px 7px}
+.stats-table th{position:sticky;top:0;background:#0b5e63;color:#fff;border:1px solid #2e4a4a;padding:6px 7px;z-index:1}
 .stats-table td{border:1px solid #3f5b57;padding:5px 7px;background:#fff;text-align:center}
-@media (min-width:900px){ .stats-grid{grid-template-columns: 1fr 1fr;}}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;background:#eef7f7;border:1px solid #d7ecec;font-weight:900;color:#0b5e63}
+.kpi{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.kpi .card{padding:10px 12px;border:1px solid #e6eeee;border-radius:12px;background:#f8fcfc;font-weight:900}
+
+/* لوحة المُحوِّل */
+#convDialog{display:none;position:fixed;inset:0;z-index:350;align-items:center;justify-content:center;background:rgba(0,0,0,.35);padding:12px}
+.conv-card{background:#fff;border-radius:14px;min-width:320px;max-width:700px;width:92%;padding:16px;border:1px solid #e6eeee;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:680px){ .conv-grid{grid-template-columns:1fr;} }
+.conv-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.conv-row .select{min-width:100px}
+
+/* لوحة المؤقّت وحاسبة الدقائق */
+#timePad{display:none;position:fixed;background:#fff;border:1px solid #e6eeee;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:10px;z-index:200}
+#adderPad{display:none;position:fixed;background:#fff;border:1px solid #e6eeee;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:10px;z-index:200}
 </style>
 </head>
 <body>
 
-<!-- الأدوات -->
+<!-- ===== الأدوات (كلها في صف واحد متقارب) ===== -->
 <div class="toolbar">
   <div class="toolbar-row">
-    <button id="btnMakePDF" class="secondary">📄 إنشاء PDF</button>
-    <button id="btnWA" class="secondary">📲 واتساب</button>
-    <button id="btnOpenStats" class="secondary" title="إحصائيات وأرشيف">📊 إحصائيات</button>
-    <button id="btnClearImport" class="secondary" title="مسح الأسماء/البيانات">🧹 تصفير الاستيراد</button>
+    <div class="left">
+      <div class="chips">
+        <button id="btnMakePDF" class="chip" title="إنشاء PDF"><span class="ico">📄</span><span>PDF</span></button>
+        <button id="btnWA" class="chip" title="إرسال واتساب"><span class="ico">📲</span><span>واتساب</span></button>
+        <button id="btnOpenStats" class="chip" title="إحصائيات وأرشيف"><span class="ico">📊</span><span>الإحصائيات</span></button>
+        <label class="chip" id="dropZone" title="استيراد (إكسل/CSV)">
+          <span class="ico">⬆️</span><span>استيراد</span>
+          <input id="fileInput" type="file" accept=".xlsx,.xls,.xlsm,.xlsb,.xltx,.xltm,.ods,.csv,.tsv,.txt,.json">
+        </label>
+        <button id="btnClearImport" class="chip warn" title="تصفير الاستيراد"><span class="ico">🧹</span><span>تصفير</span></button>
 
-    <div class="drop" id="dropZone" style="display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px dashed #d7ecec;border-radius:10px;cursor:pointer">
-      <button id="btnImport" class="secondary">⬆️ استيراد ملفات</button>
-      <input id="fileInput" type="file" accept=".xlsx,.xls,.xlsm,.xlsb,.xltx,.xltm,.ods,.csv,.tsv,.txt,.json">
-      <span class="hint">أفلت الملف هنا أو اضغط للاستيراد</span>
-    </div>
+        <button id="btnToggleCal" class="chip" title="التبديل بين منتقي هجري/ميلادي"><span class="ico">🗓️</span><span id="calModeTxt">هجري</span></button>
+        <button id="btnDateConv" class="chip" title="محول التاريخ (هجري ↔︎ ميلادي)"><span class="ico">🔁</span><span>محول</span></button>
 
-    <span class="hint">ابحث واختر معلماً:</span>
-    <input id="teacherSearch" class="search" placeholder="ابحث بالاسم…">
-    <select id="teacherSelect" class="select" style="min-width:220px">
-      <option value="">— اختر معلماً —</option>
-    </select>
-  </div>
-
-  <div class="controls-row">
-    <div class="block">
-      <span class="hint">تاريخ الواقعة (هجري):</span>
-      <div class="pack">
-        <select id="hjDay" class="select"></select>
-        <select id="hjMonth" class="select"></select>
-        <select id="hjYear" class="select"></select>
+        <button id="btnAddLate" class="chip" title="إضافة دقائق تأخر يدوية للمعلم الحالي"><span class="ico">⏱️</span><span>إضافة تأخر</span></button>
       </div>
     </div>
-    <div class="block"><span class="hint">بداية الدوام:</span><input id="workStart" class="t" type="time" value="06:45" step="60"></div>
-    <div class="block"><span class="hint">نهاية الدوام:</span><input id="workEnd" class="t" type="time" value="13:45" step="60"></div>
+
+    <div class="right">
+      <span class="hint">ابحث واختر معلماً:</span>
+      <input id="teacherSearch" class="search" placeholder="ابحث بالاسم…">
+      <select id="teacherSelect" class="select" style="min-width:240px">
+        <option value="">— اختر معلماً —</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="split">
+    <!-- مُنتقي التاريخ (يتبدّل هجري/ميلادي) -->
+    <div class="pack" id="pickHijri">
+      <span class="hint">تاريخ الواقعة (هجري رسمي):</span>
+      <select id="hjDay" class="select"></select>
+      <select id="hjMonth" class="select"></select>
+      <select id="hjYear" class="select"></select>
+    </div>
+
+    <div class="pack" id="pickGreg" style="display:none">
+      <span class="hint">تاريخ الواقعة (ميلادي):</span>
+      <select id="gy" class="select"></select>
+      <select id="gm" class="select"></select>
+      <select id="gd" class="select"></select>
+    </div>
+
+    <div class="pack">
+      <span class="hint">بداية الدوام:</span><input id="workStart" class="t" type="time" value="06:45" step="60">
+      <span class="hint">نهاية الدوام:</span><input id="workEnd" class="t" type="time" value="13:45" step="60">
+    </div>
+  </div>
+</div>
+
+<!-- حوار مُحوّل التاريخ -->
+<div id="convDialog">
+  <div class="conv-card">
+    <h3 style="margin:0 0 10px;color:#0b5e63">محول التاريخ (هجري ↔︎ ميلادي — لا يؤثر على السجلات)</h3>
+    <div class="conv-grid">
+      <div>
+        <div class="conv-row"><span class="hint">هجري:</span>
+          <select id="c_hy" class="select"></select>
+          <select id="c_hm" class="select"></select>
+          <select id="c_hd" class="select"></select>
+        </div>
+        <div id="convOutH" style="margin-top:8px;padding:10px;border:1px dashed #d7ecec;border-radius:10px;background:#fafefe;font-weight:800"></div>
+      </div>
+      <div>
+        <div class="conv-row"><span class="hint">ميلادي:</span>
+          <select id="c_gy" class="select"></select>
+          <select id="c_gm" class="select"></select>
+          <select id="c_gd" class="select"></select>
+        </div>
+        <div id="convOutG" style="margin-top:8px;padding:10px;border:1px dashed #d7ecec;border-radius:10px;background:#fafefe;font-weight:800"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+      <button id="convCopy" class="chip"><span>نسخ النتائج</span></button>
+      <button id="convClose" class="chip primary"><span>إغلاق</span></button>
+    </div>
   </div>
 </div>
 
@@ -234,32 +290,26 @@ body.exporting .seg{display:none !important}
     <!-- ===== الهيدر ===== -->
     <div class="header">
       <div class="hdr-grid">
+        <div class="hdr-left-org">
+          <div class="org">
+            <div class="l1">المملكة العربية السعودية</div>
+            <div class="l2">وزارة التعليم</div>
+            <div class="l3">الإدارة العامة للتعليم بالمنطقة الشرقية</div>
+            <div class="l4" id="schoolNameHdr">مدرسة اليعقوبي الثانوي بالخبر</div>
+          </div>
+        </div>
 
-        <!-- يسار: المملكة / الوزارة / الإدارة / المدرسة (موسّطة مع تباعد متناسق) -->
-<div class="hdr-left-org">
-  <div class="org">
-    <div class="l1">المملكة العربية السعودية</div>
-    <div class="l2">وزارة التعليم</div>
-    <div class="l3">الإدارة العامة للتعليم بالمنطقة الشرقية</div>
-    <div class="l4" id="schoolNameHdr">مدرسة اليعقوبي الثانوي بالخبر</div>
-  </div>
-</div>
-
-        <!-- الوسط: شعار الوزارة -->
         <div class="hdr-center">
           <img src="وزارة التعليم.png" alt="شعار وزارة التعليم" id="moeLogo" draggable="false" crossOrigin="anonymous">
         </div>
 
-        <!-- يمين: الرقم + التاريخ + الإجمالي -->
         <div class="hdr-right-info meta">
           <div class="meta-item"><span class="label">الرقم:</span><span class="value" id="serialNo">01</span></div>
-          <div class="meta-item"><span class="label"> التاريخ :</span><span class="value" id="hdrHijri">١٤٤٧/٠٤/١٣ هـ</span></div>
+          <div class="meta-item"><span class="label"> التاريخ :</span><span class="value" id="hdrHijri">—</span></div>
           <div class="case-total">إجمالي مساءلات المعلّم: <strong id="caseTotal">0</strong></div>
         </div>
-
       </div>
     </div>
-    <!-- ===== نهاية الهيدر ===== -->
 
     <div class="page">
       <div class="content">
@@ -335,7 +385,7 @@ body.exporting .seg{display:none !important}
                 <input type="checkbox" checked>
                 <span class="text">
                   تأخركم من بداية العمل، وحضوركم الساعة ( <span id="tLateIn" class="timebox empty">--:--</span> ).
-                  <span class="calc">— إجمالي التأخر: <span id="lateTotal">0 دقيقة</span></span>
+                  <span class="calc">— إجمالي التأخر: <span id="lateTotal">0 دقيقة</span> (<span id="lateHH">00:00</span> س)</span>
                 </span>
               </label>
 
@@ -344,7 +394,7 @@ body.exporting .seg{display:none !important}
                 <span class="text">
                   عدم تواجدكم أثناء العمل من الساعة : ( <span id="tAbsFrom" class="timebox empty">--:--</span> )
                   إلى الساعة : ( <span id="tAbsTo" class="timebox empty">--:--</span> ).
-                  <span class="calc">— مدة عدم التواجد: <span id="absTotal">0 دقيقة</span></span>
+                  <span class="calc">— مدة عدم التواجد: <span id="absTotal">0 دقيقة</span> (<span id="absHH">00:00</span> س)</span>
                 </span>
               </label>
 
@@ -352,7 +402,7 @@ body.exporting .seg{display:none !important}
                 <input type="checkbox" checked>
                 <span class="text">
                   انصرافكم مبكرًا قبل نهاية العمل من الساعة : ( <span id="tEarlyFrom" class="timebox empty">--:--</span> ).
-                  <span class="calc">— مدة الانصراف المبكر: <span id="earlyTotal">0 دقيقة</span></span>
+                  <span class="calc">— مدة الانصراف المبكر: <span id="earlyTotal">0 دقيقة</span> (<span id="earlyHH">00:00</span> س)</span>
                 </span>
               </label>
             </div>
@@ -404,7 +454,7 @@ body.exporting .seg{display:none !important}
             <p class="para"><strong>السلام عليكم ورحمة الله وبركاته</strong> وبعد ،،،</p>
             <p class="para">
               من خلال متابعة سجل الدوام تبين غيابكم خلال الفترة الموضحة بعالية، آمل الإفادة عن سبب ذلك
-              وعليكم تقديم ما يؤيد عذركم خلال أسبوع فقط من تاريخه، علماً بأنه في حالة عدم الإلتزام سيتم اتخاذ اللازم حسب التعليمات.
+              وعليكم تقديم ما يؤيد عذركم خلال أسبوع فقط من تاريخه، علماً بأنه في حالة عدم الالتزام سيتم اتخاذ اللازم حسب التعليمات.
             </p>
             <p class="para">
               <strong>اسم الرئيس المباشر :</strong> <span id="managerName4">فهد بن حامد علي الزهراني</span>
@@ -488,7 +538,6 @@ body.exporting .seg{display:none !important}
             </span>
           </p>
 
-          <!-- التوقيعات -->
           <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
             <div style="flex:1">
               <p style="margin:0 0 4px"><strong>توقيع الموظف بالاطلاع:</strong> ...............................</p>
@@ -538,6 +587,8 @@ body.exporting .seg{display:none !important}
 <div id="statsDialog" role="dialog" aria-modal="true">
   <div id="statsCard">
     <h3>إحصائيات وإرشيف المساءلات والتنبيهات</h3>
+    <div class="kpi" id="kpiRow"></div>
+
     <div class="stats-actions">
       <button id="btnExportArchive" class="ghost">💾 نسخ احتياطي</button>
       <label class="ghost" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
@@ -545,47 +596,68 @@ body.exporting .seg{display:none !important}
         <input id="restoreInput" type="file" accept=".json" style="display:none">
       </label>
       <button id="btnResetAll" class="ghost">↺ تصفير المساءلات</button>
-      <span class="hint">يمكن تصفية الأرشيف باسم المعلم:</span>
+
+      <span class="hint">فلترة بالاسم:</span>
       <input id="statsFilter" class="search" placeholder="اكتب اسم معلم…">
+
+      <span class="hint">الفترة (هجري YYYY/MM/DD):</span>
+      <input id="fromHijri" class="search" placeholder="من هـ">
+      <input id="toHijri"   class="search" placeholder="إلى هـ">
+      <button id="btnApplyRange" class="ghost">تطبيق</button>
+
       <button id="btnCloseStats" class="primary">إغلاق</button>
     </div>
 
     <div class="stats-grid">
       <div>
         <h3 style="margin-top:0">الأرشيف (تفصيلي)</h3>
-        <table class="stats-table" id="tblArchive">
-          <thead><tr>
-            <th>التاريخ (هجري)</th>
-            <th>اسم المعلم</th>
-            <th>السجل المدني</th>
-            <th>نوع الإجراء</th>
-            <th>رقم الإجراء</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="stats-box">
+          <table class="stats-table" id="tblArchive">
+            <thead>
+              <tr>
+                <th>التاريخ (هجري)</th>
+                <th>اليوم</th>
+                <th>اسم المعلم</th>
+                <th>السجل المدني</th>
+                <th>نوع الإجراء</th>
+                <th>المدة (دقائق)</th>
+                <th>المدة (ساعات:دقائق)</th>
+                <th>رقم الإجراء</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
+
       <div>
         <h3 style="margin-top:0">ملخص حسب المعلم</h3>
-        <table class="stats-table" id="tblSummary">
-          <thead><tr>
-            <th>المعلم</th>
-            <th>السجل المدني</th>
-            <th>مساءلة غياب</th>
-            <th>تنبيه تأخر</th>
-            <th>تنبيه عدم تواجد</th>
-            <th>تنبيه انصراف مبكر</th>
-            <th>لفت نظر</th>
-            <th>الإجمالي</th>
-          </tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="stats-box">
+          <table class="stats-table" id="tblSummary">
+            <thead>
+              <tr>
+                <th>المعلم</th>
+                <th>السجل المدني</th>
+                <th>مساءلة غياب</th>
+                <th>تنبيه تأخر</th>
+                <th>دقائق التأخر</th>
+                <th>ساعات التأخر</th>
+                <th>عدم تواجد</th>
+                <th>انصراف مبكر</th>
+                <th>لفت نظر</th>
+                <th>الإجمالي</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <!-- لوحة المؤقّت -->
-<div id="timePad" style="display:none;position:fixed;background:#fff;border:1px solid #e6eeee;border-radius:12px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:10px;z-index:200">
+<div id="timePad">
   <div class="display" id="timePadDisplay" style="font:700 18px ui-monospace,Consolas,monospace;text-align:center;margin-bottom:6px">--:--</div>
   <div class="grid" style="display:grid;grid-template-columns:repeat(3,44px);gap:6px;justify-content:center">
     <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button>
@@ -598,698 +670,1056 @@ body.exporting .seg{display:none !important}
   </div>
 </div>
 
-<script>
-/* ===== هوية وثوابت ===== */
-const BASE_TITLE='الشؤون الإدارية والمتابعة';
-const DEFAULT_WA='966504532489';
-const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
-const en2ar = s => (s+'').replace(/[0-9]/g,d=>AR[d]);
-const ar2en = s => (s+'').replace(/[٠-٩]/g,d=>EN[AR.indexOf(d)]);
+<!-- لوحة إضافة دقائق التأخر -->
+<div id="adderPad">
+  <div style="font-weight:900;margin-bottom:6px">إضافة دقائق تأخر للمعلم الحالي</div>
+  <div class="row" style="display:flex;gap:6px;align-items:center">
+    <input id="adderMins" class="search" type="number" min="0" step="1" placeholder="أدخل عدد الدقائق">
+    <button id="adderSave" class="chip primary">اعتماد</button>
+    <button id="adderClose" class="chip">إغلاق</button>
+  </div>
+  <div class="hint" style="margin-top:6px">تُضاف كسجل تأخر في الأرشيف بتاريخ اليوم المختار.</div>
+</div>
 
-/* ===== تناسب تلقائي ===== */
+<script>
+/* ========= مؤثر النقر للأزرار ========= */
+function addRipple(e){
+  const btn=e.currentTarget; if(!btn.classList.contains('chip')) return;
+  const wave=document.createElement('span'); wave.className='ripple';
+  const r=btn.getBoundingClientRect(); const size=Math.max(r.width,r.height);
+  wave.style.width=wave.style.height=size+'px';
+  wave.style.left=(e.clientX-r.left-size/2)+'px'; wave.style.top=(e.clientY-r.top-size/2)+'px';
+  btn.appendChild(wave); setTimeout(()=>wave.remove(),600);
+}
+document.addEventListener('click',ev=>{ const b=ev.target.closest('.chip'); if(b) addRipple(ev); });
+
+/* ========= ضبط قياس ورقة A4 ========= */
 function fitSheet(){
-  const sheet=document.getElementById('sheet');
-  if(!sheet) return;
-  const avail = Math.max(320, window.innerWidth - 16);
-  const scale = Math.min(1, avail / sheet.offsetWidth);
+  const sheet=document.getElementById('sheet'); if(!sheet) return;
+  const avail=Math.max(320, window.innerWidth-16);
+  const scale=Math.min(1, avail/sheet.offsetWidth);
   document.documentElement.style.setProperty('--scale', String(scale));
 }
-addEventListener('resize', fitSheet);
-addEventListener('orientationchange', fitSheet);
-document.addEventListener('DOMContentLoaded', fitSheet);
+window.addEventListener('resize',fitSheet);
+window.addEventListener('orientationchange',fitSheet);
+document.addEventListener('DOMContentLoaded',fitSheet);
 
-/* ===== تاريخ أمّ القرى ===== */
-function fmtHijriNoSuffix(d){
-  const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
-  const DD=en2ar(parts.find(p=>p.type==='day').value.padStart(2,'0'));
-  const MM=en2ar(parts.find(p=>p.type==='month').value.padStart(2,'0'));
-  const YY=en2ar(parts.find(p=>p.type==='year').value);
-  return `${DD}/${MM}/${YY}`;
-}
-function fmtHijriYMDNoSuffix(d){
-  const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(d);
-  const DD=en2ar(parts.find(p=>p.type==='day').value.padStart(2,'0'));
-  const MM=en2ar(parts.find(p=>p.type==='month').value.padStart(2,'0'));
-  const YY=en2ar(parts.find(p=>p.type==='year').value);
-  return `${YY}/${MM}/${DD}`;
-}
-const wdHijri = d => new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{weekday:'long'}).format(d);
+/* ========= أدوات أرقام عربية/إنجليزية ========= */
+const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
+const en2ar = s => (''+s).replace(/[0-9]/g, d => AR[d]);
+const ar2en = s => (''+s).replace(/[٠-٩]/g, d => EN[AR.indexOf(d)]);
 
-function hijriToGregorian(y,m,d){
+/* ========= تحويل هجري/ميلادي (أم القرى) ========= */
+function fmtHijriNoSuffix(dateObj){
   const fmt=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'});
-  const parts = dt => { const p=fmt.formatToParts(dt); let yy,mm,dd;
-    p.forEach(q=>{ if(q.type==='year') yy=parseInt(ar2en(q.value),10);
-                   if(q.type==='month') mm=parseInt(ar2en(q.value),10);
-                   if(q.type==='day') dd=parseInt(ar2en(q.value),10); });
-    return {yy,mm,dd}; };
-  let t=new Date(1937,0,1);
-  for(let i=0;i<60000;i++){
-    const a=parts(t);
-    if(a.yy===y && a.mm===m && a.dd===d) return new Date(t.getFullYear(),t.getMonth(),t.getDate());
-    t.setDate(t.getDate()+1);
+  const parts=fmt.formatToParts(dateObj);
+  const day = parts.find(p=>p.type==='day').value.padStart(2,'0');
+  const mon = parts.find(p=>p.type==='month').value.padStart(2,'0');
+  const yr = parts.find(p=>p.type==='year').value;
+  return `${day}/${mon}/${yr}`;
+}
+function fmtHijriYMDNoSuffix(dateObj){
+  const fmt=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'});
+  const parts=fmt.formatToParts(dateObj);
+  const day = parts.find(p=>p.type==='day').value.padStart(2,'0');
+  const mon = parts.find(p=>p.type==='month').value.padStart(2,'0');
+  const yr = parts.find(p=>p.type==='year').value;
+  return `${yr}/${mon}/${day}`;
+}
+function wdHijri(dateObj){
+  return new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{weekday:'long'}).format(dateObj);
+}
+function hijriToGregorian(y, m, d){
+  let lo = new Date(1937,0,1), hi = new Date(2077,11,31);
+  const fmt = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'numeric',day:'numeric'});
+  const parts = dt => {
+    const ps = fmt.formatToParts(dt);
+    return {
+      y: +ar2en(ps.find(p=>p.type==='year').value),
+      m: +ar2en(ps.find(p=>p.type==='month').value),
+      d: +ar2en(ps.find(p=>p.type==='day').value)
+    };
+  };
+  while(lo <= hi){
+    const mid = new Date((lo.getTime()+hi.getTime())/2);
+    const v = parts(mid);
+    if(v.y===y && v.m===m && v.d===d) {
+      return new Date(mid.getFullYear(), mid.getMonth(), mid.getDate());
+    }
+    if(v.y < y || (v.y===y && v.m < m) || (v.y===y && v.m===m && v.d < d)) {
+      lo = new Date(mid.getFullYear(), mid.getMonth(), mid.getDate()+1);
+    } else {
+      hi = new Date(mid.getFullYear(), mid.getMonth(), mid.getDate()-1);
+    }
   }
   return null;
 }
+function gregorianToHijri(dateObj){
+  const fmt = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'});
+  const parts = fmt.formatToParts(dateObj);
+  const day = parts.find(p=>p.type==='day').value.padStart(2,'0');
+  const mon = parts.find(p=>p.type==='month').value.padStart(2,'0');
+  const yr = parts.find(p=>p.type==='year').value;
+  return `${day}/${mon}/${yr}`;
+}
 
-(function buildHijriPicker(){
-  const dSel=document.getElementById('hjDay'), mSel=document.getElementById('hjMonth'), ySel=document.getElementById('hjYear');
+/* ========= مُنتقي التاريخ الهجري + الميلادي ========= */
+let CAL_MODE = 'h'; // h=Hijri, g=Gregorian
+
+function buildHijriPicker(){
+  const dSel = document.getElementById('hjDay'),
+        mSel = document.getElementById('hjMonth'),
+        ySel = document.getElementById('hjYear');
+  dSel.innerHTML = mSel.innerHTML = ySel.innerHTML = '';
   for(let d=1; d<=30; d++) dSel.add(new Option(en2ar(String(d).padStart(2,'0')), d));
   for(let m=1; m<=12; m++) mSel.add(new Option(en2ar(String(m).padStart(2,'0')), m));
-  const now=new Date();
-  const curAH=parseInt(ar2en(new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric'}).format(now)),10);
-  for(let y=curAH-10; y<=curAH+10; y++) ySel.add(new Option(en2ar(y), y));
-  const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
-  dSel.value=parseInt(ar2en(parts.find(p=>p.type==='day').value),10);
-  mSel.value=parseInt(ar2en(parts.find(p=>p.type==='month').value),10);
-  ySel.value=parseInt(ar2en(parts.find(p=>p.type==='year').value),10);
+  const now = new Date();
+  const curAH = parseInt(ar2en(new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric'}).format(now)),10);
+  for(let y = curAH - 10; y <= curAH + 10; y++) ySel.add(new Option(en2ar(String(y)), y));
+  const parts = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
+  dSel.value = parseInt(ar2en(parts.find(p=>p.type==='day').value),10);
+  mSel.value = parseInt(ar2en(parts.find(p=>p.type==='month').value),10);
+  ySel.value = parseInt(ar2en(parts.find(p=>p.type==='year').value),10);
+
   function update(){
-    const y=+ySel.value,m=+mSel.value,d=+dSel.value;
-    const g=hijriToGregorian(y,m,d); if(!g){ alert('تعذّر تحويل التاريخ الهجري'); return; }
-    const hijYMD=fmtHijriYMDNoSuffix(g);
-    document.getElementById('hdrHijri').textContent = `${hijYMD} هـ`;
-    const hijNo=fmtHijriNoSuffix(g);
+    const y = +ySel.value, m = +mSel.value, d = +dSel.value;
+    const g = hijriToGregorian(y, m, d);
+    if(!g) return;
+    const hijYMD = fmtHijriYMDNoSuffix(g);
+    const hijDMY = fmtHijriNoSuffix(g);
     const dayName = wdHijri(g);
+    document.getElementById('hdrHijri').textContent = `${hijYMD} هـ`;
     document.getElementById('dynDay').textContent = dayName;
-    document.getElementById('dynHijri').textContent = hijNo;
-    document.getElementById('absDayP').textContent  = dayName;
+    document.getElementById('dynHijri').textContent = hijDMY;
+    document.getElementById('absDayP').textContent = dayName;
     document.getElementById('absDateYMD').textContent = hijYMD;
+
+    // مزامنة المُنتقي الميلادي
+    setGregFromDate(g);
   }
-  dSel.onchange=mSel.onchange=ySel.onchange=update; update();
-})();
+  dSel.onchange = mSel.onchange = ySel.onchange = update;
+  update();
+}
 
-/* ===== بيانات المعلمين (cache) ===== */
-let TEACHERS=JSON.parse(localStorage.getItem('teachersCache')||'[]');
+function buildGregPicker(){
+  const ySel = document.getElementById('gy'),
+        mSel = document.getElementById('gm'),
+        dSel = document.getElementById('gd');
+  ySel.innerHTML = mSel.innerHTML = dSel.innerHTML = '';
+  const now = new Date();
+  const yNow = now.getFullYear();
+  for(let y=yNow-10; y<=yNow+10; y++) ySel.add(new Option(en2ar(String(y)), y));
+  for(let m=1; m<=12; m++) mSel.add(new Option(en2ar(String(m).padStart(2,'0')), m));
+  function daysIn(y,m){ return new Date(y, m, 0).getDate(); }
+  function fillDays(){
+    const y=+ySel.value, m=+mSel.value;
+    const n=daysIn(y,m);
+    dSel.innerHTML='';
+    for(let d=1; d<=n; d++) dSel.add(new Option(en2ar(String(d).padStart(2,'0')), d));
+  }
+  ySel.onchange = ()=>{ fillDays(); updateFromGreg(); };
+  mSel.onchange = ()=>{ fillDays(); updateFromGreg(); };
+  dSel.onchange = updateFromGreg;
+  // ضبط على اليوم
+  ySel.value = yNow; mSel.value = now.getMonth()+1; fillDays(); dSel.value = now.getDate();
+  updateFromGreg();
+}
+
+function setGregFromDate(g){
+  const ySel = document.getElementById('gy'),
+        mSel = document.getElementById('gm'),
+        dSel = document.getElementById('gd');
+  if(!ySel) return;
+  const y = g.getFullYear(), m = g.getMonth()+1, d = g.getDate();
+  // ملء الأيام إن لزم
+  function daysIn(y,m){ return new Date(y, m, 0).getDate(); }
+  const needFill = (+mSel.value||0)!==m || (+ySel.value||0)!==y || (dSel.options.length!==daysIn(y,m));
+  if(needFill){
+    ySel.value = y; mSel.value = m;
+    dSel.innerHTML=''; const n=daysIn(y,m);
+    for(let i=1;i<=n;i++) dSel.add(new Option(en2ar(String(i).padStart(2,'0')), i));
+  }
+  dSel.value = d;
+}
+
+function updateFromGreg(){
+  const y=+document.getElementById('gy').value,
+        m=+document.getElementById('gm').value,
+        d=+document.getElementById('gd').value;
+  const g = new Date(y, m-1, d);
+  // تحديث الحقول الهجرية الظاهرة
+  const hijYMD = fmtHijriYMDNoSuffix(g);
+  const hijDMY = fmtHijriNoSuffix(g);
+  const dayName = wdHijri(g);
+  document.getElementById('hdrHijri').textContent = `${hijYMD} هـ`;
+  document.getElementById('dynDay').textContent = dayName;
+  document.getElementById('dynHijri').textContent = hijDMY;
+  document.getElementById('absDayP').textContent = dayName;
+  document.getElementById('absDateYMD').textContent = hijYMD;
+
+  // مزامنة المُنتقي الهجري
+  const fmt = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'numeric',day:'numeric'});
+  const ps = fmt.formatToParts(g);
+  document.getElementById('hjYear').value  = +ar2en(ps.find(p=>p.type==='year').value);
+  document.getElementById('hjMonth').value = +ar2en(ps.find(p=>p.type==='month').value);
+  document.getElementById('hjDay').value   = +ar2en(ps.find(p=>p.type==='day').value);
+}
+
+/* تبديل واجهة المُنتقي */
+function toggleCalMode(){
+  CAL_MODE = (CAL_MODE==='h') ? 'g' : 'h';
+  document.getElementById('pickHijri').style.display = (CAL_MODE==='h')?'':'none';
+  document.getElementById('pickGreg').style.display  = (CAL_MODE==='g')?'':'none';
+  document.getElementById('calModeTxt').textContent = (CAL_MODE==='h')?'هجري':'ميلادي';
+}
+document.getElementById('btnToggleCal').addEventListener('click', toggleCalMode);
+
+/* ========= بيانات المعلمين / التخزين ========= */
+let TEACHERS = JSON.parse(localStorage.getItem('teachersCache') || '[]');
 let currentIdx = null;
-function pad2(n){return String(n).padStart(2,'0');}
-
-/* اسم المدير — تخزين */
-const MANAGER_KEY='managerName';
+function pad2(n){ return String(n).padStart(2,'0'); }
+const MANAGER_KEY = 'managerName';
 function getManagerName(){ return localStorage.getItem(MANAGER_KEY) || 'فهد حامد علي الزهراني'; }
 function setManagerName(v){
-  if(!v) return; localStorage.setItem(MANAGER_KEY, v);
+  if(!v) return;
+  localStorage.setItem(MANAGER_KEY, v);
   ['managerName1','managerName2','managerName3','managerName4','managerName5','managerNameNote'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.textContent=v;
+    const el = document.getElementById(id);
+    if(el) el.textContent = v;
   });
 }
 
-/* ===== أرشيف الإجراءات ===== */
-const ARCHIVE_KEY='caseArchive_v1';
+/* ========= الأرشيف ========= */
+const ARCHIVE_KEY = 'caseArchive_v3';
 let ARCHIVE = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || '[]');
 
 function teacherKeyFromObj(obj){
-  const civil=(obj.civil||'').trim();
-  const name=(obj.name||'').trim();
-  return civil? ('id:'+civil) : ('name:'+name);
+  const c = (obj.civil||'').trim(), n = (obj.name||'').trim();
+  return c ? ('id:' + c) : ('name:' + n);
 }
-function getCurrentTeacher(){ if(currentIdx==null) return null; return TEACHERS[currentIdx] || null; }
+function getCurrentTeacher(){
+  if(currentIdx === null) return null;
+  return TEACHERS[currentIdx] || null;
+}
 function computeCountsFor(key){
-  let total=0, byType={gaib:0, late:0, absent:0, early:0, note:0};
-  for(const e of ARCHIVE){ if(e.tkey===key){ total++; if(byType[e.kind]!=null) byType[e.kind]++; } }
-  return {total, byType};
+  let total = 0, lateMins=0;
+  const byType = {gaib:0, late:0, absent:0, early:0, note:0};
+  for(const e of ARCHIVE){
+    if(e.tkey === key){
+      total++;
+      if(byType[e.kind] != null) byType[e.kind]++;
+      if(e.kind==='late') lateMins += (e.mins||0);
+    }
+  }
+  return { total, byType, lateMins };
 }
-function nextSerialFor(key){ return computeCountsFor(key).total + 1; }
+function nextSerialFor(key){
+  return computeCountsFor(key).total + 1;
+}
 function refreshHeaderCounts(){
-  const t=getCurrentTeacher(); 
-  if(!t){ document.getElementById('serialNo').textContent='01'; document.getElementById('caseTotal').textContent='0'; return; }
-  const key=teacherKeyFromObj(t);
+  const t = getCurrentTeacher();
+  if(!t){
+    document.getElementById('serialNo').textContent = '01';
+    document.getElementById('caseTotal').textContent = '0';
+    return;
+  }
+  const key = teacherKeyFromObj(t);
   document.getElementById('serialNo').textContent = pad2(nextSerialFor(key));
   document.getElementById('caseTotal').textContent = computeCountsFor(key).total;
 }
-function saveArchive(){ localStorage.setItem(ARCHIVE_KEY, JSON.stringify(ARCHIVE)); refreshHeaderCounts(); }
-
-/* تسجيل إجراء جديد */
-function recordCase(kind, source){
-  const t=getCurrentTeacher();
-  if(!t){ alert('يرجى اختيار معلّم أولاً.'); return; }
-  const key=teacherKeyFromObj(t);
-  const serial = nextSerialFor(key);
-  const hj=document.getElementById('hdrHijri').textContent.replace('هـ','').trim();
-  const day=document.getElementById('dynDay').textContent.trim();
-  ARCHIVE.push({
-    ts: Date.now(), hj, day, kind, serial, source: source || 'manual',
-    tkey: key, name: (t.name||'').trim(), civil: (t.civil||'').trim()
-  });
-  saveArchive();
+function saveArchive(){
+  localStorage.setItem(ARCHIVE_KEY, JSON.stringify(ARCHIVE));
+  refreshHeaderCounts();
 }
 
-/* ربط الرقم والإجمالي بالمعلم الحالي */
-function refreshCaseNo(){ refreshHeaderCounts(); }
+/* تسجيل الإجراء مع المدد بالدقائق */
+function recordCase(kind, source, mins){
+  const t = getCurrentTeacher();
+  if(!t){
+    alert('يرجى اختيار معلّم أولاً.');
+    return false;
+  }
+  const key = teacherKeyFromObj(t);
+  const serial = nextSerialFor(key);
+  const hj = (document.getElementById('hdrHijri').textContent || '').replace('هـ','').trim();
+  const day = (document.getElementById('dynDay').textContent || '').trim();
+  const ts = Date.now();
+  ARCHIVE.push({ ts, hj, day, kind, serial, source: source || 'manual', tkey: key,
+                 name: (t.name||'').trim(), civil: (t.civil||'').trim(), mins: Math.max(0, mins|0) });
+  saveArchive();
+  return true;
+}
 
-/* تطبيق المعلم المختار */
+/* ========= تطبيق المعلم على النموذج ========= */
 function applyTeacher(t, idx){
   currentIdx = idx;
   document.getElementById('schoolNameHdr').textContent = t.school || 'مدرسة اليعقوبي الثانوية';
-  const set=(id,v)=>document.getElementById(id).textContent=v||'';
-  set('t_name',t.name); set('t_spec',t.spec); set('t_level',t.level||t.rank); set('t_job',t.job); set('t_work',t.work);
-  document.getElementById('t_civil').textContent = t.civil || '';
+  function set(id, v){
+    const el = document.getElementById(id);
+    if(el) el.textContent = v || '';
+  }
+  set('t_name', t.name);
+  set('t_spec', t.spec);
+  set('t_level', t.level || t.rank);
+  set('t_job', t.job);
+  set('t_work', t.work);
+  set('t_civil', t.civil);
   document.getElementById('afadaName').textContent = t.name || '—';
   document.getElementById('abs-name-top').textContent = t.name || '—';
   document.getElementById('abs-teacher-name').textContent = t.name || '—';
   document.getElementById('noteTeacherName').textContent = t.name || '';
-  refreshCaseNo();
+  refreshHeaderCounts();
 }
 function refillSelect(){
-  const sel=document.getElementById('teacherSelect');
-  sel.innerHTML='<option value="">— اختر معلماً —</option>';
-  TEACHERS.forEach((t,i)=> sel.add(new Option(t.name? t.name : `بدون اسم ${i+1}`, i)));
+  const sel = document.getElementById('teacherSelect');
+  sel.innerHTML = '<option value="">— اختر معلماً —</option>';
+  TEACHERS.forEach((t,i)=> {
+    sel.add(new Option(t.name || `معلم ${i+1}`, i));
+  });
 }
 refillSelect();
-document.getElementById('teacherSelect').addEventListener('change',e=>{
-  const i=+e.target.value; if(Number.isInteger(i)&&TEACHERS[i]) applyTeacher(TEACHERS[i], i);
+document.getElementById('teacherSelect').addEventListener('change', e=>{
+  const i = +e.target.value;
+  if(Number.isInteger(i) && TEACHERS[i]){
+    applyTeacher(TEACHERS[i], i);
+  }
 });
-document.getElementById('teacherSearch').addEventListener('input',e=>{
-  const q=e.target.value.trim(); const sel=document.getElementById('teacherSelect');
-  for(const o of sel.options){ if(!o.value){o.hidden=false;continue;} o.hidden=q && !o.text.includes(q); }
+document.getElementById('teacherSearch').addEventListener('input', e=>{
+  const q = e.target.value.trim();
+  const sel = document.getElementById('teacherSelect');
+  for(const opt of sel.options){
+    if(!opt.value){ opt.hidden = false; continue; }
+    opt.hidden = q && !opt.text.includes(q);
+  }
 });
 ['t_name','t_spec','t_level','t_job','t_work','t_civil','noteTeacherName'].forEach(id=>{
-  const el=document.getElementById(id);
-  el.addEventListener('blur',()=>{
-    if(currentIdx==null || !TEACHERS[currentIdx]) return;
-    const v=el.textContent.trim();
-    if(id==='t_name' || id==='noteTeacherName'){ 
-      TEACHERS[currentIdx].name=v;
-      document.getElementById('t_name').textContent=v;
-      document.getElementById('noteTeacherName').textContent=v;
-      document.getElementById('afadaName').textContent=v||'—';
-      document.getElementById('abs-name-top').textContent=v||'—';
-      document.getElementById('abs-teacher-name').textContent=v||'—';
-    } else if(id==='t_spec'){ TEACHERS[currentIdx].spec=v; }
-    else if(id==='t_level'){ TEACHERS[currentIdx].level=v; }
-    else if(id==='t_job'){ TEACHERS[currentIdx].job=v; }
-    else if(id==='t_work'){ TEACHERS[currentIdx].work=v; }
-    else if(id==='t_civil'){ TEACHERS[currentIdx].civil=v; }
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('blur', ()=>{
+    if(currentIdx === null || !TEACHERS[currentIdx]) return;
+    const v = el.textContent.trim();
+    if(id === 't_name' || id === 'noteTeacherName'){
+      TEACHERS[currentIdx].name = v;
+      document.getElementById('t_name').textContent = v;
+      document.getElementById('noteTeacherName').textContent = v;
+      document.getElementById('afadaName').textContent = v || '—';
+      document.getElementById('abs-name-top').textContent = v || '—';
+      document.getElementById('abs-teacher-name').textContent = v || '—';
+    } else if(id === 't_spec'){ TEACHERS[currentIdx].spec = v; }
+    else if(id === 't_level'){ TEACHERS[currentIdx].level = v; }
+    else if(id === 't_job'){ TEACHERS[currentIdx].job = v; }
+    else if(id === 't_work'){ TEACHERS[currentIdx].work = v; }
+    else if(id === 't_civil'){ TEACHERS[currentIdx].civil = v; }
     localStorage.setItem('teachersCache', JSON.stringify(TEACHERS));
-    refreshCaseNo();
+    refreshHeaderCounts();
   });
 });
 
-/* تعديل اسم المدير — يدوي */
+/* اسم المدير قابل للتعديل + حفظ */
 ['managerName1','managerName2','managerName3','managerName4','managerName5','managerNameNote'].forEach(id=>{
-  const el=document.getElementById(id);
+  const el = document.getElementById(id);
   if(!el) return;
   el.setAttribute('contenteditable','true');
-  el.addEventListener('blur', ()=> setManagerName(el.textContent.trim()||''));
+  el.addEventListener('blur', ()=> setManagerName(el.textContent.trim() || ''));
 });
 setManagerName(getManagerName());
 
 /* تصفير الاستيراد */
 document.getElementById('btnClearImport').addEventListener('click', ()=>{
-  if(!confirm('سيتم تصفير بيانات الاستيراد والأسماء. هل أنت متأكد؟')) return;
-  TEACHERS=[]; localStorage.removeItem('teachersCache'); refillSelect();
-  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name','noteTeacherName'].forEach(id=>{
-    const el=document.getElementById(id); if(el) el.textContent='';
-  });
-  document.getElementById('afadaName').textContent='—';
-  document.getElementById('abs-name-top').textContent='—';
-  document.getElementById('abs-teacher-name').textContent='—';
-  currentIdx=null;
-  refreshCaseNo();
+  if(!confirm('سيتم تصفير بيانات المعلمين والأرشيف. هل أنت متأكد؟')) return;
+  TEACHERS = [];
+  localStorage.removeItem('teachersCache');
+  refillSelect();
+  ['t_name','t_spec','t_level','t_job','t_work','t_civil','afadaName','abs-name-top','abs-teacher-name','noteTeacherName']
+    .forEach(id=>{ const el = document.getElementById(id); if(el) el.textContent = ''; });
+  currentIdx = null;
+  ARCHIVE = [];
+  saveArchive();
 });
 
-/* ===== الاستيراد ===== */
-const fileInput=document.getElementById('fileInput');
-const drop=document.getElementById('dropZone');
-const importDialog=document.getElementById('importDialog');
-document.getElementById('btnImport').addEventListener('click',()=>fileInput.click());
-drop.addEventListener('click', (e)=>{ if(e.target.id!=='btnImport') fileInput.click();});
-['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.background='#f7ffff';}));
-['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.style.background='transparent';}));
-drop.addEventListener('drop',e=>{e.preventDefault(); const f=e.dataTransfer.files?.[0]; if(f) beginImport(f);});
-fileInput.addEventListener('change',e=>{if(e.target.files && e.target.files[0]) beginImport(e.target.files[0]);});
+/* ========= الاستيراد ========= */
+const fileInput = document.getElementById('fileInput');
+const drop = document.getElementById('dropZone');
+const importDialog = document.getElementById('importDialog');
 
-let IMPORT_CTX = {workbook:null, sheets:[], arrays:{}, headers:{}};
+drop.addEventListener('click', e=>{
+  if(e.target.id !== 'fileInput') fileInput.click();
+});
+['dragenter','dragover'].forEach(ev=>{
+  drop.addEventListener(ev, e=>{
+    e.preventDefault();
+    drop.style.outline = '2px dashed #0b7e88';
+  });
+});
+['dragleave','drop'].forEach(ev=>{
+  drop.addEventListener(ev, e=>{
+    e.preventDefault();
+    drop.style.outline = 'none';
+  });
+});
+drop.addEventListener('drop', e=>{
+  e.preventDefault();
+  const f = e.dataTransfer.files?.[0];
+  if(f) beginImport(f);
+});
+fileInput.addEventListener('change', e=>{
+  if(e.target.files && e.target.files[0]) beginImport(e.target.files[0]);
+});
+
+let IMPORT_CTX = { workbook: null, sheets: [], arrays: {}, headers: {} };
 
 function detectSeparator(txt){
-  const cTab=(txt.match(/\t/g)||[]).length, cSemi=(txt.match(/;/g)||[]).length, cComma=(txt.match(/,/g)||[]).length;
-  if(cTab>cSemi && cTab>cComma) return '\t';
-  if(cSemi>cComma) return ';';
+  const cTab = (txt.match(/\t/g)||[]).length;
+  const cSemi = (txt.match(/;/g)||[]).length;
+  const cComma = (txt.match(/,/g)||[]).length;
+  if(cTab > cSemi && cTab > cComma) return '\t';
+  if(cSemi > cComma) return ';';
   return ',';
 }
 async function readTextAllEnc(file){
-  const buf=await file.arrayBuffer();
-  try{ return new TextDecoder('utf-8',{fatal:false}).decode(buf); }catch{}
-  try{ return new TextDecoder('windows-1256',{fatal:false}).decode(buf); }catch{}
-  try{ return new TextDecoder('iso-8859-6',{fatal:false}).decode(buf); }catch{}
+  const buf = await file.arrayBuffer();
+  try { return new TextDecoder('utf-8',{fatal:false}).decode(buf); } catch {}
+  try { return new TextDecoder('windows-1256',{fatal:false}).decode(buf); } catch {}
+  try { return new TextDecoder('iso-8859-6',{fatal:false}).decode(buf); } catch {}
   return await file.text();
 }
-function sheetToAOA(ws){ return XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:''}); }
+function sheetToAOA(ws){ return XLSX.utils.sheet_to_json(ws, { header:1, raw:true, defval: '' }); }
 function pickHeaderRow(A){
   const rowsToCheck = Math.min(5, A.length);
   let bestIdx = 0, bestScore = -1;
-  const keywords = ['الاسم','اسم','name','المعلم','الموظف','السجل','الهوية','التخصص','المرتبة','المستوى','رقم الوظيفة','العمل','الجوال','الهاتف','whatsapp','mobile','phone','الإيميل','الايميل','البريد'];
-  for(let r=0;r<rowsToCheck;r++){
-    const row=(A[r]||[]).join(' ').toLowerCase();
-    let score=0; keywords.forEach(k=>{ if(row.includes(k)) score++; });
-    if(score>bestScore){ bestScore=score; bestIdx=r; }
+  const keywords = ['الاسم','name','المعلم','سجل','التخصص','المرتبة','وظيفة','العمل','جوال','phone'];
+  for(let r=0; r<rowsToCheck; r++){
+    const row = (A[r]||[]).join(' ').toLowerCase();
+    let score=0;
+    for(const k of keywords) if(row.includes(k)) score++;
+    if(score > bestScore){ bestScore = score; bestIdx = r; }
   }
   return bestIdx;
 }
 function guess(header){
-  const h=(header||'').toString().trim().toLowerCase();
-  const norm=h.replace(/[^\u0600-\u06FFa-z0-9 ]/g,'');
-  const tests={
-    name:['name','الاسم','اسم','المعلم','معلم','الموظف','موظف'],
-    civil:['civil','national','id','identity','السجل','السجل المدني','رقم الهوية','الهوية','هوية','رقم السجل'],
-    spec:['التخصص','تخصص','subject','spec','specialty'],
-    level:['المرتبة','رتبة','rank','grade','level','المستوى','مستوى','الرتبه'],
-    job:['رقم الوظيفة','وظيفة','job','employee id','كود','رقم وظيفي'],
-    work:['العمل الحالي','العمل','work','job title','المسمى'],
-    school:['المدرسة','school'],
-    phone:['الجوال','الهاتف','واتساب','whatsapp','mobile','phone','رقم','رقم الجوال','رقم الهاتف','contact'],
-    email:['الإيميل','الايميل','البريد','email','e-mail','mail']
+  if(!header) return null;
+  const h = header.toString().trim().toLowerCase();
+  const tests = {
+    name: ['name','الاسم','معلم','موظف'],
+    civil: ['سجل','هوية','id','national'],
+    spec: ['تخصص','subject'],
+    level: ['مرتبة','rank','level'],
+    job: ['وظيفة','job','وظائف'],
+    work: ['العمل','work'],
+    school: ['مدرسة','school'],
+    phone: ['جوال','هاتف','mobile','phone']
   };
-  for(const k in tests){ if(tests[k].some(key=>norm.includes(key))) return k; }
+  for(const k in tests){ for(const w of tests[k]){ if(h.includes(w)) return k; } }
   return null;
 }
 
-/* === beginImport === */
 async function beginImport(file){
-  try{
-    const lower=(file.name||'').toLowerCase();
-    let wb=null;
-
+  try {
+    const lower = (file.name || '').toLowerCase();
+    let wb = null;
     if(/\.(csv|tsv|txt)$/.test(lower)){
-      const text=await readTextAllEnc(file);
+      const text = await readTextAllEnc(file);
       const sep = detectSeparator(text);
-      const rows = text.split(/\r?\n/).map(line=> line.split(sep));
+      const rows = text.split(/\r?\n/).map(line => line.split(sep));
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      const wbNew = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbNew, ws, 'البيانات');
-      wb = wbNew;
+      wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'البيانات');
     } else if(/\.json$/.test(lower)){
-      const text=await readTextAllEnc(file);
-      const data = Array.isArray(JSON.parse(text)) ? JSON.parse(text) : [];
+      const text = await readTextAllEnc(file);
+      const data = JSON.parse(text);
       const ws = XLSX.utils.json_to_sheet(data);
-      const wbNew = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wbNew, ws, 'البيانات');
-      wb = wbNew;
+      wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'البيانات');
     } else {
-      const buf=await file.arrayBuffer();
-      wb = XLSX.read(buf, {type:'array'});
+      const buf = await file.arrayBuffer();
+      wb = XLSX.read(buf, { type:'array' });
     }
-
-    if(!wb || !wb.SheetNames || !wb.SheetNames.length) throw new Error('لم يتم العثور على أوراق في الملف.');
-
-    IMPORT_CTX.workbook=wb;
-    IMPORT_CTX.sheets=wb.SheetNames.slice();
-    IMPORT_CTX.arrays={};
-    wb.SheetNames.forEach(sh=>{
-      const ws=wb.Sheets[sh];
-      IMPORT_CTX.arrays[sh]=sheetToAOA(ws);
-    });
-
+    if(!wb || !wb.SheetNames || wb.SheetNames.length === 0){
+      throw new Error('لم يتم العثور على أوراق في الملف.');
+    }
+    IMPORT_CTX.workbook = wb;
+    IMPORT_CTX.sheets = wb.SheetNames.slice();
+    IMPORT_CTX.arrays = {};
+    for(const sh of wb.SheetNames){
+      IMPORT_CTX.arrays[sh] = sheetToAOA(wb.Sheets[sh]);
+    }
     openImportDialog();
-  }catch(err){
-    console.error(err);
-    alert('تعذّر استيراد الملف. تأكّد من الصيغة وأن الملف غير محمي بكلمة مرور.\nالتفاصيل: ' + (err.message||err));
+  } catch(err){
+    alert('تعذّر استيراد الملف: ' + (err.message || err));
   }
 }
 
 function openImportDialog(){
-  const sheetSel=document.getElementById('sheetSelect');
-  sheetSel.innerHTML='';
-  (IMPORT_CTX.sheets.length?IMPORT_CTX.sheets:['البيانات']).forEach(sh=>sheetSel.add(new Option(sh,sh)));
-  sheetSel.onchange=refreshMappingUI;
-
-  ['mapName','mapCivil','mapSpec','mapLevel','mapJob','mapWork','mapSchool','mapPhone'].forEach(id=>document.getElementById(id).innerHTML='');
+  const sheetSel = document.getElementById('sheetSelect');
+  sheetSel.innerHTML = '';
+  (IMPORT_CTX.sheets.length ? IMPORT_CTX.sheets : ['البيانات']).forEach(sh=>{
+    sheetSel.add(new Option(sh, sh));
+  });
+  sheetSel.onchange = refreshMappingUI;
+  ['mapName','mapCivil','mapSpec','mapLevel','mapJob','mapWork','mapSchool','mapPhone']
+    .forEach(id => document.getElementById(id).innerHTML = '');
   refreshMappingUI();
-  importDialog.style.display='flex';
-  document.getElementById('btnCancelImport').onclick=()=>{ importDialog.style.display='none'; };
-  document.getElementById('btnConfirmImport').onclick=confirmImport;
+  importDialog.style.display = 'flex';
+  document.getElementById('btnCancelImport').onclick = ()=> importDialog.style.display = 'none';
+  document.getElementById('btnConfirmImport').onclick = confirmImport;
 }
+
 function refreshMappingUI(){
-  const sheetSel=document.getElementById('sheetSelect');
-  const sh=sheetSel.value || IMPORT_CTX.sheets[0] || 'البيانات';
-  const A=(IMPORT_CTX.arrays[sh]||[]).slice(); if(!A.length){ return; }
-
+  const sheetSel = document.getElementById('sheetSelect');
+  const sh = sheetSel.value || IMPORT_CTX.sheets[0];
+  const A = (IMPORT_CTX.arrays[sh] || []).slice();
+  if(!A.length) return;
   const headerRowIdx = pickHeaderRow(A);
-  const HEADS = (A[headerRowIdx]||[]).map(x=>String(x||'').trim());
-  const ROWS  = A.slice(headerRowIdx+1, headerRowIdx+1+20);
+  const HEADS = (A[headerRowIdx]||[]).map(x => (x||'').toString().trim());
+  const ROWS = A.slice(headerRowIdx+1, headerRowIdx+1+20);
+  function fillSel(id){
+    const el = document.getElementById(id);
+    el.innerHTML = '<option value="">— اختر عمودًا —</option>';
+    HEADS.forEach((h,i)=> el.add(new Option(h || `عمود ${i+1}`, i)));
+    return el;
+  }
+  const sName = fillSel('mapName'),
+        sCivil = fillSel('mapCivil'),
+        sSpec = fillSel('mapSpec'),
+        sLevel = fillSel('mapLevel'),
+        sJob = fillSel('mapJob'),
+        sWork = fillSel('mapWork'),
+        sSchool = fillSel('mapSchool'),
+        sPhone = fillSel('mapPhone');
 
-  const fillSel=id=>{ const el=document.getElementById(id); el.innerHTML='<option value="">— اختر عمودًا —</option>'; HEADS.forEach((h,i)=>el.add(new Option(h||`عمود ${i+1}`, i))); return el; };
-  const sName=fillSel('mapName'), sCivil=fillSel('mapCivil'), sSpec=fillSel('mapSpec'),
-        sLevel=fillSel('mapLevel'), sJob=fillSel('mapJob'), sWork=fillSel('mapWork'),
-        sSchool=fillSel('mapSchool'), sPhone=fillSel('mapPhone');
+  const idxByRole = {};
+  HEADS.forEach((h,i)=>{ const r = guess(h); if(r && idxByRole[r] == null) idxByRole[r] = i; });
+  if(idxByRole.name != null) sName.value = idxByRole.name;
+  if(idxByRole.civil != null) sCivil.value = idxByRole.civil;
+  if(idxByRole.spec != null) sSpec.value = idxByRole.spec;
+  if(idxByRole.level != null) sLevel.value = idxByRole.level;
+  if(idxByRole.job != null) sJob.value = idxByRole.job;
+  if(idxByRole.work != null) sWork.value = idxByRole.work;
+  if(idxByRole.school != null) sSchool.value = idxByRole.school;
+  if(idxByRole.phone != null) sPhone.value = idxByRole.phone;
 
-  const idxByRole={}; HEADS.forEach((h,i)=>{ const r=guess(h); if(r && idxByRole[r]==null) idxByRole[r]=i; });
-  if(idxByRole.name!=null) sName.value=idxByRole.name;
-  if(idxByRole.civil!=null) sCivil.value=idxByRole.civil;
-  if(idxByRole.spec!=null) sSpec.value=idxByRole.spec;
-  if(idxByRole.level!=null) sLevel.value=idxByRole.level;
-  if(idxByRole.job!=null) sJob.value=idxByRole.job;
-  if(idxByRole.work!=null) sWork.value=idxByRole.work;
-  if(idxByRole.school!=null) sSchool.value=idxByRole.school;
-  if(idxByRole.phone!=null) sPhone.value=idxByRole.phone;
-
-  const table=document.getElementById('previewTable');
-  table.innerHTML='';
-  const thead=document.createElement('thead'); const hr=document.createElement('tr');
-  HEADS.forEach(h=>{const th=document.createElement('th'); th.textContent=h||''; hr.appendChild(th);});
+  const table = document.getElementById('previewTable');
+  table.innerHTML = '';
+  const thead = document.createElement('thead');
+  const hr = document.createElement('tr');
+  HEADS.forEach(h=>{ const th = document.createElement('th'); th.textContent = h; hr.appendChild(th); });
   thead.appendChild(hr); table.appendChild(thead);
-  const tbody=document.createElement('tbody');
+
+  const tbody = document.createElement('tbody');
   ROWS.forEach(r=>{
-    const tr=document.createElement('tr');
-    HEADS.forEach((_,i)=>{const td=document.createElement('td'); td.textContent=(r[i]!=null?r[i]:''); tr.appendChild(td);});
+    const tr = document.createElement('tr');
+    HEADS.forEach((_, i)=>{ const td = document.createElement('td'); td.textContent = (r[i] != null ? r[i] : ''); tr.appendChild(td); });
     tbody.appendChild(tr);
   });
   table.appendChild(tbody);
-
-  IMPORT_CTX.headers={sheet:sh, headerRowIdx, heads:HEADS};
+  IMPORT_CTX.headers = { sheet: sh, headerRowIdx, heads: HEADS };
 }
+
 function normalizePhone(raw){
   if(!raw) return '';
-  let s = String(raw).trim();
-  s = ar2en(s).replace(/[^\d]/g,'');
+  let s = ('' + raw).trim();
+  s = ar2en(s).replace(/[^\d]/g, '');
   if(s.startsWith('00966')) s = s.slice(2);
   if(s.startsWith('00')) s = s.slice(2);
-  if(s.startsWith('966')) { if(s.length===13 && s[3]==='0') s='966'+s.slice(4); return s; }
-  if(s.startsWith('05') && s.length===10) return '966'+s.slice(1);
-  if(s.startsWith('5')  && s.length===9 ) return '966'+s;
+  if(s.startsWith('966')){
+    if(s.length === 13 && s[3] === '0') s = '966' + s.slice(4);
+    return s;
+  }
+  if(s.startsWith('05') && s.length === 10) return '966' + s.slice(1);
+  if(s.startsWith('5') && s.length === 9) return '966' + s;
   return s;
 }
+
 function confirmImport(){
-  try{
-    const ctx=IMPORT_CTX.headers||{};
-    const A=IMPORT_CTX.arrays[ctx.sheet]||[];
+  try {
+    const ctx = IMPORT_CTX.headers || {};
+    const A = IMPORT_CTX.arrays[ctx.sheet] || [];
     if(!A.length){ alert('لا توجد بيانات في الورقة المحددة.'); return; }
+    function getIdx(id){ const v = document.getElementById(id).value; return v ? parseInt(v,10) : -1; }
+    const cName = getIdx('mapName'),
+          cCivil = getIdx('mapCivil'),
+          cSpec = getIdx('mapSpec'),
+          cLevel = getIdx('mapLevel'),
+          cJob = getIdx('mapJob'),
+          cWork = getIdx('mapWork'),
+          cSchool = getIdx('mapSchool'),
+          cPhone = getIdx('mapPhone');
 
-    const getIdx = id => { const v=document.getElementById(id).value; return v? parseInt(v,10): -1; };
-    const ixName=getIdx('mapName'), ixCivil=getIdx('mapCivil'), ixSpec=getIdx('mapSpec'),
-          ixLevel=getIdx('mapLevel'), ixJob=getIdx('mapJob'), ixWork=getIdx('mapWork'),
-          ixSchool=getIdx('mapSchool'), ixPhone=getIdx('mapPhone');
-
-    const start = (ctx.headerRowIdx!=null? ctx.headerRowIdx+1 : 1);
-    const out=[];
-    for(let r=start;r<A.length;r++){
-      const row=A[r]||[]; if(!row.some(c=>String(c||'').trim())) continue;
-      const pick=i=> (i>=0 && i<row.length)? String(row[i]??'').trim() : '';
-      out.push({
-        name:pick(ixName),
-        civil:pick(ixCivil),
-        spec:pick(ixSpec),
-        level:pick(ixLevel),
-        job:pick(ixJob),
-        work:pick(ixWork),
-        school:pick(ixSchool),
-        phone:normalizePhone(pick(ixPhone))
-      });
+    if(cName < 0 && cCivil < 0){ alert('على الأقل: عمود الاسم أو السجل المدني.'); return; }
+    const startRow = (ctx.headerRowIdx || 0) + 1;
+    const out = [];
+    for(let r = startRow; r < A.length; r++){
+      const row = A[r] || [];
+      const name = cName >= 0 ? (row[cName] || '').toString().trim() : '';
+      const civil = cCivil >= 0 ? (row[cCivil] || '').toString().trim() : '';
+      const spec = cSpec >= 0 ? (row[cSpec] || '').toString().trim() : '';
+      const level = cLevel >= 0 ? (row[cLevel] || '').toString().trim() : '';
+      const job = cJob >= 0 ? (row[cJob] || '').toString().trim() : '';
+      const work = cWork >= 0 ? (row[cWork] || '').toString().trim() : '';
+      const school = cSchool >= 0 ? (row[cSchool] || '').toString().trim() : '';
+      const phoneRaw = cPhone >= 0 ? row[cPhone] : '';
+      const phone = normalizePhone(phoneRaw);
+      if(!(name || civil)) continue;
+      out.push({ name, civil, spec, level, job, work, school, phone });
     }
-    TEACHERS=out.filter(t=> (t.name||t.civil||t.spec||t.level||t.job||t.work||t.phone));
+    if(!out.length){ alert('لم يُستخرج سجلات صالحة.'); return; }
+    TEACHERS = out;
     localStorage.setItem('teachersCache', JSON.stringify(TEACHERS));
-    refillSelect();
-    importDialog.style.display='none';
-    if(TEACHERS.length){ document.getElementById('teacherSelect').value='0'; applyTeacher(TEACHERS[0],0); }
-    else alert('تم الاستيراد، ولكن لم يتم العثور على صفوف بيانات صالحة بعد التحقق من الخرائط.');
-  }catch(err){
-    console.error(err);
-    alert('حدث خطأ أثناء اعتماد الاستيراد: ' + (err.message||err));
+    refillSelect(); importDialog.style.display = 'none';
+    alert(`تم استيراد ${out.length} معلماً بنجاح.`);
+  } catch(err){ alert('تعذّر اعتماد الاستيراد: ' + (err.message || err)); }
+}
+
+/* ========= التبديل بين الحزم ========= */
+function setPack(kind){
+  const alertPack = document.getElementById('alertPack');
+  const absencePack = document.getElementById('absencePack');
+  const notePack = document.getElementById('notePack');
+  const mainTitle = document.getElementById('mainTitle');
+  const kindTitle = document.getElementById('kindTitle');
+  const lineLate = document.getElementById('lineLate');
+  const lineAbs = document.getElementById('lineAbs');
+  const lineEarly = document.getElementById('lineEarly');
+
+  if(kind === 'gaib'){
+    alertPack.style.display = 'none';
+    absencePack.style.display = '';
+    notePack.style.display = 'none';
+    mainTitle.textContent = 'مساءلة غياب';
+  } else if(kind === 'note'){
+    alertPack.style.display = 'none';
+    absencePack.style.display = 'none';
+    notePack.style.display = '';
+    mainTitle.textContent = 'لفت نظر';
+  } else {
+    alertPack.style.display = '';
+    absencePack.style.display = 'none';
+    notePack.style.display = 'none';
+    mainTitle.textContent = 'تنبيه';
+    lineLate.style.display = (kind==='late') ? '' : 'none';
+    lineAbs.style.display = (kind==='absent') ? '' : 'none';
+    lineEarly.style.display = (kind==='early') ? '' : 'none';
+    const mapT = { late:'تأخر', absent:'عدم تواجد', early:'انصراف مبكر' };
+    kindTitle.textContent = mapT[kind] || '—';
   }
 }
+document.querySelectorAll('#noticeSeg input[name="nt"]').forEach(r=> r.addEventListener('change', ()=> setPack(r.value)));
+setPack(document.querySelector('#noticeSeg input[name="nt"]:checked').value);
 
-/* ===== تبديل نوع الإجراء ===== */
-const segEl   = document.getElementById('noticeSeg');
-const radios  = segEl.querySelectorAll('input[name="nt"]');
-const kindLbl = document.getElementById('kindTitle');
-const mainTitle = document.getElementById('mainTitle');
-const alertPack = document.getElementById('alertPack');
-const absencePack = document.getElementById('absencePack');
-const notePack = document.getElementById('notePack');
-const rowLate  = document.getElementById('lineLate');
-const rowAbs   = document.getElementById('lineAbs');
-const rowEarly = document.getElementById('lineEarly');
-
-function setNotice(kind){
-  alertPack.style.display   = (kind==='late' || kind==='absent' || kind==='early') ? 'block':'none';
-  absencePack.style.display = (kind==='gaib') ? 'block':'none';
-  notePack.style.display    = (kind==='note') ? 'block':'none';
-
-  if(kind==='gaib'){ mainTitle.textContent = 'مساءلة غياب'; }
-  else if(kind==='note'){ mainTitle.textContent = 'لفت نظر'; }
-  else{ mainTitle.textContent = 'تنبيه'; }
-
-  if(kind==='late'){ kindLbl.textContent='تأخر'; }
-  else if(kind==='absent'){ kindLbl.textContent='عدم تواجد'; }
-  else if(kind==='early'){ kindLbl.textContent='انصراف مبكر'; }
-
-  rowLate.style.display  = (kind==='late')   ? 'flex' : 'none';
-  rowAbs.style.display   = (kind==='absent') ? 'flex' : 'none';
-  rowEarly.style.display = (kind==='early')  ? 'flex' : 'none';
-
-  refreshCaseNo();
+/* ========= تحويل دقائق ↔︎ ساعات:دقائق ========= */
+function toMin(hhmm){
+  const m = /^(\d{1,2}):(\d{2})$/.exec(ar2en(hhmm||'').trim());
+  if(!m) return null;
+  const h = +m[1], mi = +m[2];
+  if(h > 23 || mi > 59) return null;
+  return h*60 + mi;
 }
-radios.forEach(r => r.addEventListener('change', e => setNotice(e.target.value)));
-setNotice(segEl.querySelector('input[name="nt"]:checked')?.value || 'late');
-
-/* ===== PDF بجودة عالية ===== */
-async function exportPDFBlob(){
-  const root=document.documentElement;
-  const prevScale = getComputedStyle(root).getPropertyValue('--scale');
-  root.style.setProperty('--scale','1'); document.body.classList.add('exporting');
-  const sheet=document.getElementById('sheet');
-  const canvas = await html2canvas(sheet,{scale:4,useCORS:true,background:'#ffffff',logging:false,letterRendering:true});
-  document.body.classList.remove('exporting'); root.style.setProperty('--scale', prevScale||'1');
-  const img = canvas.toDataURL('image/jpeg',1.0);
-  const {jsPDF}=window.jspdf; const pdf=new jsPDF('p','mm','a4');
-  const pageW=pdf.internal.pageSize.getWidth(), pageH=pdf.internal.pageSize.getHeight();
-  const px2mm=px=>px*25.4/96, imgWmm=px2mm(canvas.width), imgHmm=px2mm(canvas.height);
-  const s=Math.min(pageW/imgWmm,pageH/imgHmm), w=imgWmm*s, h=imgHmm*s;
-  pdf.addImage(img,'JPEG',(pageW-w)/2,(pageH-h)/2,w,h);
-  return pdf.output('blob');
+function fmtHM(mins){
+  const h = Math.floor(mins/60), m = mins % 60;
+  return en2ar(String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0'));
 }
-document.getElementById('btnMakePDF').addEventListener('click', async ()=>{
-  try{
-    const kind=document.querySelector('input[name="nt"]:checked')?.value || 'late';
-    recordCase(kind,'PDF');
-    const name=(document.getElementById('t_name').textContent||document.getElementById('noteTeacherName').textContent||'بدون اسم').trim();
-    const hj=(document.getElementById('hdrHijri').textContent||'التاريخ الهجري').trim();
-    const fileName=`${BASE_TITLE} — ${document.getElementById('mainTitle').textContent} — ${name} — ${hj}.pdf`;
-    const blob=await exportPDFBlob();
-    const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fileName; a.click(); URL.revokeObjectURL(url);
-  }catch(err){
-    alert('تعذر إنشاء PDF. حاول مجددًا.\nالتفاصيل: ' + (err.message||err));
-  }
-});
 
-/* ===== مؤقّت وحسابات ===== */
-let active=null; const pad=document.getElementById('timePad'),disp=document.getElementById('timePadDisplay');
-document.querySelectorAll('.timebox').forEach(el=>el.addEventListener('click',()=>openPad(el)));
-function openPad(el){active=el;disp.textContent=el.dataset.value||'--:--';pad.style.display='block';const r=el.getBoundingClientRect();pad.style.left=Math.min(window.innerWidth-220,r.left)+'px';pad.style.top=(r.bottom+8)+'px';}
-function closePad(){pad.style.display='none';active=null;}
-document.getElementById('timePadClose').addEventListener('click',closePad);
-document.getElementById('timePadSave').addEventListener('click',()=>{if(!active) return; const v=disp.textContent; active.textContent=v; active.classList.toggle('empty',!/\d{2}:\d{2}/.test(v)); active.dataset.value=v; recalc(); closePad();});
-document.querySelectorAll('#timePad .grid button').forEach(b=>b.addEventListener('click',()=>{
-  if(b.classList.contains('del')){disp.textContent=disp.textContent.slice(0,-1)||'--:--';return;}
-  const k=b.dataset.k; let v=disp.textContent.replace(/-/g,'').replace(/:/g,''); if(disp.textContent==='--:--') v='';
-  if(k===':'){if(v.length>=2 && !v.includes(':')) disp.textContent=v.slice(0,2)+':'+v.slice(2); return;}
-  if(/[0-9]/.test(k)){v+=k; if(v.length<=4){disp.textContent=(v.padEnd(4,'-').slice(0,2))+':'+(v.padEnd(4,'-').slice(2,4));}}
-}));
-const t2m=t=>{ if(!/^\d{2}:\d{2}$/.test(t||'')) return null; const [h,m]=t.split(':').map(Number); return h*60+m; };
-const fmtDur=mins=>{ mins=Math.max(0,Math.round(mins||0)); const h=Math.floor(mins/60),m=mins%60; return h?(m?`${h} ساعة و ${m} دقيقة`:`${h} ساعة`):`${m} دقيقة`; };
+/* ========= لوحة الوقت + الحساب ========= */
+const timeTargets = ['tLateIn','tAbsFrom','tAbsTo','tEarlyFrom'];
+let timePadTarget = null;
+
 function recalc(){
-  const ws=document.getElementById('workStart')?.value||'06:45';
-  const we=document.getElementById('workEnd')?.value||'13:45';
-  const mWS=t2m(ws), mWE=t2m(we);
-  const mLate=t2m((document.getElementById('tLateIn')?.dataset.value)||'');
-  const late = (mWS!=null && mLate!=null) ? Math.max(0, mLate - mWS) : 0;
-  const mAF=t2m((document.getElementById('tAbsFrom')?.dataset.value)||'');
-  const mAT=t2m((document.getElementById('tAbsTo')?.dataset.value)||'');
-  const abs = (mAF!=null && mAT!=null) ? Math.max(0, mAT - mAF) : 0;
-  const mEF=t2m((document.getElementById('tEarlyFrom')?.dataset.value)||'');
-  const early = (mWE!=null && mEF!=null) ? Math.max(0, mWE - mEF) : 0;
-  document.getElementById('lateTotal').textContent  = fmtDur(late);
-  document.getElementById('absTotal').textContent   = fmtDur(abs);
-  document.getElementById('earlyTotal').textContent = fmtDur(early);
+  const ws = document.getElementById('workStart').value || '06:45';
+  const we = document.getElementById('workEnd').value || '13:45';
+  const wsM = toMin(ws), weM = toMin(we);
+
+  // تأخر
+  const tLate = document.getElementById('tLateIn').textContent.trim();
+  const tLateM = toMin(tLate);
+  if(tLateM != null && wsM != null && tLateM > wsM){
+    const mins = tLateM - wsM;
+    document.getElementById('lateTotal').textContent = en2ar(String(mins)) + ' دقيقة';
+    document.getElementById('lateHH').textContent = fmtHM(mins);
+    document.getElementById('tLateIn').classList.remove('empty');
+  } else {
+    document.getElementById('lateTotal').textContent = '0 دقيقة';
+    document.getElementById('lateHH').textContent = '00:00';
+    if(!tLate) document.getElementById('tLateIn').classList.add('empty');
+  }
+
+  // عدم تواجد
+  const aF = document.getElementById('tAbsFrom').textContent.trim();
+  const aT = document.getElementById('tAbsTo').textContent.trim();
+  const aFM = toMin(aF), aTM = toMin(aT);
+  if(aFM != null && aTM != null && aTM > aFM){
+    const mins = aTM - aFM;
+    document.getElementById('absTotal').textContent = en2ar(String(mins)) + ' دقيقة';
+    document.getElementById('absHH').textContent = fmtHM(mins);
+    document.getElementById('tAbsFrom').classList.remove('empty');
+    document.getElementById('tAbsTo').classList.remove('empty');
+  } else {
+    document.getElementById('absTotal').textContent = '0 دقيقة';
+    document.getElementById('absHH').textContent = '00:00';
+    if(!aF) document.getElementById('tAbsFrom').classList.add('empty');
+    if(!aT) document.getElementById('tAbsTo').classList.add('empty');
+  }
+
+  // انصراف مبكر
+  const eF = document.getElementById('tEarlyFrom').textContent.trim();
+  const eFM = toMin(eF);
+  if(eFM != null && weM != null && weM > eFM){
+    const mins = weM - eFM;
+    document.getElementById('earlyTotal').textContent = en2ar(String(mins)) + ' دقيقة';
+    document.getElementById('earlyHH').textContent = fmtHM(mins);
+    document.getElementById('tEarlyFrom').classList.remove('empty');
+  } else {
+    document.getElementById('earlyTotal').textContent = '0 دقيقة';
+    document.getElementById('earlyHH').textContent = '00:00';
+    if(!eF) document.getElementById('tEarlyFrom').classList.add('empty');
+  }
 }
-recalc();
-
-/* ===== واتساب ===== */
-function beautifyTime(t){ return en2ar((t||'--:--')); }
-function buildWhatsAppMessage(){
-  const school = (document.getElementById('schoolNameHdr').textContent||'مدرسة اليعقوبي الثانوية').trim();
-  const name   = (document.getElementById('t_name').textContent||document.getElementById('noteTeacherName').textContent||'—').trim();
-  const kind   = document.querySelector('input[name="nt"]:checked')?.value || 'late';
-  const hj     = (document.getElementById('hdrHijri').textContent||'—').replace(/\s+/g,' ').trim();
-  const dayName= (document.getElementById('dynDay').textContent||'—').trim();
-  const serial = (document.getElementById('serialNo').textContent||'01').trim();
-  const total  = (document.getElementById('caseTotal').textContent||'0').trim();
-  const ws     = beautifyTime(document.getElementById('workStart')?.value||'--:--');
-  const we     = beautifyTime(document.getElementById('workEnd')?.value||'--:--');
-
-  if(kind==='note'){
-    const reason = document.getElementById('noteReasonText').textContent.trim();
-    return `السلام عليكم ورحمة الله وبركاته
-
-الأستاذ/ ${name} حفظه الله،
-
-نفيدكم بصدور «لفت نظر» رقم (${en2ar(serial)}) في ${school} يوم ${dayName} الموافق ${hj}.
-النص: لوحظ ${reason}.
-
-نأمل تلافي ذلك مستقبلًا والالتزام بالمهام الوظيفية. مع الشكر والتقدير.
-
-مدير المدرسة:
-${getManagerName()}
-
-إجمالي الإجراءات حتى تاريخه: ${en2ar(total)}.`;
-  }
-
-  let body='';
-  if(kind==='gaib'){
-    body =
-`السلام عليكم ورحمة الله وبركاته
-
-الأستاذ/ ${name} وفقه الله،
-
-نفيدكم بوجود مساءلة غياب برقم (${en2ar(serial)}) في ${school}.
-يوم ${dayName} الموافق ${hj}.
-
-مدير المدرسة:
-${getManagerName()}
-
-إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
-  }
-  else if(kind==='late'){
-    const tIn = beautifyTime(document.getElementById('tLateIn').dataset.value||'--:--');
-    const dur = (document.getElementById('lateTotal').textContent||'—');
-    body =
-`السلام عليكم ورحمة الله وبركاته
-
-الأستاذ/ ${name} وفقه الله،
-
-تنبيه تأخر رقم (${en2ar(serial)}) في ${school}.
-بداية الدوام: (${ws}) — حضوركم: (${tIn}) — إجمالي التأخر: ${dur}.
-
-مدير المدرسة:
-${getManagerName()}
-
-إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
-  }
-  else if(kind==='absent'){
-    const from = beautifyTime(document.getElementById('tAbsFrom').dataset.value||'--:--');
-    const to   = beautifyTime(document.getElementById('tAbsTo').dataset.value||'--:--');
-    const dur  = (document.getElementById('absTotal').textContent||'—');
-    body =
-`السلام عليكم ورحمة الله وبركاته
-
-الأستاذ/ ${name} وفقه الله،
-
-تنبيه عدم تواجد رقم (${en2ar(serial)}) في ${school}.
-من (${from}) إلى (${to}) — الإجمالي: ${dur}.
-
-مدير المدرسة:
-${getManagerName()}
-
-إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
-  }
-  else { // early
-    const from = beautifyTime(document.getElementById('tEarlyFrom').dataset.value||'--:--');
-    const dur  = (document.getElementById('earlyTotal').textContent||'—');
-    body =
-`السلام عليكم ورحمة الله وبركاته
-
-الأستاذ/ ${name} وفقه الله،
-
-تنبيه انصراف مبكر رقم (${en2ar(serial)}) في ${school}.
-وقت الانصراف: (${from}) — مدة الانصراف المبكر: ${dur}.
-
-مدير المدرسة:
-${getManagerName()}
-
-إجمالي مساءلاتكم حتى تاريخه: ${en2ar(total)}.`;
-  }
-
-  return body;
-}
-function getCurrentTeacherPhone(){
-  if(currentIdx==null || !TEACHERS[currentIdx]) return '';
-  return TEACHERS[currentIdx].phone || '';
-}
-document.getElementById('btnWA').addEventListener('click', ()=>{
-  if(currentIdx==null){ alert('يرجى اختيار معلّم أولاً من القائمة.'); return; }
-  const kind=document.querySelector('input[name="nt"]:checked')?.value || 'late';
-  recordCase(kind,'WA');
-
-  let phone = getCurrentTeacherPhone();
-  if(!phone){
-    alert('لا يوجد رقم جوال للمعلّم في الملف؛ سيُستخدم الرقم الافتراضي مؤقتًا.');
-    phone = DEFAULT_WA;
-  }
-  const msg=buildWhatsAppMessage();
-  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`,'_blank');
+['workStart','workEnd'].forEach(id=> document.getElementById(id).addEventListener('change', recalc));
+timeTargets.forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.cursor = 'pointer';
+  el.addEventListener('click', ()=>{
+    timePadTarget = el;
+    document.getElementById('timePadDisplay').textContent = el.textContent.trim() || '--:--';
+    const r = el.getBoundingClientRect();
+    const pad = document.getElementById('timePad');
+    pad.style.left = Math.min(window.innerWidth - 260, Math.max(8, r.left)) + 'px';
+    pad.style.top = (r.bottom + 8 + window.scrollY) + 'px';
+    pad.style.display = 'block';
+  });
+});
+document.querySelectorAll('#timePad .grid button[data-k]').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    const disp = document.getElementById('timePadDisplay');
+    let t = disp.textContent.replace(/-/g, '').trim();
+    if(t === ':') t = '';
+    t = (t === '--:--') ? '' : t;
+    t += b.getAttribute('data-k');
+    if((t.match(/:/g)||[]).length > 1) t = t.replace(/:+$/, '');
+    disp.textContent = t;
+  });
+});
+document.querySelector('#timePad .del').addEventListener('click', ()=>{
+  const disp = document.getElementById('timePadDisplay');
+  let t = disp.textContent;
+  if(!t || t === '--:--') return;
+  disp.textContent = t.slice(0,-1) || '--:--';
+});
+document.getElementById('timePadClose').addEventListener('click', ()=> document.getElementById('timePad').style.display = 'none');
+document.getElementById('timePadSave').addEventListener('click', ()=>{
+  if(!timePadTarget) return;
+  const val = document.getElementById('timePadDisplay').textContent.trim();
+  if(!/^(\d{1,2}):(\d{2})$/.test(ar2en(val))){ alert('صيغة الوقت غير صحيحة. اكتب مثلاً 07:15'); return; }
+  timePadTarget.textContent = val;
+  timePadTarget.classList.remove('empty');
+  document.getElementById('timePad').style.display = 'none';
+  recalc();
 });
 
-/* ===== إحصائيات وأرشيف ===== */
-const dlgStats=document.getElementById('statsDialog');
-const btnOpenStats=document.getElementById('btnOpenStats');
-const btnCloseStats=document.getElementById('btnCloseStats');
-const statsFilter=document.getElementById('statsFilter');
-const tblArchiveBody=document.querySelector('#tblArchive tbody');
-const tblSummaryBody=document.querySelector('#tblSummary tbody');
-
-btnOpenStats.addEventListener('click',()=>{ renderStatsTables(); dlgStats.style.display='flex'; });
-btnCloseStats.addEventListener('click',()=>{ dlgStats.style.display='none'; });
-
-document.getElementById('btnExportArchive').addEventListener('click', ()=>{
-  const blob=new Blob([JSON.stringify(ARCHIVE,null,2)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='ارشيف_مساءلات_المعلمين.json'; a.click(); URL.revokeObjectURL(a.href);
+/* ========= لفت النظر: مزامنة السبب ========= */
+document.getElementById('noteReasonSelect').addEventListener('change', e=>{
+  const v = e.target.value || '';
+  if(v) document.getElementById('noteReasonText').textContent = v;
 });
-document.getElementById('restoreInput').parentElement.addEventListener('click', ()=> document.getElementById('restoreInput').click());
-document.getElementById('restoreInput').addEventListener('change', e=>{
-  const f=e.target.files?.[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const data=JSON.parse(r.result);
-      if(Array.isArray(data)){ ARCHIVE=data; saveArchive(); renderStatsTables(); alert('تمت الاستعادة بنجاح.'); }
-      else alert('الملف غير صالح.');
-    }catch{ alert('تعذر قراءة الملف.'); }
+
+/* ========= إحصائيات / عرض أرشيف ========= */
+function buildKPI(){
+  const total = ARCHIVE.length;
+  const by = { gaib:0, late:0, absent:0, early:0, note:0 };
+  let lateMins = 0;
+  ARCHIVE.forEach(e=>{ if(by[e.kind] != null) by[e.kind]++; if(e.kind==='late') lateMins += (e.mins||0); });
+  const row = document.getElementById('kpiRow');
+  row.innerHTML = '';
+  const add = (label, val)=>{
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.textContent = `${label}: ${en2ar(val)}`;
+    row.appendChild(d);
   };
-  r.readAsText(f);
+  add('الإجمالي', total);
+  add('مساءلة غياب', by.gaib);
+  add('تنبيه تأخر', by.late);
+  add('عدم تواجد', by.absent);
+  add('انصراف مبكر', by.early);
+  add('لفت نظر', by.note);
+  add('مجمّع دقائق التأخر', lateMins);
+  add('ساعات التأخر', fmtHM(lateMins));
+}
+
+function withinRange(hj, from, to){
+  const norm = s => (s||'').trim();
+  const H = norm(ar2en(hj));
+  const F = norm(ar2en(from));
+  const T = norm(ar2en(to));
+  if(F && H < F) return false;
+  if(T && H > T) return false;
+  return true;
+}
+
+function renderArchive(){
+  buildKPI();
+  const nameFilter = (document.getElementById('statsFilter').value || '').trim();
+  const fromH = (document.getElementById('fromHijri').value || '').trim();
+  const toH = (document.getElementById('toHijri').value || '').trim();
+
+  const tb = document.querySelector('#tblArchive tbody');
+  tb.innerHTML = '';
+
+  ARCHIVE
+    .filter(e => !nameFilter || (e.name || '').includes(nameFilter))
+    .filter(e => withinRange(e.hj, fromH, toH))
+    .sort((a,b) => a.ts - b.ts)
+    .forEach(e=>{
+      const mins = e.mins|0;
+      const tr = document.createElement('tr');
+      tr.innerHTML =
+        `<td>${e.hj}</td>
+         <td>${e.day || ''}</td>
+         <td>${e.name || ''}</td>
+         <td>${e.civil || ''}</td>
+         <td>${({gaib:'مساءلة غياب', late:'تنبيه تأخر', absent:'عدم تواجد', early:'انصراف مبكر', note:'لفت نظر'})[e.kind] || e.kind}</td>
+         <td>${en2ar(mins)}</td>
+         <td>${fmtHM(mins)}</td>
+         <td>${en2ar(String(e.serial).padStart(2,'0'))}</td>`;
+      tb.appendChild(tr);
+    });
+
+  const map = new Map();
+  ARCHIVE
+    .filter(e => !nameFilter || (e.name || '').includes(nameFilter))
+    .filter(e => withinRange(e.hj, fromH, toH))
+    .forEach(e=>{
+      const k = e.tkey;
+      if(!map.has(k)){
+        map.set(k, { name: e.name || '', civil: e.civil || '', gaib:0, late:0, absent:0, early:0, note:0, lateMins:0 });
+      }
+      map.get(k)[e.kind] = (map.get(k)[e.kind] || 0) + 1;
+      if(e.kind==='late') map.get(k).lateMins += (e.mins||0);
+    });
+
+  const tb2 = document.querySelector('#tblSummary tbody');
+  tb2.innerHTML = '';
+  for(const r of map.values()){
+    const total = r.gaib + r.late + r.absent + r.early + r.note;
+    const tr = document.createElement('tr');
+    tr.innerHTML =
+      `<td>${r.name}</td>
+       <td>${r.civil}</td>
+       <td>${en2ar(r.gaib)}</td>
+       <td>${en2ar(r.late)}</td>
+       <td>${en2ar(r.lateMins)}</td>
+       <td>${fmtHM(r.lateMins)}</td>
+       <td>${en2ar(r.absent)}</td>
+       <td>${en2ar(r.early)}</td>
+       <td>${en2ar(r.note)}</td>
+       <td><span class="badge">${en2ar(total)}</span></td>`;
+    tb2.appendChild(tr);
+  }
+}
+
+document.getElementById('btnOpenStats').addEventListener('click', ()=>{ renderArchive(); document.getElementById('statsDialog').style.display = 'flex'; });
+document.getElementById('btnCloseStats').addEventListener('click', ()=> document.getElementById('statsDialog').style.display = 'none');
+document.getElementById('btnApplyRange').addEventListener('click', renderArchive);
+document.getElementById('statsFilter').addEventListener('input', renderArchive);
+document.getElementById('btnExportArchive').addEventListener('click', ()=>{
+  const obj = { ver:3, date: new Date().toISOString(), archive: ARCHIVE };
+  const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'archive-backup.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+document.getElementById('restoreInput').addEventListener('change', async e=>{
+  const f = e.target.files?.[0];
+  if(!f) return;
+  try {
+    const txt = await f.text();
+    const obj = JSON.parse(txt);
+    if(Array.isArray(obj)) ARCHIVE = obj;
+    else if(obj && Array.isArray(obj.archive)) ARCHIVE = obj.archive;
+    else throw new Error('تنسيق غير مدعوم');
+    saveArchive();
+    renderArchive();
+    alert('تمّت الاستعادة بنجاح.');
+  } catch(err){
+    alert('فشل الاستعادة: ' + (err.message || err));
+  } finally { e.target.value = ''; }
 });
 document.getElementById('btnResetAll').addEventListener('click', ()=>{
-  if(!confirm('سيتم حذف كل الأرشيف وجميع العدادات. هل أنت متأكد؟')) return;
-  ARCHIVE=[]; saveArchive(); renderStatsTables(); alert('تم التصفير.');
+  if(!confirm('سيتم حذف الأرشيف نهائيًا. هل أنت متأكد؟')) return;
+  ARCHIVE = [];
+  saveArchive();
+  renderArchive();
 });
-statsFilter.addEventListener('input', renderStatsTables);
 
-function renderStatsTables(){
-  const q=(statsFilter.value||'').trim();
-  const filtered = ARCHIVE.slice().sort((a,b)=>b.ts-a.ts).filter(e=> !q || (e.name||'').includes(q));
+/* ========= إنشاء PDF (حل التقطيع بصفحات حقيقية) ========= */
+async function exportSheetToPDF(){
+  document.body.classList.add('exporting');
+  const sheet = document.getElementById('sheet');
+  const canvas = await html2canvas(sheet, { scale:2, useCORS:true, background:'#ffffff' });
+  const imgWidthMM = 210;  // عرض A4
+  const imgHeightMM = imgWidthMM * canvas.height / canvas.width; // الارتفاع الكلي للصفحة الواحدة لو وضعت كاملة
+  const pageHeightMM = 297; // ارتفاع A4
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation:'p', unit:'mm', format:'a4' });
 
-  // أرشيف تفصيلي
-  tblArchiveBody.innerHTML='';
-  filtered.forEach(e=>{
-    const tr=document.createElement('tr');
-    const typeText = e.kind==='gaib'?'مساءلة غياب': e.kind==='late'?'تنبيه تأخر': e.kind==='absent'?'تنبيه عدم تواجد': e.kind==='early'?'تنبيه انصراف مبكر':'لفت نظر';
-    tr.innerHTML = `<td>${e.hj}</td><td>${e.name||''}</td><td>${e.civil||''}</td><td>${typeText}</td><td>${pad2(e.serial)}</td>`;
-    tblArchiveBody.appendChild(tr);
-  });
+  // نحسب ارتفاع الجزء المكافئ لكل صفحة بالنسبة لعرض الصورة
+  const pageHeightPx = Math.floor(canvas.width * pageHeightMM / imgWidthMM);
+  let yPx = 0;
+  let first = true;
 
-  // ملخص حسب المعلم
-  const map=new Map();
-  for(const e of ARCHIVE){
-    const k=e.tkey; if(!map.has(k)) map.set(k,{name:e.name||'',civil:e.civil||'',gaib:0,late:0,absent:0,early:0,note:0,total:0});
-    const row=map.get(k); row[e.kind]=(row[e.kind]||0)+1; row.total++;
+  while (yPx < canvas.height) {
+    const slice = document.createElement('canvas');
+    slice.width = canvas.width;
+    slice.height = Math.min(pageHeightPx, canvas.height - yPx);
+    const ctx = slice.getContext('2d');
+    ctx.drawImage(canvas, 0, yPx, canvas.width, slice.height, 0, 0, canvas.width, slice.height);
+    const img = slice.toDataURL('image/png');
+    if(!first) pdf.addPage();
+    pdf.addImage(img, 'PNG', 0, 0, imgWidthMM, slice.height * imgWidthMM / canvas.width);
+    yPx += pageHeightPx;
+    first = false;
   }
-  const rows=[...map.values()].sort((a,b)=> b.total-a.total);
-  tblSummaryBody.innerHTML='';
-  for(const r of rows){
-    const tr=document.createElement('tr');
-    tr.innerHTML = `<td>${r.name}</td><td>${r.civil}</td><td>${r.gaib||0}</td><td>${r.late||0}</td><td>${r.absent||0}</td><td>${r.early||0}</td><td>${r.note||0}</td><td><strong>${r.total||0}</strong></td>`;
-    tblSummaryBody.appendChild(tr);
-  }
-  refreshHeaderCounts();
+
+  const t = getCurrentTeacher();
+  const kind = document.querySelector('#noticeSeg input[name="nt"]:checked')?.value || 'late';
+  const namePart = t?.name ? (' - ' + t.name) : '';
+  const kindLabel = { late:'تنبيه تأخر', absent:'تنبيه عدم تواجد', early:'تنبيه انصراف مبكر', gaib:'مساءلة غياب', note:'لفت نظر' }[kind] || 'تنبيه';
+  pdf.save(`${kindLabel}${namePart}.pdf`);
+  document.body.classList.remove('exporting');
 }
 
-/* ===== لفت النظر — مزامنة السبب ===== */
-const noteSelect = document.getElementById('noteReasonSelect');
-const noteText   = document.getElementById('noteReasonText');
-noteSelect.addEventListener('change', ()=>{
-  const v = (noteSelect.value||'').trim();
-  noteText.textContent = v ? v : 'المهمة المحددة';
+document.getElementById('btnMakePDF').addEventListener('click', ()=>{
+  // نحسب الدقائق لكل نوع عند التصدير للأرشفة
+  const kind = document.querySelector('#noticeSeg input[name="nt"]:checked')?.value || 'late';
+  let mins = 0;
+  if(kind==='late'){ const m = parseInt(ar2en((document.getElementById('lateTotal').textContent||'').replace(/\D/g,''))||'0',10); mins = m||0; }
+  if(kind==='absent'){ const m = parseInt(ar2en((document.getElementById('absTotal').textContent||'').replace(/\D/g,''))||'0',10); mins = m||0; }
+  if(kind==='early'){ const m = parseInt(ar2en((document.getElementById('earlyTotal').textContent||'').replace(/\D/g,''))||'0',10); mins = m||0; }
+  recordCase(kind, 'pdf', mins);
+  exportSheetToPDF().catch(err=>{ document.body.classList.remove('exporting'); alert('تعذّر إنشاء PDF: ' + (err.message || err)); });
 });
 
-/* ===== عند البدء ===== */
-refreshHeaderCounts();
+/* ========= زر واتساب: مع أرشفة المدة ========= */
+const DEFAULT_WA = '966504532489';
+document.getElementById('btnWA').addEventListener('click', ()=>{
+  const t = getCurrentTeacher();
+  const num = (t?.phone && /^\d{11,13}$/.test(t.phone)) ? t.phone : DEFAULT_WA;
+  const kind = document.querySelector('#noticeSeg input[name="nt"]:checked')?.value || 'late';
+  const hj = (document.getElementById('hdrHijri').textContent || '').trim();
+  const day = (document.getElementById('dynDay').textContent || '').trim();
+  const serial = (document.getElementById('serialNo').textContent || '').trim();
+  const name = t?.name || '—';
+  let details = ''; let mins = 0;
+  if(kind === 'late'){
+    details = `تأخر عن بداية الدوام. ساعة الحضور: ${document.getElementById('tLateIn').textContent.trim()} — إجمالي التأخر: ${document.getElementById('lateTotal').textContent} (${document.getElementById('lateHH').textContent} س)`;
+    mins = parseInt(ar2en((document.getElementById('lateTotal').textContent||'').replace(/\D/g,''))||'0',10);
+  } else if(kind === 'absent'){
+    details = `عدم تواجد أثناء الدوام من ${document.getElementById('tAbsFrom').textContent.trim()} إلى ${document.getElementById('tAbsTo').textContent.trim()} — المدة: ${document.getElementById('absTotal').textContent} (${document.getElementById('absHH').textContent} س)`;
+    mins = parseInt(ar2en((document.getElementById('absTotal').textContent||'').replace(/\D/g,''))||'0',10);
+  } else if(kind === 'early'){
+    details = `انصراف مبكر قبل نهاية الدوام من ${document.getElementById('tEarlyFrom').textContent.trim()} — المدة: ${document.getElementById('earlyTotal').textContent} (${document.getElementById('earlyHH').textContent} س)`;
+    mins = parseInt(ar2en((document.getElementById('earlyTotal').textContent||'').replace(/\D/g,''))||'0',10);
+  } else if(kind === 'gaib'){
+    details = `مساءلة غياب لليوم المذكور.`;
+  } else if(kind === 'note'){
+    details = `لفت نظر بسبب: ${document.getElementById('noteReasonText').textContent.trim()}`;
+  }
+  const kindLabel = { late:'تنبيه تأخر', absent:'تنبيه عدم تواجد', early:'تنبيه انصراف مبكر', gaib:'مساءلة غياب', note:'لفت نظر' }[kind] || 'تنبيه';
+  const msg = `السلام عليكم
+${kindLabel} — رقم الإجراء: ${serial}
+الاسم: ${name}
+اليوم: ${day}
+التاريخ الهجري: ${hj}
+${details}
+
+*أُرسل من نظام الشؤون الإدارية والمتابعة*`;
+  recordCase(kind, 'whatsapp', mins);
+  const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+});
+
+/* ========= محول التاريخ (نافذة) ========= */
+function openConv(){
+  // تعبئة القوائم
+  const now = new Date();
+  function fillRange(sel, from, to){
+    sel.innerHTML=''; for(let v=from; v<=to; v++) sel.add(new Option(en2ar(String(v).padStart(2,'0')), v));
+  }
+  const c_hy = document.getElementById('c_hy'), c_hm=document.getElementById('c_hm'), c_hd=document.getElementById('c_hd');
+  const curAH = parseInt(ar2en(new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric'}).format(now)),10);
+  fillRange(c_hy, curAH-10, curAH+10); fillRange(c_hm,1,12); fillRange(c_hd,1,30);
+
+  const c_gy = document.getElementById('c_gy'), c_gm=document.getElementById('c_gm'), c_gd=document.getElementById('c_gd');
+  const yNow = now.getFullYear(); fillRange(c_gy,yNow-10,yNow+10); fillRange(c_gm,1,12);
+  function fillGD(){ const y=+c_gy.value, m=+c_gm.value; const n=new Date(y,m,0).getDate(); c_gd.innerHTML=''; for(let i=1;i<=n;i++) c_gd.add(new Option(en2ar(String(i).padStart(2,'0')), i)); }
+  c_gy.onchange=()=>{ fillGD(); updateConvG(); }; c_gm.onchange=()=>{ fillGD(); updateConvG(); }; c_gd.onchange=updateConvG;
+  c_hy.onchange=updateConvH; c_hm.onchange=updateConvH; c_hd.onchange=updateConvH;
+
+  // قيم افتراضية من المُنتقي الرئيسي
+  const hy = +document.getElementById('hjYear').value;
+  const hm = +document.getElementById('hjMonth').value;
+  const hd = +document.getElementById('hjDay').value;
+  c_hy.value=hy; c_hm.value=hm; c_hd.value=hd;
+
+  const gy = +document.getElementById('gy').value || now.getFullYear();
+  const gm = +document.getElementById('gm').value || (now.getMonth()+1);
+  c_gy.value = gy; c_gm.value = gm; fillGD(); c_gd.value = +document.getElementById('gd').value || now.getDate();
+
+  updateConvH(); updateConvG();
+  document.getElementById('convDialog').style.display = 'flex';
+}
+function updateConvH(){
+  const y=+document.getElementById('c_hy').value, m=+document.getElementById('c_hm').value, d=+document.getElementById('c_hd').value;
+  const g = hijriToGregorian(y,m,d);
+  const out = document.getElementById('convOutH');
+  if(!g){ out.textContent='—'; return; }
+  const gd = new Intl.DateTimeFormat('ar-SA',{year:'numeric',month:'2-digit',day:'2-digit'}).format(g);
+  out.innerHTML = `الميلادي المقابل: <strong>${gd}</strong>`;
+}
+function updateConvG(){
+  const y=+document.getElementById('c_gy').value, m=+document.getElementById('c_gm').value, d=+document.getElementById('c_gd').value;
+  const g = new Date(y,m-1,d);
+  const hijYMD = fmtHijriYMDNoSuffix(g) + ' هـ';
+  const hijDMY = fmtHijriNoSuffix(g);
+  document.getElementById('convOutG').innerHTML = `الهجري (Y/M/D): <strong>${hijYMD}</strong><br>الهجري (D/M/Y): <strong>${hijDMY}</strong>`;
+}
+document.getElementById('btnDateConv').addEventListener('click', openConv);
+document.getElementById('convClose').addEventListener('click', ()=> document.getElementById('convDialog').style.display = 'none');
+document.getElementById('convDialog').addEventListener('click', e=> { if(e.target.id === 'convDialog') e.currentTarget.style.display = 'none'; });
+document.getElementById('convCopy').addEventListener('click', ()=>{
+  const t = (document.getElementById('convOutH').innerText||'') + '\n' + (document.getElementById('convOutG').innerText||'');
+  navigator.clipboard.writeText(t);
+});
+
+/* ========= حاسبة إضافة دقائق التأخر ========= */
+function openAdder(){
+  const ad = document.getElementById('adderPad');
+  const r = document.getElementById('btnAddLate').getBoundingClientRect();
+  ad.style.left = Math.min(window.innerWidth - 320, Math.max(8, r.left)) + 'px';
+  ad.style.top = (r.bottom + 8 + window.scrollY) + 'px';
+  ad.style.display = 'block';
+}
+document.getElementById('btnAddLate').addEventListener('click', openAdder);
+document.getElementById('adderClose').addEventListener('click', ()=> document.getElementById('adderPad').style.display='none');
+document.getElementById('adderSave').addEventListener('click', ()=>{
+  const mins = parseInt(document.getElementById('adderMins').value||'0',10);
+  if(!Number.isFinite(mins) || mins<=0){ alert('أدخل عدد دقائق صحيحًا.'); return; }
+  if(recordCase('late', 'manual-add', mins)){
+    document.getElementById('adderMins').value='';
+    document.getElementById('adderPad').style.display='none';
+    alert('تمت إضافة الدقائق وتوثيقها في الأرشيف.');
+  }
+});
+
+/* ========= عند التحميل ========= */
+document.addEventListener('DOMContentLoaded', ()=>{
+  buildHijriPicker();
+  buildGregPicker();
+  refreshHeaderCounts();
+  recalc();
+});
 </script>
 </body>
 </html>
