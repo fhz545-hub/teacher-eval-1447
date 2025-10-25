@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1"> <!-- مهم للجوال -->
 <title>الشؤون الإدارية والمتابعة</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -12,17 +12,25 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:#f6fafb;color:var(--ink);font:12.6px/1.8 Tajawal,system-ui;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
+
+/* التخطيط العام */
 .app{display:grid;grid-template-columns:var(--sidebarW) 1fr;min-height:100vh}
+@media (max-width:1024px){ /* تكديس في الأجهزة المتوسطة والصغيرة */
+  .app{grid-template-columns:1fr}
+}
 
 /* لوحة التعليمات */
 .sidebar{position:sticky;top:0;height:100vh;background:#fff;border-inline-end:1px solid #e8f2f2;box-shadow:0 0 24px rgba(0,0,0,.04);display:flex;flex-direction:column;z-index:5}
+@media (max-width:1024px){
+  .sidebar{position:relative;height:auto;top:auto;border-inline-end:0;border-bottom:1px solid #e8f2f2}
+}
 .sb-head{padding:12px;border-bottom:1px solid #eef4f4;font-weight:900;color:#064b50}
 .sb-body{padding:10px;overflow:auto}
 .f{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
 .f label{font-weight:800;color:#03636a;font-size:11.6px}
 .sel,.inp,.btn{height:34px;border:1px solid #dbe9e9;border-radius:10px;background:#fff;padding:6px 9px;font-weight:800}
 .sel{appearance:none;background-image:linear-gradient(45deg,transparent 50%,#89a 0),linear-gradient(135deg,#89a 50%,transparent 0);background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px,6px 6px;background-repeat:no-repeat;cursor:pointer}
-.row{display:flex;gap:6px;align-items:center}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{border:1px solid #dbe9e9;border-radius:12px;background:#f2fafb;color:#0b5e63;font-weight:900;padding:6px 10px;cursor:pointer}
 .chip.active{background:var(--moe);color:#fff;border-color:transparent}
@@ -30,11 +38,11 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .sb-actions{margin-top:8px;display:flex;flex-direction:column;gap:8px}
 .rights{font-size:10px;color:#7a8790;text-align:center;padding:8px 10px;border-top:1px dashed #eef4f4;margin-top:auto}
 
-/* محتوى A4 */
+/* المحتوى */
 .content{padding:16px}
-.sheet-wrap{display:flex;justify-content:center}
-.sheet{width:210mm;min-height:297mm;background:#fff;border:1px solid var(--b);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.04)}
-.pad{padding:8mm 10mm 9mm} /* رفعت الصفحة قليلاً للأعلى */
+.sheet-wrap{display:flex;justify-content:center;overflow:auto}
+.sheet{width:100%;max-width:210mm;min-height:297mm;background:#fff;border:1px solid var(--b);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.04)}
+.pad{padding:8mm 10mm 9mm} /* رفع بسيط للأعلى */
 
 /* الهيدر */
 .hdr{position:relative;margin:0 0 5mm}
@@ -52,7 +60,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .tbl td{border:1px solid #3f5b57;padding:5px 7px;height:10mm;text-align:center}
 .tbl .name{width:38%}.tbl .spec{width:14%}.tbl .level{width:16%}.tbl .job{width:16%}.tbl .work{width:16%}
 
-/* شارة تحت جدول الاسم */
+/* شارة السجل المدني */
 .badges-under{margin:6px auto 0;display:flex;gap:10px;justify-content:flex-start;align-items:center;width:100%}
 .badge{display:inline-flex;align-items:center;gap:8px;border:1px solid #0b7e88;border-radius:10px;padding:2px 10px;background:#fff;font-weight:900}
 .badge .tag{background:var(--moe);color:#fff;border-radius:8px;padding:2px 8px}
@@ -306,9 +314,8 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
               </label>
             </div>
 
-            <p id="workRangeLine" style="margin:6px 0 8px; font-weight:800; color:#064b50">
-              يُرجى التقيد بمواعيد الدوام الرسمية: <span id="workRangeText">—</span>.
-            </p>
+            <!-- تمت إزالة عبارة نطاق الدوام (workRangeLine) -->
+            <!-- <p id="workRangeLine" style="display:none"></p> -->
 
             <p>عليه نأمل توضيح أسباب ذلك مع إرفاق ما يؤيد عذركم … ولكم تحياتنا.</p>
             <p style="margin-top:6px"><strong>مدير المدرسة :</strong> <span>فهد حامد علي الزهراني</span>
@@ -373,7 +380,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
             <p>الأستاذ الفاضل/ <span id="noteTeacherName" style="font-weight:900">—</span> حفظه الله</p>
             <p><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
             <p>في يوم <span id="noteDay" style="font-weight:900;border-bottom:1px dotted #2f4f4c;padding:0 3mm">—</span>
-              الموافق <span id="noteHijri" style="font-weight:900;border-bottom:1px dotted #2ف4ف4c;padding:0 3mm">—</span></p>
+              الموافق <span id="noteHijri" style="font-weight:900;border-bottom:1px dotted #2f4f4c;padding:0 3mm">—</span></p>
             <p id="noteParagraph">
               إشارةً إلى التعليمات والأنظمة المعتمدة في المدرسة؛ لوحِظ
               <span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>.
@@ -401,7 +408,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
     </div>
     <div class="h">
-      <div style="font-weight:900;color:#064b50">ملخص الإحصائيات</div>
+      <div style="font-weight:900;color:#064ب50">ملخص الإحصائيات</div>
       <div class="stats-actions" style="display:flex;gap:6px">
         <button id="btnResetStats" class="btn ghost" title="تصفير الأرشيف">تصفير الأرشيف ♻️</button>
         <button id="btnStatsPDF" class="btn primary">PDF الملخص</button>
@@ -515,7 +522,7 @@ fillTeachers();
 
 /* حالة عامة + أرشيف */
 let STATE={kind:'late',excuse:'without',accept:'rejected',faris:'not'};
-const KEY_ARCH='followup_archive_v9';
+const KEY_ARCH='followup_archive_v10';
 let ARCH=JSON.parse(localStorage.getItem(KEY_ARCH)||'[]');
 function saveARCH(){ localStorage.setItem(KEY_ARCH, JSON.stringify(ARCH)); }
 function clearARCH(){ ARCH=[]; saveARCH(); }
@@ -530,17 +537,16 @@ const lineAbs=document.getElementById('lineAbs');
 const lineEarly=document.getElementById('lineEarly');
 const kindTitle=document.getElementById('kindTitle');
 
-/* نطاق دوام */
+/* نطاق دوام + محوّل الموسم */
 const WORK={ winter:{start:'06:45',end:'13:45',label:'الشتوي (06:45–13:45)'}, summer:{start:'07:00',end:'14:00',label:'الصيفي (07:00–14:00)'} };
 let SEASON='winter';
-function refreshWorkRangeLine(){ document.getElementById('workRangeText').textContent=WORK[SEASON].label; }
 document.getElementById('seasonChips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
   [...e.currentTarget.children].forEach(x=>x.classList.remove('active')); b.classList.add('active');
-  SEASON=b.dataset.season; refreshWorkRangeLine(); recalc();
+  SEASON=b.dataset.season; recalc();
 });
 
-/* تبديل نوع الإجراء */
+/* نوع الإجراء */
 function setPack(kind){
   STATE.kind=kind;
   document.getElementById('mainTitle').textContent=({late:'تنبيه',absent:'تنبيه',early:'تنبيه',gaib:'مساءلة غياب',note:'لفت نظر'})[kind];
@@ -616,7 +622,7 @@ function syncFromHijri(){
   document.getElementById('affTeacher').textContent=document.getElementById('t_name').textContent||'—';
   document.getElementById('absDayP').textContent=dayName;
   document.getElementById('absDateYMD').textContent=hij;
-  // إحصائيات الهيدر
+  // هيدر الإحصائيات
   document.getElementById('statsDay').textContent=dayName;
   document.getElementById('statsHijri').textContent=hij;
 }
@@ -728,7 +734,7 @@ ${details}
   window.open(`https://wa.me/${t.phone||'966500000000'}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* تضمين الصور كـ DataURL لضمان ظهور الهيدر في PDF */
+/* تضمين الصور (لضمان ظهور الهيدر في PDF) */
 async function embedImageToDataURL(imgEl){
   try{
     const src=imgEl.getAttribute('src')||''; if(!src) return;
@@ -743,7 +749,7 @@ async function ensureAllImagesEmbedded(root){
   for(const im of imgs){ if(!im.src.startsWith('data:')) await embedImageToDataURL(im); }
 }
 
-/* زر PDF للصفحة الرئيسية */
+/* حفظ PDF للصفحة الرئيسية */
 document.getElementById('btnPDF').addEventListener('click', async function(){
   const i=+selTeacher.value; if(!Number.isInteger(i)) { alert('اختر معلماً أولاً'); return; }
   const t=TEACHERS[i];
@@ -811,7 +817,7 @@ function openStats(){
   }
   statsDlg.style.display='flex';
   statsDlg.setAttribute('aria-hidden','false');
-  // مزامنة الهيدر
+  // مزامنة اليوم/التاريخ في هيدر الإحصائيات
   document.getElementById('statsDay').textContent=document.getElementById('metaDay').textContent;
   document.getElementById('statsHijri').textContent=document.getElementById('metaHijri').textContent;
 }
@@ -819,7 +825,6 @@ function openStats(){
 /* تهيئة */
 function init(){
   buildHijriPicker();
-  refreshWorkRangeLine();
   setPack('late');
   document.getElementById('sidebar').style.pointerEvents='auto';
   document.getElementById('statsDlg').style.display='none';
