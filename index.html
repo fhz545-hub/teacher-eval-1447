@@ -15,7 +15,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 
 /* التخطيط العام */
 .app{display:grid;grid-template-columns:var(--sidebarW) 1fr;min-height:100vh}
-@media (max-width:1024px){ /* تكديس في الأجهزة المتوسطة والصغيرة */
+@media (max-width:1024px){
   .app{grid-template-columns:1fr}
 }
 
@@ -25,7 +25,8 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
   .sidebar{position:relative;height:auto;top:auto;border-inline-end:0;border-bottom:1px solid #e8f2f2}
 }
 .sb-head{padding:12px;border-bottom:1px solid #eef4f4;font-weight:900;color:#064b50}
-.sb-body{padding:10px;overflow:auto}
+.sb-body{padding:10px;overflow:auto;max-height:calc(100vh - 120px)}
+@media (max-width:1024px){.sb-body{max-height:none}}
 .f{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
 .f label{font-weight:800;color:#03636a;font-size:11.6px}
 .sel,.inp,.btn{height:34px;border:1px solid #dbe9e9;border-radius:10px;background:#fff;padding:6px 9px;font-weight:800}
@@ -43,7 +44,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .content{padding:16px}
 .sheet-wrap{display:flex;justify-content:center;overflow:auto}
 .sheet{width:100%;max-width:210mm;min-height:297mm;background:#fff;border:1px solid var(--b);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.04)}
-.pad{padding:8mm 10mm 9mm} /* رفع بسيط للأعلى */
+.pad{padding:8mm 10mm 9mm}
 
 /* الهيدر */
 .hdr{position:relative;margin:0 0 5mm}
@@ -84,7 +85,6 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .lines{min-height:26mm;border:1px dashed #2f4f4c;border-radius:10px;padding:8px 10px;background:#fafefe}
 .lines div{height:9mm;border-bottom:1px dotted #2f4f4c}
 .lines div:last-child{border-bottom:0}
-/* نمط منقط خفيف (موجود مسبقاً لجزء المساءلة) */
 .lines.dotted{border-color:#cfd8d8}
 .lines.dotted div{border-bottom:1px dotted #c7cfd0}
 
@@ -103,6 +103,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .tbl2{width:100%;border-collapse:collapse}
 .tbl2 th{background:#0b5e63;color:#fff;border:1px solid #2b4949;padding:6px 8px;position:sticky;top:0}
 .tbl2 td{border:1px solid #2b4949;padding:6px 8px}
+.tbl2 .no-print{ /* نخفيها في الطباعة فقط عبر @media print */ }
 
 /* عدّاد الساعة */
 #clockDlg{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);align-items:center;justify-content:center;padding:16px}
@@ -119,37 +120,13 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 /* طباعة قوية وواضحة */
 *{-webkit-print-color-adjust:exact; print-color-adjust:exact}
 @media print{
-  @page{size:A4;margin:10mm} /* هوامش A4 واضحة */
+  @page{size:A4;margin:10mm}
   body{background:#fff}
 
-  .sidebar,.rights,#clockDlg{display:none !important}
-  .content{padding:0}
-  .sheet{width:210mm;min-height:auto;border:0;box-shadow:none;page-break-inside:avoid}
-  .pad{padding:7mm 9mm 8mm}
-  .hdr{margin:0 0 4mm}
-  .hdr img{max-height:40mm;object-fit:cover;border-radius:8px}
-  .title-center{margin:4mm 0 2mm}
-
-  /* إبراز الحدود والخطوط والوقت */
-  .tbl th{background:#0b5e63 !important;color:#fff !important;border-color:#000 !important}
-  .tbl td{border-color:#000 !important}
-  .timebox{border-color:#000 !important;color:#000 !important}
-  .lines{border-color:#000 !important}
-  .lines div{border-color:#000 !important}
-  .dotfield{border-bottom:1px dotted #000 !important}
-
-  /* ضغط خاص للطباعة لنموذج التنبيهات والمساءلة ليلائم ورقة واحدة */
-  #alertPack, #absencePack{
-    line-height:1.45 !important;
-  }
-  #alertPack p, #absencePack p{ margin:2mm 0 1.5mm !important }
-  #alertPack .sec, #absencePack .sec{ margin-top:4mm !important }
-  #alertPack .checkline, #absencePack .checkline{ margin:3mm 0 !important; gap:4px !important }
-  #alertPack .lines div, #absencePack .lines div{ height:6mm !important } /* تقليل ارتفاع السطور */
-  #alertPack .lines, #absencePack .lines{ padding:6px 8px !important }
-
-  /* طباعة الإحصائيات فقط (الجدول) عند تفعيل وضع طباعة الإحصائيات */
+  /* إخفاء التطبيق بالكامل في وضع طباعة الإحصائيات */
   body[data-print="stats"] .app{display:none !important}
+
+  /* إظهار نافذة الإحصائيات فقط للطباعة */
   body[data-print="stats"] #statsDlg[aria-hidden="false"]{
     display:block !important; position:static !important; inset:auto !important;
     background:#fff !important; padding:0 !important;
@@ -159,16 +136,51 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
     min-height:auto !important;max-height:none !important;overflow:visible !important;box-shadow:none !important;margin:0 auto !important;
     page-break-inside:avoid;
   }
-  /* إظهار الجدول فقط — بدون هيدر وصفي وأزرار */
-  body[data-print="stats"] #statsDlg .stats-hdr,
+
+  /* نُظهر الهيدر في الإحصائيات مطبوعًا كاملاً */
+  body[data-print="stats"] #statsDlg .stats-hdr{display:block !important;margin:0 0 6mm !important}
+  body[data-print="stats"] #statsDlg .stats-hdr img{width:100% !important;height:auto !important;border-radius:8px !important}
+  body[data-print="stats"] #statsDlg .stats-meta .rowB{background:transparent !important;border:0 !important}
+
+  /* إخفاء الأزرار والعناصر التفاعلية داخل الإحصائيات أثناء الطباعة */
   body[data-print="stats"] #statsDlg .h,
-  body[data-print="stats"] #statsDlg .stats-actions{ display:none !important }
-  body[data-print="stats"] #statsDlg .tbl2{ width:100% !important; border-collapse:collapse }
-  body[data-print="stats"] #statsDlg .tbl2 thead{ display:table-header-group }
-  body[data-print="stats"] #statsDlg .tbl2 tfoot{ display:table-footer-group }
-  body[data-print="stats"] #statsDlg .tbl2 th{ position:static !important;background:#0b5e63 !important;color:#fff !important;border-color:#000 !important }
-  body[data-print="stats"] #statsDlg .tbl2 td{ border-color:#000 !important }
-  body[data-print="stats"] #statsDlg .tbl2 tr{ page-break-inside:avoid }
+  body[data-print="stats"] #statsDlg .stats-actions{display:none !important}
+
+  /* جدول الإحصائيات: عنوان متكرر لكل صفحة وإخفاء عمود الحذف */
+  body[data-print="stats"] #tblStats thead{display:table-header-group}
+  body[data-print="stats"] #tblStats tfoot{display:table-footer-group}
+  body[data-print="stats"] #tblStats th,
+  body[data-print="stats"] #tblStats td{border-color:#000 !important}
+  body[data-print="stats"] #tblStats th{background:#0b5e63 !important;color:#fff !important}
+  body[data-print="stats"] #tblStats tr{page-break-inside:avoid}
+  body[data-print="stats"] #tblStats th:last-child,
+  body[data-print="stats"] #tblStats td:last-child,
+  body[data-print="stats"] #tblStats .no-print{display:none !important}
+
+  /* باقي الصفحة خارج وضع الإحصائيات يطبع طبيعيًا */
+  body:not([data-print="stats"]) .sidebar,
+  body:not([data-print="stats"]) .rights,
+  body:not([data-print="stats"]) #clockDlg{display:none !important}
+  body:not([data-print="stats"]) .content{padding:0}
+  body:not([data-print="stats"]) .sheet{width:210mm;min-height:auto;border:0;box-shadow:none;page-break-inside:avoid}
+  body:not([data-print="stats"]) .pad{padding:7mm 9mm 8mm}
+  body:not([data-print="stats"]) .hdr{margin:0 0 4mm}
+  body:not([data-print="stats"]) .hdr img{max-height:40mm;object-fit:cover;border-radius:8px}
+  body:not([data-print="stats"]) .title-center{margin:4mm 0 2mm}
+  body:not([data-print="stats"]) .tbl th{background:#0b5e63 !important;color:#fff !important;border-color:#000 !important}
+  body:not([data-print="stats"]) .tbl td{border-color:#000 !important}
+  body:not([data-print="stats"]) .timebox{border-color:#000 !important;color:#000 !important}
+  body:not([data-print="stats"]) .lines{border-color:#000 !important}
+  body:not([data-print="stats"]) .lines div{border-color:#000 !important}
+  body:not([data-print="stats"]) .dotfield{border-bottom:1px dotted #000 !important}
+
+  /* ضغط خاص لنموذجي التنبيه/المساءلة */
+  #alertPack, #absencePack{line-height:1.45 !important}
+  #alertPack p, #absencePack p{margin:2mm 0 1.5mm !important}
+  #alertPack .sec, #absencePack .sec{margin-top:4mm !important}
+  #alertPack .checkline, #absencePack .checkline{margin:3mm 0 !important;gap:4px !important}
+  #alertPack .lines div, #absencePack .lines div{height:6mm !important}
+  #alertPack .lines, #absencePack .lines{padding:6px 8px !important}
 }
 </style>
 </head>
@@ -226,9 +238,9 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
         </select>
       </div>
 
-      <!-- الموحّد: العذر/فارس -->
+      <!-- الموحّد: العذر/القبول/فارس -->
       <div class="f">
-        <label>العذر/فارس</label>
+        <label>العذر/القبول/فارس</label>
         <button id="btnUnified" class="btn ghost" style="width:100%;display:flex;justify-content:space-between;align-items:center">
           <span id="unifiedText">بدون عذر</span><span>▾</span>
         </button>
@@ -248,7 +260,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
             </div>
           </div>
           <div class="f" style="margin:6px 0 0">
-            <label>فارس — يظهر لمساءلات الغياب فقط</label>
+            <label>فارس — يظهر فقط لمساءلة الغياب</label>
             <div class="chips" id="frGroup">
               <button class="chip" data-fr="raised">مرفوع</button>
               <button class="chip active" data-fr="not">لم يُرفع</button>
@@ -320,7 +332,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           <div id="alertPack" class="sec">
             <h3>( 1 ) خطاب التنبيه — <span id="kindTitle">تأخر</span></h3>
             <div class="rule-row"><span class="label">المكرم المعلم :</span>
-              <strong id="teacherNameInline" style="min-width:38mm;text-align:center;border-bottom:1px dotted #2f4f4c;display:inline-block;padding:0 2mm">—</strong>
+              <strong id="teacherNameInline" style="min-width:38mm;text-align:center;border-bottom:1px dotted #2ف4f4c;display:inline-block;padding:0 2mm">—</strong>
               <span>وفقه الله</span></div>
             <p><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
             <p>إنه في يوم <span class="dotfield"><span id="dynDay">—</span></span>
@@ -458,7 +470,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       <div style="font-weight:900;color:#064b50">ملخص الإحصائيات</div>
       <div class="stats-actions" style="display:flex;gap:6px">
         <button id="btnResetStats" class="btn ghost" title="تصفير الأرشيف">تصفير الأرشيف ♻️</button>
-        <button id="btnStatsPDF" class="btn primary" title="طباعة الجدول فقط">طباعة الإحصائيات</button>
+        <button id="btnStatsPDF" class="btn primary" title="طباعة الإحصائيات">طباعة الإحصائيات</button>
         <button id="btnCloseStats" class="btn ghost">إغلاق</button>
       </div>
     </div>
@@ -466,7 +478,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       <table id="tblStats" class="tbl2">
         <thead>
           <tr>
-            <th>المعلّم</th><th>النوع</th><th>اليوم</th><th>التاريخ (هـ)</th><th>العذر</th><th>فارس</th><th>تفاصيل</th><th>إجراء</th>
+            <th>المعلّم</th><th>النوع</th><th>اليوم</th><th>التاريخ (هـ)</th><th>العذر</th><th>فارس</th><th>تفاصيل</th><th class="no-print">إجراء</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -508,7 +520,7 @@ const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
 const en2ar=s=>(''+s).replace(/[0-9]/g,d=>AR[d]);
 const ar2en=s=>(''+s).replace(/[٠-٩]/g,d=>EN[AR.indexOf(d)]);
 
-/* قائمة المعلمين (الاسم\tالهوية\tالجوال\tالتخصص\tالمرتبة) */
+/* قائمة المعلمين */
 const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058931	فيزيا	معلم ممارس
 مبارك عوضه سفر آل ثابت	1056464405	966597233399	كيميا	معلم ممارس
 فرج عبدالعلي يوسف ال سيف	1000397735	966504113707	احياء	معلم ممارس
@@ -573,8 +585,6 @@ const kindTitle=document.getElementById('kindTitle');
 const statsDlg=document.getElementById('statsDlg');
 
 /* نطاق دوام + محوّل الموسم — الشتوي افتراضي (07:00–14:00)، الصيفي (06:45–13:45) */
-const WORK={ winter:{start:'07:00',end:'14:00',label:'الشتوي (07:00–14:00)'},
-             summer:{start:'06:45',end:'13:45',label:'الصيفي (06:45–13:45)'} };
 const WORK_RANGE={ winter:{start:'07:00',end:'14:00'}, summer:{start:'06:45',end:'13:45'} };
 let SEASON='winter';
 document.getElementById('seasonChips').addEventListener('click',e=>{
@@ -598,10 +608,10 @@ function setPack(kind){
   kindTitle.textContent=({late:'تأخر',absent:'عدم تواجد',early:'انصراف مبكر'})[kind]||'—';
   document.getElementById('affKind').textContent=({late:'التأخر',absent:'عدم التواجد',early:'الانصراف المبكر'})[kind]||'المخالفة';
 
-  // تفعيل/تعطيل فارس: فقط لمساءلة الغياب
-  const frF=document.getElementById('frGroup').parentElement;
-  if(kind==='gaib'){ frF.classList.remove('disabled'); if(!STATE.faris) STATE.faris='not'; }
-  else { frF.classList.add('disabled'); STATE.faris=''; }
+  // فارس يظهر فقط في مساءلة الغياب
+  const frWrap=document.getElementById('frGroup').parentElement;
+  if(kind==='gaib'){ frWrap.classList.remove('disabled'); if(!STATE.faris) STATE.faris='not'; }
+  else { frWrap.classList.add('disabled'); STATE.faris=''; }
 
   updUnifiedText();
   if(kind==='gaib') updatePrincipalAbs();
@@ -691,11 +701,11 @@ function syncFromGregInputs(){
   updatePrincipalAbs();
 }
 
-/* تحويلات الوقت والحساب */
+/* تحويلات الوقت */
 function toMin(hhmm){ const m=/^(\d{1,2}):(\d{2})$/.exec(ar2en(hhmm||'')); if(!m) return null; const h=+m[1], mi=+m[2]; if(h>23||mi>59) return null; return h*60+mi; }
 function fmtHM(mins){ const h=Math.floor(mins/60), m=mins%60; return en2ar(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')); }
 
-/* قناع الإدخال + فتح عدّاد الساعة */
+/* قناع الإدخال + عدّاد الساعة */
 function attachTimeMask(el){
   el.addEventListener('beforeinput', (e)=>{ if(e.inputType==='insertText'){ const ch=e.data; if(!(/[0-9٠-٩:]/.test(ch))) e.preventDefault(); }});
   el.addEventListener('input', ()=>{
@@ -709,7 +719,6 @@ function attachTimeMask(el){
 function placeCaretAtEnd(el){ const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
 ['tLateIn','tAbsFrom','tAbsTo','tEarlyFrom'].forEach(id=>attachTimeMask(document.getElementById(id)));
 
-/* عدّاد الساعة */
 let CLOCK_TARGET=null;
 const clockDlg=document.getElementById('clockDlg');
 const clockHour=document.getElementById('clockHour');
@@ -735,14 +744,11 @@ clockDlg.addEventListener('click',(e)=>{ if(e.target===clockDlg) hideClock(); })
 /* إعادة الحساب */
 function recalc(){
   const wsM=toMin(WORK_RANGE[SEASON].start), weM=toMin(WORK_RANGE[SEASON].end);
-  // تأخر
   const tLate=document.getElementById('tLateIn').textContent.trim(); const tLateM=toMin(tLate);
   if(tLateM!=null&&wsM!=null&&tLateM>wsM){ const mins=tLateM-wsM; lateTotal.textContent=en2ar(mins)+' دقيقة'; lateHH.textContent=fmtHM(mins); } else { lateTotal.textContent='0 دقيقة'; lateHH.textContent='00:00'; }
-  // عدم تواجد
   const aF=document.getElementById('tAbsFrom').textContent.trim(), aT=document.getElementById('tAbsTo').textContent.trim();
   const aFM=toMin(aF), aTM=toMin(aT);
   if(aFM!=null&&aTM!=null&&aTM>aFM){ const mins=aTM-aFM; absTotal.textContent=en2ar(mins)+' دقيقة'; absHH.textContent=fmtHM(mins);} else { absTotal.textContent='0 دقيقة'; absHH.textContent='00:00'; }
-  // انصراف
   const eF=document.getElementById('tEarlyFrom').textContent.trim(); const eFM=toMin(eF);
   if(eFM!=null&&weM!=null&&weM>eFM){ const mins=weM-eFM; earlyTotal.textContent=en2ar(mins)+' دقيقة'; earlyHH.textContent=fmtHM(mins);} else { earlyTotal.textContent='0 دقيقة'; earlyHH.textContent='00:00'; }
 }
@@ -784,7 +790,7 @@ ${details}
   window.open(`https://wa.me/${t.phone||'966500000000'}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* تضمين الصور (لضمان ظهور الهيدر في PDF) */
+/* تضمين الصور (لضمان ظهور الهيدر في PDF والطباعة) */
 async function embedImageToDataURL(imgEl){
   try{
     const src=imgEl.getAttribute('src')||''; if(!src) return;
@@ -821,13 +827,15 @@ document.getElementById('btnPrintSave').addEventListener('click', async function
   finally{ btn.disabled=false; btn.textContent=old; }
 });
 
-/* طباعة الإحصائيات — الجدول فقط */
+/* طباعة الإحصائيات — الهيدر + الجدول فقط، بدون أزرار/حذف */
 document.getElementById('btnStatsPDF').onclick=async()=>{
+  const dlg=document.getElementById('statsDlg');
   const card=document.getElementById('statsCard');
   await ensureAllImagesEmbedded(card);
-  document.body.setAttribute('data-print','stats');    // وضع طباعة الإحصائيات فقط
+  dlg.setAttribute('aria-hidden','false');
+  document.body.setAttribute('data-print','stats');
   window.print();
-  setTimeout(()=>document.body.removeAttribute('data-print'),400);
+  setTimeout(()=>document.body.removeAttribute('data-print'),300);
 };
 
 /* إحصائيات */
@@ -858,7 +866,7 @@ function openStats(){
         <td>${r.excuse==='with'?'بعذر':'بدون عذر'}</td>
         <td>${r.kind==='gaib' ? ((r.faris==='raised')?'مرفوع':'لم يُرفع') : ''}</td>
         <td>${shortDetails(r)}</td>
-        <td><button class="btn ghost delRow" data-ts="${r.ts}" title="حذف">حذف</button></td>`;
+        <td class="no-print"><button class="btn ghost delRow" data-ts="${r.ts}" title="حذف">حذف</button></td>`;
       tb.appendChild(tr);
     });
   }
@@ -876,7 +884,7 @@ document.getElementById('tblStats').addEventListener('click', (e)=>{
   }
 });
 
-/* تعبئة توقيع المدير في نموذج المساءلة — خوارزمياً */
+/* توقيع المدير في المساءلة — خوارزمياً */
 const PRINCIPAL_NAME='فهد حامد علي الزهراني';
 function updatePrincipalAbs(){
   const nameEl=document.getElementById('principalNameAbs');
@@ -891,8 +899,8 @@ function updatePrincipalAbs(){
 /* تهيئة */
 function init(){
   buildHijriPicker();
-  setPack('late');         // افتراضي
-  SEASON='winter';         // الشتوي افتراضي
+  setPack('late');     // افتراضي
+  SEASON='winter';     // الشتوي افتراضي
   document.getElementById('sidebar').style.pointerEvents='auto';
   statsDlg.style.display='none';
   document.getElementById('clockDlg').style.display='none';
