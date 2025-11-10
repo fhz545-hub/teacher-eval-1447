@@ -15,9 +15,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 
 /* التخطيط العام */
 .app{display:grid;grid-template-columns:var(--sidebarW) 1fr;min-height:100vh}
-@media (max-width:1024px){ /* تكديس في الأجهزة المتوسطة والصغيرة */
-  .app{grid-template-columns:1fr}
-}
+@media (max-width:1024px){ .app{grid-template-columns:1fr} }
 
 /* لوحة التعليمات */
 .sidebar{position:sticky;top:0;height:100vh;background:#fff;border-inline-end:1px solid #e8f2f2;box-shadow:0 0 24px rgba(0,0,0,.04);display:flex;flex-direction:column;z-index:5}
@@ -34,15 +32,16 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .chip{border:1px solid #dbe9e9;border-radius:12px;background:#f2fafb;color:#0b5e63;font-weight:900;padding:6px 10px;cursor:pointer}
 .chip.active{background:var(--moe);color:#fff;border-color:transparent}
-.btn{cursor:pointer}.btn.ghost{background:#eef7f7}.btn.primary{background:var(--moe);color:#fff;border-color:transparent}.btn.wh{background:#25D366;color:#fff;border-color:#1aae53}
+.btn{cursor:pointer}.btn.ghost{background:#eef7ف7}.btn.primary{background:var(--moe);color:#fff;border-color:transparent}.btn.wh{background:#25D366;color:#fff;border-color:#1aae53}
 .sb-actions{margin-top:8px;display:flex;flex-direction:column;gap:8px}
 .rights{font-size:10px;color:#7a8790;text-align:center;padding:8px 10px;border-top:1px dashed #eef4f4;margin-top:auto}
+.disabled{opacity:.45;pointer-events:none;filter:grayscale(1)}
 
 /* المحتوى */
 .content{padding:16px}
 .sheet-wrap{display:flex;justify-content:center;overflow:auto}
 .sheet{width:100%;max-width:210mm;min-height:297mm;background:#fff;border:1px solid var(--b);border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.04)}
-.pad{padding:8mm 10mm 9mm} /* رفع بسيط للأعلى */
+.pad{padding:8mm 10mm 9mm}
 
 /* الهيدر */
 .hdr{position:relative;margin:0 0 5mm}
@@ -80,9 +79,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .calc{font-weight:900;color:#0b5e63}
 
 /* خطوط الكتابة */
-.lines{min-height:26mm;border:1px dashed #2f4f4c;border-radius:10px;padding:8px 10px;background:#fafefe}
+.lines{min-height:26mm;border:1px dashed #2ف4ف4c;border-radius:10px;padding:8px 10px;background:#fafefe}
 .lines div{height:9mm;border-bottom:1px dotted #2f4f4c}
 .lines div:last-child{border-bottom:0}
+/* نمط منقط خفيف لفراغ الإفادة */
+.lines.dotted{border-color:#cfd8d8}
+.lines.dotted div{border-bottom:1px dotted #c7cfd0}
 
 /* عبارة “تحفظ …” */
 .footer-note{margin-top:10mm}
@@ -93,7 +95,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .stats-card{background:#fff;border-radius:16px;max-width:1100px;width:96%;max-height:90vh;overflow:auto;border:1px solid var(--b)}
 .stats-card .h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef4f4}
 .stats-hdr{position:relative;margin:8px 8px 10px}
-.stats-hdr img{width:100%;display:block;border-radius:12px}
+.stats-hdr img{width:100%;display:block;border-radius:12px} /* ملء الهيدر */
 .stats-meta{position:absolute;inset-inline-end:12px;top:12px;display:flex;flex-direction:column;gap:6px;min-width:130px}
 .stats-meta .rowB{background:transparent;border:0;border-radius:10px;padding:6px 10px;font-weight:900;text-align:center}
 .tbl2{width:100%;border-collapse:collapse}
@@ -112,25 +114,59 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .clock-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
 .clock-actions .btn{height:auto;padding:7px 10px}
 
-/* طباعة قوية وواضحة */
+/* طباعة A4 لكل الصفحات + الإحصائيات — ضغط مدروس بدون اجتزاء */
 *{-webkit-print-color-adjust:exact; print-color-adjust:exact}
 @media print{
-  @page{size:A4;margin:7mm}
-  body{background:#fff}
-  .sidebar,.rights,#clockDlg{display:none !important}
+  @page{size:A4;margin:10mm}
+  html,body{height:auto;background:#fff}
   .content{padding:0}
   .sheet{width:210mm;min-height:auto;border:0;box-shadow:none;page-break-inside:avoid}
-  .pad{padding:7mm 9mm 8mm}
+  /* ضغط طفيف للمسافات للحفاظ على الهوية دون اجتزاء */
+  .pad{padding:8mm 9mm 9mm}
   .hdr{margin:0 0 4mm}
-  /* إبراز الحدود والخطوط والوقت */
+  .hdr img{max-height:40mm;object-fit:cover;border-radius:8px}
+  .title-center{margin:4mm 0 2mm}
+  .sec{margin-top:5mm}
+
   .tbl th{background:#0b5e63 !important;color:#fff !important;border-color:#000 !important}
   .tbl td{border-color:#000 !important}
   .timebox{border-color:#000 !important;color:#000 !important}
   .lines{border-color:#000 !important}
   .lines div{border-color:#000 !important}
   .dotfield{border-bottom:1px dotted #000 !important}
-  /* إخفاء أزرار الإحصائيات عند الطباعة/الحفظ */
-  #statsDlg .btn{display:none !important}
+
+  /* طباعة نافذة الإحصائيات كصفحة كاملة A4 */
+  #statsDlg[aria-hidden="false"]{
+    display:block !important; position:static !important; inset:auto !important;
+    background:#fff !important; padding:0 !important;
+  }
+  #statsDlg[aria-hidden="false"] ~ .app{visibility:hidden}
+  #statsDlg[aria-hidden="false"]{visibility:visible}
+  #statsDlg[aria-hidden="false"] .stats-card{
+    border:0 !important;border-radius:0 !important;width:210mm !important;max-width:none !important;
+    min-height:297mm !important;max-height:none !important;overflow:visible !important;box-shadow:none !important;margin:0 auto !important;
+    page-break-inside:avoid;
+  }
+  #statsDlg[aria-hidden="false"] .stats-card > .h,
+  #statsDlg[aria-hidden="false"] .stats-hdr,
+  #statsDlg[aria-hidden="false"] .stats-card > div[style^="padding"]{
+    padding-inline:9mm !important;
+  }
+  #statsDlg[aria-hidden="false"] .stats-hdr{margin:7mm 0 6mm !important}
+  #statsDlg[aria-hidden="false"] .stats-hdr img{border-radius:8px !important;max-height:40mm;object-fit:cover}
+  #statsDlg[aria-hidden="false"] .tbl2{width:100%;border-collapse:collapse;table-layout:auto}
+  #statsDlg[aria-hidden="false"] .tbl2 thead{display:table-header-group}
+  #statsDlg[aria-hidden="false"] .tbl2 tfoot{display:table-footer-group}
+  #statsDlg[aria-hidden="false"] .tbl2 th{position:static !important}
+  #statsDlg[aria-hidden="false"] .tbl2 th,
+  #statsDlg[aria-hidden="false"] .tbl2 td{padding:6px 8px !important}
+  #statsDlg[aria-hidden="false"] .tbl2 tr{page-break-inside:avoid}
+  #statsDlg[aria-hidden="false"] .stats-card .h{padding-block:7mm 4mm !important;border:0 !important}
+  #statsDlg[aria-hidden="false"] .stats-actions{display:none !important}
+  #statsDlg[aria-hidden="false"] .tbl2 th{background:#0b5e63 !important;color:#fff !important;border-color:#000 !important}
+  #statsDlg[aria-hidden="false"] .tbl2 td{border-color:#000 !important}
+
+  .sidebar,.rights,#clockDlg{display:none !important}
 }
 </style>
 </head>
@@ -188,30 +224,33 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
         </select>
       </div>
 
-      <!-- الموحّد: العذر/القبول/فارس -->
+      <!-- الموحّد: العذر/فارس -->
       <div class="f">
-        <label>العذر/القبول/فارس</label>
+        <label>العذر/فارس</label>
         <button id="btnUnified" class="btn ghost" style="width:100%;display:flex;justify-content:space-between;align-items:center">
-          <span id="unifiedText">بدون عذر • غير مقبول • لم يُرفع</span><span>▾</span>
+          <span id="unifiedText">بدون عذر</span><span>▾</span>
         </button>
+
         <div id="unifiedPanel" style="display:none;border:1px solid #dbe9e9;border-radius:10px;padding:8px;margin-top:6px">
           <div class="f" style="margin:0">
             <label>العذر</label>
-            <div class="chips">
+            <div class="chips" id="excuseGroup">
               <button class="chip" data-exc="with">بعذر</button>
               <button class="chip active" data-exc="without">بدون عذر</button>
             </div>
           </div>
+
           <div class="f" style="margin:6px 0 0">
             <label>قبول العذر</label>
-            <div class="chips">
+            <div class="chips" id="acceptGroup">
               <button class="chip" data-acc="accepted">مقبول</button>
               <button class="chip active" data-acc="rejected">غير مقبول</button>
             </div>
           </div>
+
           <div class="f" style="margin:6px 0 0">
-            <label>فارس</label>
-            <div class="chips">
+            <label>فارس — يظهر لمساءلات الغياب فقط</label>
+            <div class="chips" id="frGroup">
               <button class="chip" data-fr="raised">مرفوع</button>
               <button class="chip active" data-fr="not">لم يُرفع</button>
             </div>
@@ -238,11 +277,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       <div class="sb-actions">
         <button id="btnStats" class="btn ghost">الإحصائيات 📊</button>
         <button id="btnWA" class="btn wh">واتساب</button>
-        <button id="btnPDF" class="btn primary">PDF و حفظ</button>
+        <button id="btnPrintSave" class="btn primary">طباعة / حفظ</button>
       </div>
     </div>
     <div class="rights">مبادرة اليعقوبي — تطوير: فهد حامد الزهراني (لا تظهر في الطباعة)</div>
   </aside>
+
   <!-- صفحة A4 -->
   <main class="content">
     <div class="sheet-wrap">
@@ -314,20 +354,17 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
               </label>
             </div>
 
-            <!-- تمت إزالة عبارة نطاق الدوام (workRangeLine) -->
-            <!-- <p id="workRangeLine" style="display:none"></p> -->
-
             <p>عليه نأمل توضيح أسباب ذلك مع إرفاق ما يؤيد عذركم … ولكم تحياتنا.</p>
             <p style="margin-top:6px"><strong>مدير المدرسة :</strong> <span>فهد حامد علي الزهراني</span>
               &nbsp;&nbsp; <strong>التوقيع :</strong> <span class="dotfield" style="min-width:26mm"></span>
               &nbsp;&nbsp; <strong>التاريخ :</strong> <span class="dotfield" style="min-width:20mm"></span></p>
           </div>
 
-          <!-- (2) إفادة المعلم -->
+          <!-- (2) إفادة المعلم — سطران فقط -->
           <div id="affidavitPack" class="sec">
             <h3>( 2 ) إفادة المعلم</h3>
             <p>أُفيدكم بأن سبب <span id="affKind">التأخر</span> الموضّح أعلاه هو:</p>
-            <div class="lines"><div></div><div></div><div></div></div>
+            <div class="lines"><div></div><div></div></div>
             <p style="margin-top:6px">
               <strong>اسم المعلم :</strong> <span id="affTeacher">—</span>
               &nbsp;&nbsp; <strong>التوقيع :</strong> ____________________
@@ -352,6 +389,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           <div id="absencePack" class="sec" style="display:none">
             <p>إنه في يوم <strong><span id="absDayP">—</span></strong>
               الموافق <strong><span id="absDateYMD">—</span></strong> تغيبت عن العمل.</p>
+
             <h3>( 1 ) طلب الإفادة</h3>
             <p><strong>المكرم /</strong> <span id="abs-name-top">—</span> <span>وفقه الله</span></p>
             <p><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
@@ -360,11 +398,11 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
             <p><strong>اسم الرئيس المباشر :</strong> <span>فهد بن حامد علي الزهراني</span>
                &nbsp;&nbsp; <strong>التوقيع :</strong> ________ &nbsp;&nbsp; <strong>التاريخ :</strong> ______ / ______ / ______</p>
 
-            <h3>( 2 ) الإفادة</h3>
+            <h3>( 2 ) الإفادة — سطران فقط</h3>
             <p><strong>المكرم / مدير المدرسة</strong> وفقه الله</p>
             <p><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
             <p>أفيدكم أن غيابي كان للأسباب التالية:</p>
-            <div class="lines"><div></div><div></div><div></div></div>
+            <div class="lines dotted"><div></div><div></div></div>
             <p>وسأقوم بتقديم ما يثبت ذلك خلال أسبوع من تاريخه.</p>
             <p><strong>اسم المعلم :</strong> <span id="abs-teacher-name">—</span> &nbsp;&nbsp; <strong>التوقيع :</strong> ________ &nbsp;&nbsp; <strong>التاريخ :</strong> ______ / ______ / ______</p>
 
@@ -372,6 +410,16 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
             <label><input type="checkbox"> تُحتسب له إجازة مرضية بعد التأكد من نظامية التقرير.</label><br>
             <label><input type="checkbox"> يُحتسب غيابه من رصيده للإجازات الإضطرارية لقبول عذره إذا كان رصيده يسمح ولا يُحسم عليه.</label><br>
             <label><input type="checkbox"> يعتمد الحسم لعدم قبول عذره.</label>
+
+            <!-- ( 4 ) توقيع المدير — تسحب خوارزمياً -->
+            <div class="sec" id="principalSignPack" style="margin-top:6mm">
+              <h3>( 4 ) توقيع المدير</h3>
+              <p>
+                <strong>اسم الرئيس المباشر :</strong> <span id="principalNameAbs">—</span>
+                &nbsp;&nbsp; <strong>التوقيع :</strong> <span id="principalSignAbs">____________________</span>
+                &nbsp;&nbsp; <strong>التاريخ :</strong> <span id="principalDateAbs">—</span>
+              </p>
+            </div>
           </div>
 
           <!-- لفت نظر -->
@@ -397,6 +445,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
     </div>
   </main>
 </div>
+
 <!-- نافذة الإحصائيات -->
 <div id="statsDlg" aria-hidden="true" style="display:none">
   <div class="stats-card" id="statsCard">
@@ -408,10 +457,10 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
     </div>
     <div class="h">
-      <div style="font-weight:900;color:#064ب50">ملخص الإحصائيات</div>
+      <div style="font-weight:900;color:#064b50">ملخص الإحصائيات</div>
       <div class="stats-actions" style="display:flex;gap:6px">
         <button id="btnResetStats" class="btn ghost" title="تصفير الأرشيف">تصفير الأرشيف ♻️</button>
-        <button id="btnStatsPDF" class="btn primary">PDF الملخص</button>
+        <button id="btnStatsPDF" class="btn primary" title="حفظ/طباعة">طباعة / حفظ</button>
         <button id="btnCloseStats" class="btn ghost">إغلاق</button>
       </div>
     </div>
@@ -419,10 +468,11 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       <table id="tblStats" class="tbl2">
         <thead>
           <tr>
-            <th>المعلّم</th><th>النوع</th><th>اليوم</th><th>التاريخ (هـ)</th><th>بعذر/قبول</th><th>فارس</th><th>تفاصيل</th>
+            <th>المعلّم</th><th>النوع</th><th>اليوم</th><th>التاريخ (هـ)</th><th>العذر</th><th>فارس</th><th>تفاصيل</th><th>إجراء</th>
           </tr>
         </thead>
         <tbody></tbody>
+        <tfoot></tfoot>
       </table>
     </div>
   </div>
@@ -454,6 +504,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
     </div>
   </div>
 </div>
+
 <script>
 /* أرقام عربية/إنجليزية */
 const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
@@ -485,20 +536,6 @@ const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058
 عبد الله حسن عمر الادريسي	1081556910	966533025505	رياضيات	معلم ممارس
 تقي عبد الهادي تقي العلي	1026472363	966543219321	كيميا	معلم ممارس
 صالح بن محمد بن صالح السميحي	1003535422	966506921115	دين	معلم ممارس
-عادل بن علي بن ناصر البارقي	1007370701	966530667666	رياضه	معلم ممارس
-ابراهيم بن أحمد بن ابراهيم العجلان	1001082179	966559999808	دين	معلم ممارس
-خالد أحمد محمد الشهري	1034318301	966560687900	كيميا	معلم ممارس
-خالد سعد راشد المرضي	1025640010	966505877238	اجتماعيات	معلم ممارس
-عبدالله بن خلوفة بن عبدالله ال مرعي	1029490875	966533225515	دين	معلم ممارس
-يحيى بن محمد بن سعيد القحطاني	1048978892	966555751385	اجتماعيات	معلم ممارس
-حسين بن سعيد سلمان المدن	1022616799	966556336875	مكتبات	معلم ممارس
-يوسف عيسى عيسى العيد	1012646822	966592038351	اللغة العربية	معلم ممارس
-نبيل بن محسن محمد القلاف	1025472604	966562962766	رياضه	معلم ممارس
-عبدالمجيد عبدالرحمن عبدالله السالمي	1073861831	966558151033	انجليزي	معلم ممارس
-حسن علي حسن الشهري	1037273594	966500677015	اللغة العربية	معلم ممارس
-جميل عبدالمجيد جواد العلي	1029281589	966566712113	فيزيا	معلم ممارس
-حسن يوسف حسين الخليفة	1056994203	966506907431	كيميا	معلم ممارس
-حسن عبدالله علي العبدالله	1005472780	966543705512	احياء	معلم ممارس
 عادل بن علي بن سليمان السبعان	1005472780	966504836200	موجه طلابي	معلم ممارس
 ياسر عبدالله محمد النمر	1001443397	966543705512	مدخل بيانات	مساعد معلم
 علي بن حسن بن علي آل قمبر	1004780860	966502085389	سكرتاريه	مساعد معلم
@@ -521,7 +558,7 @@ function fillTeachers(){ selTeacher.innerHTML='<option value="">— اختر م�
 fillTeachers();
 
 /* حالة عامة + أرشيف */
-let STATE={kind:'late',excuse:'without',accept:'rejected',faris:'not'};
+let STATE={kind:'late',excuse:'without',accept:'rejected',faris:''}; // faris يُستخدم فقط للغياب
 const KEY_ARCH='followup_archive_v10';
 let ARCH=JSON.parse(localStorage.getItem(KEY_ARCH)||'[]');
 function saveARCH(){ localStorage.setItem(KEY_ARCH, JSON.stringify(ARCH)); }
@@ -536,6 +573,7 @@ const lineLate=document.getElementById('lineLate');
 const lineAbs=document.getElementById('lineAbs');
 const lineEarly=document.getElementById('lineEarly');
 const kindTitle=document.getElementById('kindTitle');
+const statsDlg=document.getElementById('statsDlg');
 
 /* نطاق دوام + محوّل الموسم */
 const WORK={ winter:{start:'06:45',end:'13:45',label:'الشتوي (06:45–13:45)'}, summer:{start:'07:00',end:'14:00',label:'الصيفي (07:00–14:00)'} };
@@ -546,7 +584,7 @@ document.getElementById('seasonChips').addEventListener('click',e=>{
   SEASON=b.dataset.season; recalc();
 });
 
-/* نوع الإجراء */
+/* نوع الإجراء + التحكم بفارس */
 function setPack(kind){
   STATE.kind=kind;
   document.getElementById('mainTitle').textContent=({late:'تنبيه',absent:'تنبيه',early:'تنبيه',gaib:'مساءلة غياب',note:'لفت نظر'})[kind];
@@ -560,6 +598,14 @@ function setPack(kind){
   lineEarly.style.display=(kind==='early')?'':'none';
   kindTitle.textContent=({late:'تأخر',absent:'عدم تواجد',early:'انصراف مبكر'})[kind]||'—';
   document.getElementById('affKind').textContent=({late:'التأخر',absent:'عدم التواجد',early:'الانصراف المبكر'})[kind]||'المخالفة';
+
+  // تفعيل/تعطيل فارس: فقط لمساءلة الغياب
+  const frF=document.getElementById('frGroup').parentElement; // .f
+  if(kind==='gaib'){ frF.classList.remove('disabled'); if(!STATE.faris) STATE.faris='not'; }
+  else { frF.classList.add('disabled'); STATE.faris=''; }
+
+  updUnifiedText();
+  if(kind==='gaib') updatePrincipalAbs(); // تعبئة توقيع المدير في نموذج المساءلة
 }
 document.getElementById('kindChips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
@@ -572,13 +618,25 @@ const unifiedPanel=document.getElementById('unifiedPanel'), unifiedText=document
 document.getElementById('btnUnified').onclick=()=> unifiedPanel.style.display=unifiedPanel.style.display?'':'block';
 unifiedPanel.addEventListener('click',e=>{
   const c=e.target.closest('.chip'); if(!c) return;
-  const gp=c.dataset.exc?'[data-exc]':(c.dataset.acc?'[data-acc]':'[data-fr]');
-  c.parentElement.querySelectorAll(gp).forEach(x=>x.classList.remove('active')); c.classList.add('active');
-  if(c.dataset.exc) STATE.excuse=c.dataset.exc;
-  if(c.dataset.acc) STATE.accept=c.dataset.acc;
-  if(c.dataset.fr)  STATE.faris=c.dataset.fr;
-  unifiedText.textContent=`${STATE.excuse==='with'?'بعذر':'بدون عذر'} • ${STATE.accept==='accepted'?'مقبول':'غير مقبول'} • ${STATE.faris==='raised'?'مرفوع':'لم يُرفع'}`;
+  if(c.dataset.exc){
+    c.parentElement.querySelectorAll('[data-exc]').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active'); STATE.excuse=c.dataset.exc;
+  }
+  if(c.dataset.acc){
+    c.parentElement.querySelectorAll('[data-acc]').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active'); STATE.accept=c.dataset.acc;
+  }
+  if(c.dataset.fr && STATE.kind==='gaib'){
+    c.parentElement.querySelectorAll('[data-fr]').forEach(x=>x.classList.remove('active'));
+    c.classList.add('active'); STATE.faris=c.dataset.fr;
+  }
+  updUnifiedText();
 });
+function updUnifiedText(){
+  const excTxt = (STATE.excuse==='with')?'بعذر':'بدون عذر';
+  const frTxt  = (STATE.kind==='gaib') ? (' • فارس: ' + (STATE.faris==='raised'?'مرفوع':'لم يُرفع')) : '';
+  unifiedText.textContent = excTxt + frTxt;
+}
 
 /* التاريخ: هجري/ميلادي */
 let CAL_MODE='h';
@@ -608,7 +666,9 @@ function buildHijriPicker(){
   for(let i=1;i<=12;i++) m.add(new Option(en2ar(String(i).padStart(2,'0')),i));
   for(let i=1;i<=30;i++) d.add(new Option(en2ar(String(i).padStart(2,'0')),i));
   const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
-  d.value=+ar2en(parts.find(p=>p.type==='day').value); m.value=+ar2en(parts.find(p=>p.type==='month').value); y.value=+ar2en(parts.find(p=>p.type==='year').value);
+  d.value=+ar2en(parts.find(p=>p.type==='day').value);
+  m.value=+ar2en(parts.find(p=>p.type==='month').value);
+  y.value=+ar2en(parts.find(p=>p.type==='year').value);
   y.onchange=m.onchange=d.onchange=syncFromHijri; syncFromHijri();
 }
 function syncFromHijri(){
@@ -622,9 +682,9 @@ function syncFromHijri(){
   document.getElementById('affTeacher').textContent=document.getElementById('t_name').textContent||'—';
   document.getElementById('absDayP').textContent=dayName;
   document.getElementById('absDateYMD').textContent=hij;
-  // هيدر الإحصائيات
   document.getElementById('statsDay').textContent=dayName;
   document.getElementById('statsHijri').textContent=hij;
+  updatePrincipalAbs(); // تحديث تاريخ توقيع المدير في المساءلة
 }
 ['gY','gM','gD'].forEach(id=>document.getElementById(id).addEventListener('input',syncFromGregInputs));
 function syncFromGregInputs(){
@@ -640,7 +700,9 @@ function syncFromGregInputs(){
   document.getElementById('absDateYMD').textContent=hij;
   document.getElementById('statsDay').textContent=dayName;
   document.getElementById('statsHijri').textContent=hij;
+  updatePrincipalAbs(); // تحديث تاريخ توقيع المدير في المساءلة
 }
+
 /* تحويلات الوقت والحساب */
 function toMin(hhmm){ const m=/^(\d{1,2}):(\d{2})$/.exec(ar2en(hhmm||'')); if(!m) return null; const h=+m[1], mi=+m[2]; if(h>23||mi>59) return null; return h*60+mi; }
 function fmtHM(mins){ const h=Math.floor(mins/60), m=mins%60; return en2ar(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')); }
@@ -648,7 +710,7 @@ const WORK_RANGE={winter:{start:'06:45',end:'13:45'},summer:{start:'07:00',end:'
 
 /* قناع الإدخال + فتح عدّاد الساعة */
 function attachTimeMask(el){
-  el.addEventListener('beforeinput', (e)=>{ if(e.inputType==='insertText'){ const ch=e.data; if(!(/[0-9٠-٩:]/.test(ch))) e.preventDefault(); }});
+  el.addEventListener('beforeinput',(e)=>{ if(e.inputType==='insertText'){ const ch=e.data; if(!(/[0-9٠-٩:]/.test(ch))) e.preventDefault(); }});
   el.addEventListener('input', ()=>{
     let v=el.textContent.replace(/[^0-9٠-٩]/g,''); v=ar2en(v);
     if(v.length>=3){ v=v.slice(0,4).padEnd(4,'0'); v=v.slice(0,2)+':'+v.slice(2,4);} else if(v.length>0){ v=v.padEnd(2,'0'); }
@@ -686,14 +748,11 @@ clockDlg.addEventListener('click',(e)=>{ if(e.target===clockDlg) hideClock(); })
 /* إعادة الحساب */
 function recalc(){
   const wsM=toMin(WORK_RANGE[SEASON].start), weM=toMin(WORK_RANGE[SEASON].end);
-  // تأخر
   const tLate=document.getElementById('tLateIn').textContent.trim(); const tLateM=toMin(tLate);
   if(tLateM!=null&&wsM!=null&&tLateM>wsM){ const mins=tLateM-wsM; lateTotal.textContent=en2ar(mins)+' دقيقة'; lateHH.textContent=fmtHM(mins); } else { lateTotal.textContent='0 دقيقة'; lateHH.textContent='00:00'; }
-  // عدم تواجد
   const aF=document.getElementById('tAbsFrom').textContent.trim(), aT=document.getElementById('tAbsTo').textContent.trim();
   const aFM=toMin(aF), aTM=toMin(aT);
   if(aFM!=null&&aTM!=null&&aTM>aFM){ const mins=aTM-aFM; absTotal.textContent=en2ar(mins)+' دقيقة'; absHH.textContent=fmtHM(mins);} else { absTotal.textContent='0 دقيقة'; absHH.textContent='00:00'; }
-  // انصراف
   const eF=document.getElementById('tEarlyFrom').textContent.trim(); const eFM=toMin(eF);
   if(eFM!=null&&weM!=null&&weM>eFM){ const mins=weM-eFM; earlyTotal.textContent=en2ar(mins)+' دقيقة'; earlyHH.textContent=fmtHM(mins);} else { earlyTotal.textContent='0 دقيقة'; earlyHH.textContent='00:00'; }
 }
@@ -711,6 +770,7 @@ selTeacher.addEventListener('change',e=>{
   teacherNameInline.textContent=t.name||'—'; noteTeacherName.textContent=t.name||'—'; document.getElementById('affTeacher').textContent=t.name||'—';
   document.getElementById('abs-name-top').textContent=t.name||'—'; document.getElementById('abs-teacher-name').textContent=t.name||'—';
   metaNo.textContent=nextSerialFor(t.civil);
+  updatePrincipalAbs(); // عند تغيير المعلم أيضاً
 });
 
 /* واتساب */
@@ -734,7 +794,7 @@ ${details}
   window.open(`https://wa.me/${t.phone||'966500000000'}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-/* تضمين الصور (لضمان ظهور الهيدر في PDF) */
+/* تضمين الصور لظهور الهيدر */
 async function embedImageToDataURL(imgEl){
   try{
     const src=imgEl.getAttribute('src')||''; if(!src) return;
@@ -749,16 +809,24 @@ async function ensureAllImagesEmbedded(root){
   for(const im of imgs){ if(!im.src.startsWith('data:')) await embedImageToDataURL(im); }
 }
 
-/* حفظ PDF للصفحة الرئيسية */
-document.getElementById('btnPDF').addEventListener('click', async function(){
-  const i=+selTeacher.value; if(!Number.isInteger(i)) { alert('اختر معلماً أولاً'); return; }
+/* طباعة/حفظ الصفحة الرئيسية */
+document.getElementById('btnPrintSave').addEventListener('click', async function(){
+  const i=+selTeacher.value;
+  if(!Number.isInteger(i)) { alert('اختر معلماً أولاً'); return; }
   const t=TEACHERS[i];
-  ARCH.push({ ts:Date.now(), civil:t.civil, name:t.name, kind:STATE.kind, excuse:STATE.excuse, accept:STATE.accept, faris:STATE.faris, hijri:metaHijri.textContent, day:metaDay.textContent });
+
+  // حفظ في الأرشيف — فارس فقط للغياب
+  ARCH.push({
+    ts:Date.now(), civil:t.civil, name:t.name, kind:STATE.kind,
+    excuse:STATE.excuse, accept:STATE.accept,
+    faris:(STATE.kind==='gaib'? (STATE.faris||'not') : ''), // فقط مساءلة غياب
+    hijri:metaHijri.textContent, day:metaDay.textContent
+  });
   saveARCH();
 
-  const { jsPDF }=window.jspdf;
-  const btn=this; const old=btn.textContent; btn.disabled=true; btn.textContent='جارٍ إنشاء PDF...';
+  const btn=this; const old=btn.textContent; btn.disabled=true; btn.textContent='جارٍ الحفظ والطباعة...';
   try{
+    const { jsPDF }=window.jspdf;
     const sheet=document.getElementById('sheet');
     await ensureAllImagesEmbedded(sheet);
     const canvas=await html2canvas(sheet,{ scale:2, background:'#fff', useCORS:true, allowTaint:false, imageTimeout:0, logging:false });
@@ -766,29 +834,32 @@ document.getElementById('btnPDF').addEventListener('click', async function(){
     const w=210,h=canvas.height*210/canvas.width;
     pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
     pdf.save(`إجراء - ${t.name}.pdf`);
-  }catch(err){ alert('تعذّر إنشاء PDF: '+(err.message||err)); }
+    setTimeout(()=>window.print(), 250);
+  }catch(err){ alert('تعذّر تنفيذ العملية: '+(err.message||err)); }
   finally{ btn.disabled=false; btn.textContent=old; }
 });
 
-/* PDF للإحصائيات — إخفاء الأزرار مؤقتًا ثم إعادتها */
+/* PDF/طباعة الإحصائيات */
 document.getElementById('btnStatsPDF').onclick=async()=>{
-  const { jsPDF }=window.jspdf;
-  const card=document.getElementById('statsCard');
-  const actions=card.querySelector('.stats-actions');
-  const oldDisp=actions.style.display; actions.style.display='none';
-  await ensureAllImagesEmbedded(card);
-  const canvas=await html2canvas(card,{scale:2,background:'#fff',useCORS:true,allowTaint:false,logging:false});
-  const pdf=new jsPDF({orientation:'l',unit:'mm',format:'a4'});
-  const w=297,h=canvas.height*297/canvas.width;
-  pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
-  pdf.save('ملخص-الإحصائيات.pdf');
-  actions.style.display=oldDisp||'flex';
+  await ensureAllImagesEmbedded(document.getElementById('statsCard'));
+  setTimeout(()=>window.print(),50);
 };
 
-/* إحصائيات */
+/* إغلاق نافذة الإحصائيات */
+document.getElementById('btnCloseStats').onclick=()=>{
+  statsDlg.style.display='none';
+  statsDlg.setAttribute('aria-hidden','true');
+};
+
+/* إحصائيات + حذف صف + تصفير */
 document.getElementById('btnStats').onclick=openStats;
-document.getElementById('btnCloseStats').onclick=()=>{ statsDlg.style.display='none'; statsDlg.setAttribute('aria-hidden','true'); };
-document.getElementById('btnResetStats').onclick=()=>{ if(confirm('تأكيد: هل تريد تصفير أرشيف الإحصائيات؟')){ clearARCH(); openStats(); } };
+document.getElementById('btnResetStats').onclick=()=>{
+  if(confirm('تأكيد: هل تريد تصفير الأرشيف كاملًا؟')){
+    clearARCH(); openStats();
+  }
+};
+
+/* مساعد لتفاصيل قصيرة */
 function shortDetails(r){
   if(r.kind==='late'){ const txt=document.getElementById('lateTotal')?.textContent||'0 دقيقة'; return `تأخر ${txt.replace(/[^\d٠-٩]/g,'').trim()}د`; }
   if(r.kind==='absent'){ const a=document.getElementById('absTotal')?.textContent||'0 دقيقة'; return `عدم تواجد ${a.replace(/[^\d٠-٩]/g,'').trim()}د`; }
@@ -797,29 +868,69 @@ function shortDetails(r){
   if(r.kind==='note'){ const rs=document.getElementById('noteReasonText')?.textContent||'—'; return `لفت نظر — ${rs}`; }
   return '—';
 }
+
+/* بناء جدول الإحصائيات — فارس يظهر فقط للغياب، والعذر واحدة (بعذر/بدون) */
 function openStats(){
   const tb=document.querySelector('#tblStats tbody'); tb.innerHTML='';
-  const byTeacher=new Map(); ARCH.forEach(r=>{const k=r.civil||r.name; if(!byTeacher.has(k)) byTeacher.set(k,{name:r.name,rows:[]}); byTeacher.get(k).rows.push(r);});
+  const byTeacher=new Map();
+  ARCH.forEach(r=>{
+    const k=r.civil||r.name;
+    if(!byTeacher.has(k)) byTeacher.set(k,{name:r.name,rows:[]});
+    byTeacher.get(k).rows.push(r);
+  });
+
   for(const {name,rows} of byTeacher.values()){
     rows.sort((a,b)=>a.ts-b.ts);
     rows.forEach((r,idx)=>{
       const tr=document.createElement('tr');
-      if(idx===0) tr.innerHTML=`<td rowspan="${rows.length}" style="font-weight:900">${name}</td>`;
-      tr.innerHTML+=`
+      if(idx===0){
+        const td=document.createElement('td');
+        td.rowSpan=rows.length; td.style.fontWeight='900'; td.textContent=name;
+        tr.appendChild(td);
+      }
+      tr.innerHTML += `
         <td>${({late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',early:'تنبيه انصراف مبكر',gaib:'مساءلة غياب',note:'لفت نظر'})[r.kind]}</td>
         <td>${r.day}</td>
         <td>${r.hijri}</td>
-        <td>${({with:'بعذر',without:'بدون'})[r.excuse]||'—'} / ${({accepted:'مقبول',rejected:'غير مقبول'})[r.accept]||'—'}</td>
-        <td>${({raised:'مرفوع',not:'لم يُرفع'})[r.faris]||'—'}</td>
-        <td>${shortDetails(r)}</td>`;
+        <td>${r.excuse==='with'?'بعذر':'بدون عذر'}</td>
+        <td>${r.kind==='gaib' ? ((r.faris==='raised')?'مرفوع':'لم يُرفع') : ''}</td>
+        <td>${shortDetails(r)}</td>
+        <td><button class="btn ghost delRow" data-ts="${r.ts}" title="حذف هذا السجل">حذف</button></td>`;
       tb.appendChild(tr);
     });
   }
+
+  // إظهار النافذة + تحديث الهيدر
   statsDlg.style.display='flex';
   statsDlg.setAttribute('aria-hidden','false');
-  // مزامنة اليوم/التاريخ في هيدر الإحصائيات
   document.getElementById('statsDay').textContent=document.getElementById('metaDay').textContent;
   document.getElementById('statsHijri').textContent=document.getElementById('metaHijri').textContent;
+
+  // ضمان تضمين صورة الهيدر للإحصائيات حتى تُطبع وتظهر ممتلئة
+  ensureAllImagesEmbedded(document.getElementById('statsCard'));
+}
+
+/* حذف صف من الأرشيف */
+document.getElementById('tblStats').addEventListener('click', (e)=>{
+  const btn=e.target.closest('.delRow'); if(!btn) return;
+  const ts=+btn.dataset.ts;
+  if(!Number.isFinite(ts)) return;
+  if(confirm('تأكيد حذف هذا السجل؟')){
+    const idx=ARCH.findIndex(r=>r.ts===ts);
+    if(idx>-1){ ARCH.splice(idx,1); saveARCH(); openStats(); }
+  }
+});
+
+/* تعبئة توقيع المدير في نموذج المساءلة — خوارزمياً */
+const PRINCIPAL_NAME='فهد حامد علي الزهراني';
+function updatePrincipalAbs(){
+  const nameEl=document.getElementById('principalNameAbs');
+  const signEl=document.getElementById('principalSignAbs');
+  const dateEl=document.getElementById('principalDateAbs');
+  if(!nameEl||!dateEl||!signEl) return;
+  nameEl.textContent=PRINCIPAL_NAME;
+  signEl.textContent='____________________';
+  dateEl.textContent=document.getElementById('metaHijri').textContent||'—';
 }
 
 /* تهيئة */
@@ -827,8 +938,9 @@ function init(){
   buildHijriPicker();
   setPack('late');
   document.getElementById('sidebar').style.pointerEvents='auto';
-  document.getElementById('statsDlg').style.display='none';
+  statsDlg.style.display='none';
   document.getElementById('clockDlg').style.display='none';
+  updatePrincipalAbs();
 }
 init();
 </script>
