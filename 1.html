@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>تحليل حضور المعلمين من ملفات حضوري – Excel</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+:root{
+  --moe:#0b7e88;
+  --moe-soft:#e1f3f1;
+  --ink:#0b2f2b;
+  --muted:#6b7280;
+  --bg:#f3f7f8;
+  --card:#ffffff;
+  --line:#dde7e8;
+  --danger:#dc2626;
+  --warn:#f59e0b;
+  --ok:#16a34a;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  font-family:"Tajawal",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
+body{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:16px 8px 40px;
+}
+
+/* الحاوية الرئيسة */
+.shell{
+  width:100%;
+  max-width:1150px;
+  background:#f9fbfb;
+  border-radius:22px;
+  box-shadow:0 18px 40px rgba(0,0,0,.08);
+  overflow:hidden;
+  border:1px solid rgba(11,126,136,.14);
+}
+
+/* الهيدر العلوي */
+header{
+  position:relative;
+  background:radial-gradient(circle at 0% 0%,#15aabf,#0b7e88 55%,#064f55 100%);
+  color:#fff;
+  padding:10px 18px 16px;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.header-main{display:block;}
+header h1{
+  margin:0;
+  font-size:1.25rem;
+  font-weight:800;
+}
+header p{
+  margin:2px 0 0;
+  font-size:.9rem;
+  opacity:.95;
+}
+.badge-pill{
+  margin-top:4px;
+  align-self:flex-start;
+  padding:3px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.65);
+  font-size:.78rem;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* شريط التحكم في الهيدر */
+.header-controls{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:6px;
+}
+
+/* زر الاستيراد */
+.import-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:7px 12px;
+  border-radius:999px;
+  background:#fff;
+  color:#0b7e88;
+  font-size:.86rem;
+  font-weight:700;
+  border:none;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(0,0,0,.18);
+}
+.import-btn span.icon{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:rgba(11,126,136,.12);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.05rem;
+}
+.import-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 26px rgba(0,0,0,.22);
+}
+.import-btn input[type="file"]{display:none;}
+
+/* شريط علوي: طباعة + أزرار + تاريخ */
+.top-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-start;
+  gap:6px;
+}
+
+/* حقل التاريخ */
+.date-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:3px 8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.18);
+  font-size:.8rem;
+}
+.date-chip input{
+  border:none;
+  border-radius:16px;
+  padding:2px 6px;
+  font-family:"Tajawal",sans-serif;
+  font-size:.8rem;
+}
+
+/* أزرار الغياب/المتأخرين/الانصراف */
+.filter-btn{
+  border:none;
+  border-radius:999px;
+  padding:3px 9px;
+  font-size:.78rem;
+  font-family:"Tajawal",sans-serif;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  cursor:pointer;
+  background:#ffffff;
+  color:#064f55;
+}
+.filter-btn span.count{
+  background:#0b7e88;
+  color:#fff;
+  border-radius:10px;
+  padding:0 6px;
+  font-size:.75rem;
+}
+
+/* زر طباعة الجدول */
+.print-btn{
+  border:none;
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:.8rem;
+  font-family:"Tajawal",sans-serif;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  cursor:pointer;
+  background:#0f172a;
+  color:#fff;
+}
+
+/* محتوى الصفحة */
+.main{
+  padding:10px 14px 16px;
+}
+
+/* الهيدر الرسمي أعلى الجدول */
+.official-header{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:8px;
+  padding:8px 10px;
+  background:#ffffff;
+  border-radius:14px;
+  border:1px solid var(--line);
+  margin-bottom:8px;
+}
+.official-lines p{
+  margin:0;
+  font-size:.78rem;
+  color:#0b3f43;
+}
+.official-lines p:first-child{font-weight:700;}
+.official-side{
+  text-align:left;
+  font-size:.76rem;
+}
+.official-side p{
+  margin:0 0 2px;
+}
+.official-note{
+  color:var(--muted);
+  max-width:340px;
+}
+
+/* شريط الوصف */
+.info-bar{
+  font-size:.8rem;
+  color:var(--muted);
+  margin:6px 0 8px;
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.info-bar span.label{
+  font-weight:600;
+  color:#0b3f43;
+}
+
+/* الجدول الرئيس */
+.table-wrapper{
+  width:100%;
+  overflow:hidden;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:#fff;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+  font-size:.78rem;
+}
+thead{
+  background:#0b7e88;
+  color:#fff;
+}
+th,td{
+  padding:4px 4px;
+  border-bottom:1px solid #edf3f3;
+  white-space:nowrap;
+  text-align:center;
+}
+th{
+  font-weight:700;
+}
+tbody tr:nth-child(even){background:#f8fbfb;}
+tbody tr:hover{background:#eaf6f6;}
+.empty-msg{
+  padding:16px;
+  text-align:center;
+  font-size:.85rem;
+  color:var(--muted);
+}
+
+/* شارة الحالة */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:2px 6px;
+  border-radius:999px;
+  font-size:.72rem;
+  border:1px solid rgba(11,126,136,.4);
+  background:#e5f6f6;
+  color:var(--moe);
+}
+.badge-ok{
+  border-color:rgba(22,163,74,.5);
+  background:#e3ffe9;
+  color:var(--ok);
+}
+.badge-warn{
+  border-color:rgba(245,158,11,.7);
+  background:#fff7e6;
+  color:var(--warn);
+}
+.badge-danger{
+  border-color:rgba(220,38,38,.7);
+  background:#fee2e2;
+  color:var(--danger);
+}
+
+/* تضييق أعمدة الجدول الرئيس لصفحة A4 */
+.main-table th,.main-table td{
+  font-size:.72rem;
+}
+.main-table th:nth-child(1),
+.main-table td:nth-child(1){width:4%;}
+.main-table th:nth-child(2),
+.main-table td:nth-child(2){width:27%;}
+.main-table th:nth-child(3),
+.main-table td:nth-child(3){width:16%;}
+.main-table th:nth-child(4),
+.main-table td:nth-child(4){width:10%;}
+.main-table th:nth-child(5),
+.main-table td:nth-child(5){width:10%;}
+.main-table th:nth-child(6),
+.main-table td:nth-child(6){width:10%;}
+.main-table th:nth-child(7),
+.main-table td:nth-child(7){width:23%;}
+
+/* فوتر */
+footer{
+  padding:6px 12px 10px;
+  text-align:center;
+  font-size:.78rem;
+  color:var(--muted);
+  border-top:1px solid var(--line);
+  background:#fbfdfd;
+}
+
+/* شريط حالة النظام */
+#statusBar{
+  position:fixed;
+  bottom:16px;
+  right:16px;
+  background:#ffffffee;
+  padding:5px 11px;
+  border-radius:999px;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);
+  font-size:.8rem;
+  color:var(--muted);
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+.spinner{
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  border:2px solid rgba(11,126,136,.25);
+  border-top-color:#0b7e88;
+  animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* النوافذ المنبثقة */
+.modal-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(15,23,42,.7);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:40;
+  padding:8px;
+}
+.modal-backdrop.active{display:flex;}
+.modal-inner{
+  max-width:900px;
+  width:100%;
+  max-height:96vh;
+  overflow:auto;
+  border-radius:18px;
+  background:#f3f5f6;
+  box-shadow:0 18px 40px rgba(0,0,0,.35);
+  position:relative;
+}
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 14px;
+  border-bottom:1px solid #dde5e8;
+}
+.modal-header h2{
+  margin:0;
+  font-size:.96rem;
+  font-weight:800;
+  color:#064b50;
+}
+.modal-actions-top{
+  display:flex;
+  gap:8px;
+}
+.modal-actions-top .btn{
+  padding:4px 9px;
+  font-size:.78rem;
+}
+.modal-body{
+  padding:10px 16px 16px;
+}
+.a4-page{
+  background:#fff;
+  border-radius:10px;
+  box-shadow:0 0 0 1px #e3e7ea;
+  padding:18px 18px 20px;
+  color:#111827;
+  font-size:.84rem;
+}
+.a4-page h3{
+  margin:0 0 6px;
+  font-size:.9rem;
+  text-align:center;
+}
+.a4-page .meta{
+  font-size:.8rem;
+  margin-bottom:6px;
+  text-align:center;
+  color:#4b5563;
+}
+.a4-page table{
+  font-size:.76rem;
+  table-layout:fixed;
+  width:100%;
+}
+.a4-page th,.a4-page td{
+  padding:3px 4px;
+  border-bottom:1px solid #e5e7eb;
+}
+
+/* أعمدة جداول النوافذ */
+.absents-table th:nth-child(1),
+.absents-table td:nth-child(1){width:5%;}
+.absents-table th:nth-child(2),
+.absents-table td:nth-child(2){width:25%;}
+.absents-table th:nth-child(3),
+.absents-table td:nth-child(3){width:17%;}
+.absents-table th:nth-child(4),
+.absents-table td:nth-child(4){width:13%;}
+.absents-table th:nth-child(5),
+.absents-table td:nth-child(5){width:13%;}
+.absents-table th:nth-child(6),
+.absents-table td:nth-child(6){width:13%;}
+.absents-table th:nth-child(7),
+.absents-table td:nth-child(7){width:14%;}
+
+.late-table th:nth-child(1),
+.late-table td:nth-child(1){width:5%;}
+.late-table th:nth-child(2),
+.late-table td:nth-child(2){width:28%;}
+.late-table th:nth-child(3),
+.late-table td:nth-child(3){width:17%;}
+.late-table th:nth-child(4),
+.late-table td:nth-child(4){width:15%;}
+.late-table th:nth-child(5),
+.late-table td:nth-child(5){width:15%;}
+.late-table th:nth-child(6),
+.late-table td:nth-child(6){width:10%;}
+.late-table th:nth-child(7),
+.late-table td:nth-child(7){width:10%;}
+
+.noout-table th:nth-child(1),
+.noout-table td:nth-child(1){width:5%;}
+.noout-table th:nth-child(2),
+.noout-table td:nth-child(2){width:25%;}
+.noout-table th:nth-child(3),
+.noout-table td:nth-child(3){width:17%;}
+.noout-table th:nth-child(4),
+.noout-table td:nth-child(4){width:13%;}
+.noout-table th:nth-child(5),
+.noout-table td:nth-child(5){width:13%;}
+.noout-table th:nth-child(6),
+.noout-table td:nth-child(6){width:17%;}
+.noout-table th:nth-child(7),
+.noout-table td:nth-child(7){width:5%;}
+.noout-table th:nth-child(8),
+.noout-table td:nth-child(8){width:5%;}
+
+/* الأزرار العامة */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:4px 9px;
+  border-radius:999px;
+  border:none;
+  font-size:.78rem;
+  cursor:pointer;
+  font-family:"Tajawal",sans-serif;
+}
+.btn-close{background:#e5e7eb;color:#111827;}
+.btn-print{background:#0b7e88;color:#fff;}
+.btn-wa{background:#25d366;color:#fff;}
+.btn-letter{background:#0b7e88;color:#fff;}
+
+/* الطباعة */
+@media print{
+  body{
+    padding:0;
+    background:#fff;
+  }
+  #statusBar,
+  .print-btn,
+  .filter-btn,
+  .import-btn,
+  .date-chip,
+  .header-controls,
+  .info-bar span.system,
+  .modal-backdrop{ display:none !important; }
+
+  .shell{
+    max-width:none;
+    border-radius:0;
+    box-shadow:none;
+    border:none;
+  }
+  header{
+    border-radius:0;
+  }
+  .table-wrapper{
+    border-radius:0;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <header>
+    <div class="header-main">
+      <h1>تحليل حضور المعلمين من ملفات حضوري – Excel</h1>
+      <p>منصة داخلية لمتابعة الحضور والانصراف بالاعتماد على تقارير منصة «حضوري» الرسمية.</p>
+      <div class="badge-pill">
+        ⏰ الدوام الرسمي: 7:00 ص – 2:00 م (7 ساعات عمل فعلية)
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <div class="top-row">
+        <!-- زر طباعة الجدول -->
+        <button id="printMainBtn" class="print-btn">
+          🖨 طباعة الجدول
+        </button>
+
+        <!-- أزرار الغياب / المتأخرين / عدم الانصراف -->
+        <button id="btnAbsents" class="filter-btn">
+          الغياب <span id="absentsCount" class="count">0</span>
+        </button>
+        <button id="btnLate" class="filter-btn">
+          المتأخرون <span id="lateCount" class="count">0</span>
+        </button>
+        <button id="btnNoOut" class="filter-btn">
+          عدم تسجيل الانصراف / بعد 2م <span id="noOutCount" class="count">0</span>
+        </button>
+      </div>
+
+      <!-- اختيار التاريخ -->
+      <div class="date-chip">
+        <span>اليوم/التاريخ المطلوب:</span>
+        <input id="reportDate" type="date">
+      </div>
+
+      <!-- زر الاستيراد -->
+      <label class="import-btn">
+        <span class="icon">📁</span>
+        <span>استيراد ملفات حضور Excel من حضوري</span>
+        <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" multiple>
+      </label>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- الهيدر الرسمي أعلى الجدول -->
+    <div class="official-header">
+      <div class="official-lines">
+        <p>وزارة التعليم – الإدارة العامة للتعليم بالمنطقة الشرقية</p>
+        <p>قطاع التعليم بالخبر</p>
+        <p>ثانوية اليعقوبي</p>
+      </div>
+      <div class="official-side">
+        <p id="officialDateLine">اليوم والتاريخ: لم يتم التحديد بعد.</p>
+        <p class="official-note">
+          البيانات مستخرجة من تقارير منصة «حضوري» الرسمية؛ بهدف التيسير وحفظ متابعة الحضور والانصراف.
+        </p>
+      </div>
+    </div>
+
+    <div class="info-bar">
+      <span class="label" id="dateInfoLabel">لم يتم تحديد تاريخ التقرير بعد.</span>
+      <span class="system" id="filesInfo">لم يتم استيراد ملفات بعد.</span>
+    </div>
+
+    <div class="table-wrapper" id="recordsTableWrapper">
+      <div class="empty-msg">الرجاء اختيار تاريخ التقرير ثم استيراد ملف أو أكثر من ملفات Excel الصادرة من منصة حضوري.</div>
+    </div>
+  </main>
+
+  <footer>
+    © تنفيذ: فهد حامد علي الزهراني — البيانات مستمدة من تقارير منصة حضوري لتسهيل المتابعة الإدارية.
+  </footer>
+</div>
+
+<div id="statusBar">
+  <span id="statusSpinner" style="display:none" class="spinner"></span>
+  <span id="statusText">النظام جاهز للاستيراد.</span>
+</div>
+
+<!-- نافذة الغياب -->
+<div class="modal-backdrop" id="modalAbsents">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <h2>سجل الغياب لليوم المحدد</h2>
+      <div class="modal-actions-top">
+        <button class="btn btn-print" data-print-modal="modalAbsents">طباعة</button>
+        <button class="btn btn-close" data-close-modal="modalAbsents">إغلاق ✖</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="a4-page">
+        <h3>كشف المعلمين الغائبين</h3>
+        <div class="meta" id="absentsMeta"></div>
+        <table id="absentsTable" class="absents-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المعلم</th>
+              <th>رقم الهوية</th>
+              <th>التخصص</th>
+              <th>المسمى الوظيفي</th>
+              <th>واتساب</th>
+              <th>مساءلة</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة المتأخرين -->
+<div class="modal-backdrop" id="modalLate">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <h2>سجل المتأخرين لليوم المحدد</h2>
+      <div class="modal-actions-top">
+        <button class="btn btn-print" data-print-modal="modalLate">طباعة</button>
+        <button class="btn btn-close" data-close-modal="modalLate">إغلاق ✖</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="a4-page">
+        <h3>كشف المعلمين المتأخرين عن بداية الدوام</h3>
+        <div class="meta" id="lateMeta"></div>
+        <table id="lateTable" class="late-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المعلم</th>
+              <th>رقم الهوية</th>
+              <th>وقت الحضور</th>
+              <th>مقدار التأخر</th>
+              <th>واتساب</th>
+              <th>مساءلة</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة عدم تسجيل الانصراف / بعد 2م -->
+<div class="modal-backdrop" id="modalNoOut">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <h2>عدم تسجيل الانصراف / الانصراف بعد 2:00 م</h2>
+      <div class="modal-actions-top">
+        <button class="btn btn-print" data-print-modal="modalNoOut">طباعة</button>
+        <button class="btn btn-close" data-close-modal="modalNoOut">إغلاق ✖</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="a4-page">
+        <h3>كشف من لم يسجّل الانصراف أو سجّل بعد 2:00 م</h3>
+        <div class="meta" id="noOutMeta"></div>
+        <table id="noOutTable" class="noout-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>اسم المعلم</th>
+              <th>رقم الهوية</th>
+              <th>وقت الحضور</th>
+              <th>وقت الانصراف</th>
+              <th>وصف الحالة</th>
+              <th>واتساب</th>
+              <th>مساءلة</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- نافذة المساءلة الفردية -->
+<div class="modal-backdrop" id="modalLetter">
+  <div class="modal-inner">
+    <div class="modal-header">
+      <h2>نموذج مساءلة / تنبيه عن الدوام</h2>
+      <div class="modal-actions-top">
+        <button class="btn btn-print" data-print-modal="modalLetter">طباعة</button>
+        <button class="btn btn-close" data-close-modal="modalLetter">إغلاق ✖</button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="a4-page">
+        <div style="text-align:center;margin-bottom:6px;">
+          <p style="margin:1px 0;font-size:.8rem;">وزارة التعليم – الإدارة العامة للتعليم بالمنطقة الشرقية</p>
+          <p style="margin:1px 0;font-size:.8rem;">قطاع التعليم بالخبر – ثانوية اليعقوبي</p>
+          <h3 id="ltTitle" style="margin:4px 0 3px;">مساءلة عن الغياب / التأخر / الانصراف</h3>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:8px;">
+          <tr><th style="text-align:right;width:150px;">اسم المعلم:</th><td id="ltName"></td></tr>
+          <tr><th>رقم الهوية:</th><td id="ltId"></td></tr>
+          <tr><th>التخصص:</th><td id="ltSubject"></td></tr>
+          <tr><th>المسمى الوظيفي:</th><td id="ltRole"></td></tr>
+          <tr><th>تاريخ اليوم محل الملاحظة:</th><td id="ltDate"></td></tr>
+          <tr><th>وقت الحضور:</th><td id="ltAttend"></td></tr>
+          <tr><th>وقت الانصراف:</th><td id="ltLeave"></td></tr>
+          <tr><th>وصف الحالة المختصر:</th><td id="ltStatus"></td></tr>
+        </table>
+        <p>المكرم/ة الأستاذ/ة <strong id="ltNameInline"></strong> حفظه الله</p>
+        <p><strong>السلام عليكم ورحمة الله وبركاته، وبعد ،،،</strong></p>
+        <p id="ltP1"></p>
+        <p id="ltP2"></p>
+        <p id="ltP3"></p>
+        <br>
+        <p>قائد المدرسة: فهد حامد علي الزهراني</p>
+        <p>التاريخ: ____________________________</p>
+        <p>توقيع المعلم بالاطلاع: ____________________________</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// إعدادات الدوام
+const DUTY_START = "07:00";
+const DUTY_END   = "14:00";
+const REQUIRED_MINUTES = 7*60;
+
+// بيانات المعلمين
+const teachersData = [
+  {name:"موسى صلبان عبده عسيري",id:"1093013116",phone:"966507058931",subject:"فيزيا",role:"معلم ممارس"},
+  {name:"مبارك عوضه سفر آل ثابت",id:"1056464405",phone:"966597233399",subject:"كيميا",role:"معلم ممارس"},
+  {name:"يوسف  عيسى العيد",id:"1012646822",phone:"966592038351",subject:"كيميا",role:"معلم ممارس"},
+  {name:"حسن بن يوسف بن حسين الخليفه",id:"1056994203",phone:"966506907431",subject:"احياء",role:"معلم ممارس"},
+  {name:"منذر عامر حمود زميع",id:"1065913053",phone:"966541188974",subject:"انجليزي",role:"معلم ممارس"},
+  {name:"عماد محمد جمعان الزهراني",id:"1048667289",phone:"966542203039",subject:"مكتبات",role:"معلم ممارس"},
+  {name:"حسن يوسف حسين الخليفة",id:"1056994203",phone:"966506907431",subject:"كيمياء",role:"معلم ممارس"},
+  {name:"عبدالمجيد عبدالرحمن عبدالله السالمي",id:"1073861831",phone:"966558151033",subject:"كيمياء",role:"معلم ممارس"},
+  {name:"حسن علي حسن الشهري",id:"1037273594",phone:"966536824355",subject:"اللغة العربية",role:"معلم ممارس"},
+  {name:"حسين بن سعيد سلمان المدن",id:"1022616799",phone:"966556336875",subject:"مكتبات",role:"معلم ممارس"},
+  {name:"يحيى بن محمد بن سعيد القحطاني",id:"1048978892",phone:"966555751385",subject:"اجتماعيات",role:"معلم ممارس"},
+  {name:"فرج عبدالعلي يوسف ال سيف",id:"1000397735",phone:"966504113707",subject:"رياضيات",role:"معلم ممارس"},
+  {name:"بندر عبدالعزيز محمد الغامدي",id:"1046853881",phone:"966546135135",subject:"حاسب",role:"معلم ممارس"},
+  {name:"حسين بن محمد بن فهد القحطاني",id:"1014268567",phone:"966504988086",subject:"احياء",role:"معلم ممارس"},
+  {name:"ناصر علي ناصر الراشد",id:"1008303370",phone:"966542933888",subject:"حاسب",role:"معلم ممارس"},
+  {name:"حسين بن محمد بن حسين الأحمد",id:"1060369202",phone:"966563740777",subject:"اللغة العربية",role:"معلم ممارس"},
+  {name:"علي سعد سعيد الاصلعي الاحمري",id:"1023999780",phone:"966590986464",subject:"احياء",role:"معلم ممارس"},
+  {name:"حسن عبدالله علي العبدالله",id:"1005472780",phone:"966543705512",subject:"احياء",role:"معلم ممارس"},
+  {name:"محمد حمد عبدالرحمن التويجري",id:"1064745944",phone:"966541381105",subject:"اللغة العربية",role:"معلم ممارس"},
+  {name:"عبدالله فيصل بن فطيس الهذلي",id:"1094733290",phone:"966591585407",subject:"رياضيات",role:"معلم ممارس"},
+  {name:"احمد عبدالرحيم عبدالحميد ابوعصيده",id:"1033584234",phone:"966546623431",subject:"انجليزي",role:"معلم ممارس"},
+  {name:"عبدالله بن عبدالعزيز بن سيف السهلي",id:"1063175010",phone:"966546221133",subject:"علم اجتماع",role:"معلم ممارس"},
+  {name:"بشير بن أحمد بن عبدالله آل سليم",id:"1019783917",phone:"966500126925",subject:"مكتبات",role:"معلم ممارس"},
+  {name:"ابراهيم بن محمد بن ابراهيم الربيع",id:"1004182687",phone:"966548638056",subject:"انجليزي",role:"معلم ممارس"},
+  {name:"عبدالمجيد عبدالله سالم آل حبشان",id:"1004581359",phone:"966500223640",subject:"اجتماعيات",role:"معلم ممارس"},
+  {name:"خالد سعد راشد المرضي",id:"1025640010",phone:"966505877238",subject:"اجتماعيات",role:"معلم ممارس"},
+  {name:"فيصل فهد علي الزهراني",id:"1086115373",phone:"966508448455",subject:"رياضيات",role:"معلم ممارس"},
+  {name:"ابراهيم حبيب عبدالغني الميمني",id:"1072815481",phone:"966530163027",subject:"رياضيات",role:"معلم ممارس"},
+  {name:"زياد عواض ابن عيضه العمري",id:"1092156742",phone:"966557530102",subject:"علم إدارة",role:"معلم ممارس"},
+  {name:"عبدالرحمن عبدالجبار حمود العتيبي",id:"1089635724",phone:"966555741488",subject:"فيزيا",role:"معلم ممارس"},
+  {name:"جميل عبدالمجيد جواد العلي",id:"1029281589",phone:"966566712113",subject:"فيزيا",role:"معلم ممارس"},
+  {name:"عبد الله حسن عمر الادريسي",id:"1081556910",phone:"966533025505",subject:"رياضيات",role:"معلم ممارس"},
+  {name:"تقي عبد الهادي تقي العلي",id:"1026472363",phone:"966543219321",subject:"كيميا",role:"معلم ممارس"},
+  {name:"خالد أحمد محمد الشهري",id:"1034318301",phone:"966560687900",subject:"كيميا",role:"معلم ممارس"},
+  {name:"صالح بن محمد بن صالح السميحي",id:"1003535422",phone:"966506921115",subject:"دين",role:"معلم ممارس"},
+  {name:"عبدالله  خلوفة  عبدالله ال مرعي",id:"1029490875",phone:"966533225515",subject:"دين",role:"معلم ممارس"},
+  {name:"ابراهيم بن أحمد بن ابراهيم العجلان",id:"1001082179",phone:"966559999808",subject:"دين",role:"معلم ممارس"},
+  {name:"عادل بن علي بن ناصر البارقي",id:"1007370701",phone:"966530667666",subject:"رياضه",role:"معلم ممارس"},
+  {name:"نبيل بن محسن بن محمد القلاف",id:"1025472604",phone:"966562962766",subject:"رياضه",role:"معلم ممارس"},
+  {name:"عادل بن علي بن سليمان السبعان",id:"1005472780",phone:"966504836200",subject:"موجه طلابي",role:"معلم ممارس"},
+  {name:"ياسر عبدالله محمد النمر",id:"1001443397",phone:"966503834833",subject:"مدخل بيانات",role:"مساعد معلم"},
+  {name:"علي بن حسن بن علي آل قمبر",id:"1004780860",phone:"966502085389",subject:"سكرتاريه",role:"مساعد معلم"},
+  {name:"حسن بن عامر احمد الشهري",id:"1013124175",phone:"966598893731",subject:"محضر مختبر",role:"مساعد معلم"},
+  {name:"عدنان علي حسين الزريق",id:"1015776766",phone:"966505808451",subject:"وكيل",role:"معلم ممارس"},
+  {name:"فهد حامد علي الزهراني",id:"1024193532",phone:"966504532489",subject:"مدير المدرسة",role:"معلم ممارس"}
+];
+const teacherById = {};
+teachersData.forEach(t=>teacherById[t.id]=t);
+
+// عناصر DOM
+const excelInput = document.getElementById('excelInput');
+const recordsTableWrapper = document.getElementById('recordsTableWrapper');
+const statusText = document.getElementById('statusText');
+const statusSpinner = document.getElementById('statusSpinner');
+const filesInfo = document.getElementById('filesInfo');
+const dateInfoLabel = document.getElementById('dateInfoLabel');
+const reportDateInput = document.getElementById('reportDate');
+const printMainBtn = document.getElementById('printMainBtn');
+const officialDateLine = document.getElementById('officialDateLine');
+
+const absentsCount = document.getElementById('absentsCount');
+const lateCount = document.getElementById('lateCount');
+const noOutCount = document.getElementById('noOutCount');
+
+const modalAbsents = document.getElementById('modalAbsents');
+const modalLate = document.getElementById('modalLate');
+const modalNoOut = document.getElementById('modalNoOut');
+const modalLetter = document.getElementById('modalLetter');
+
+// عناصر المساءلة
+const ltName = document.getElementById('ltName');
+const ltId = document.getElementById('ltId');
+const ltSubject = document.getElementById('ltSubject');
+const ltRole = document.getElementById('ltRole');
+const ltDate = document.getElementById('ltDate');
+const ltAttend = document.getElementById('ltAttend');
+const ltLeave = document.getElementById('ltLeave');
+const ltStatus = document.getElementById('ltStatus');
+const ltNameInline = document.getElementById('ltNameInline');
+const ltTitle = document.getElementById('ltTitle');
+const ltP1 = document.getElementById('ltP1');
+const ltP2 = document.getElementById('ltP2');
+const ltP3 = document.getElementById('ltP3');
+
+// جداول النوافذ
+const absentsMeta = document.getElementById('absentsMeta');
+const lateMeta = document.getElementById('lateMeta');
+const noOutMeta = document.getElementById('noOutMeta');
+const absentsTableBody = document.querySelector('#absentsTable tbody');
+const lateTableBody = document.querySelector('#lateTable tbody');
+const noOutTableBody = document.querySelector('#noOutTable tbody');
+
+let allLogs = [];
+let dailyRecords = [];
+
+// معلومات التاريخ الحالية
+let currentWeekday = '';
+let currentGreg = '';
+let currentHijri = '';
+
+// أحداث
+excelInput.addEventListener('change', handleFiles);
+reportDateInput.addEventListener('change', rebuildDaily);
+printMainBtn.addEventListener('click', ()=>window.print());
+
+document.getElementById('btnAbsents').addEventListener('click', ()=>openModal('modalAbsents'));
+document.getElementById('btnLate').addEventListener('click', ()=>openModal('modalLate'));
+document.getElementById('btnNoOut').addEventListener('click', ()=>openModal('modalNoOut'));
+
+document.querySelectorAll('[data-close-modal]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const id = btn.getAttribute('data-close-modal');
+    document.getElementById(id).classList.remove('active');
+  });
+});
+document.querySelectorAll('[data-print-modal]').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const id = btn.getAttribute('data-print-modal');
+    const modal = document.getElementById(id);
+    if(!modal) return;
+    const backup = document.body.innerHTML;
+    document.body.innerHTML = modal.outerHTML;
+    window.print();
+    document.body.innerHTML = backup;
+    location.reload();
+  });
+});
+
+// تهيئة التاريخ الافتراضي اليوم
+(function initDateToday(){
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth()+1).padStart(2,'0');
+  const dd = String(today.getDate()).padStart(2,'0');
+  reportDateInput.value = `${yyyy}-${mm}-${dd}`;
+  updateDateLabel();
+})();
+
+// نص وصف التاريخ
+function updateDateLabel(){
+  const val = reportDateInput.value;
+  if(!val){
+    dateInfoLabel.textContent = "لم يتم تحديد تاريخ التقرير بعد.";
+    officialDateLine.textContent = "اليوم والتاريخ: لم يتم التحديد بعد.";
+    currentWeekday = currentGreg = currentHijri = '';
+    return;
+  }
+  const d = new Date(val + "T00:00:00");
+  if(isNaN(d.getTime())){
+    dateInfoLabel.textContent = "تاريخ غير صالح.";
+    officialDateLine.textContent = "اليوم والتاريخ: تاريخ غير صالح.";
+    currentWeekday = currentGreg = currentHijri = '';
+    return;
+  }
+  currentWeekday = d.toLocaleDateString('ar-SA',{weekday:'long'});
+  currentGreg = d.toLocaleDateString('ar-SA',{year:'numeric',month:'2-digit',day:'2-digit'});
+  currentHijri = d.toLocaleDateString('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'});
+  dateInfoLabel.textContent = `اليوم المحدد: ${currentWeekday} ${currentGreg} م الموافق ${currentHijri} هـ.`;
+  officialDateLine.textContent = `اليوم والتاريخ: ${currentWeekday} ${currentGreg} م / ${currentHijri} هـ.`;
+}
+
+function getDateLabel(){
+  if(!currentWeekday || !currentGreg || !currentHijri) return '';
+  return `يوم (${currentWeekday}) الموافق (${currentGreg} م / ${currentHijri} هـ)`;
+}
+
+// حالة النظام
+function setStatus(msg, loading=false){
+  statusText.textContent = msg;
+  statusSpinner.style.display = loading ? 'inline-block' : 'none';
+}
+
+// تحويلات
+function normalizeDate(raw){
+  if(raw===undefined || raw===null) return '';
+  let s = String(raw).trim();
+  if(!s) return '';
+  if(!isNaN(Number(s)) && !s.includes('-') && !s.includes('/')){
+    const n = Number(s);
+    const base = new Date(1899,11,30);
+    const d = new Date(base.getTime()+n*24*60*60*1000);
+    const y=d.getFullYear();
+    const m=String(d.getMonth()+1).padStart(2,'0');
+    const day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  s = s.replace(/\./g,'/').replace(/\\/g,'/');
+  let m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if(m){
+    const y=m[1], mm=String(m[2]).padStart(2,'0'), dd=String(m[3]).padStart(2,'0');
+    return `${y}-${mm}-${dd}`;
+  }
+  m = s.match(/^(\d{2})-(\d{2})-(\d{2})$/);
+  if(m){
+    const yy=parseInt(m[1],10);
+    const year=yy>=80?1900+yy:2000+yy;
+    return `${year}-${m[2]}-${m[3]}`;
+  }
+  return '';
+}
+function normalizeTime(raw){
+  if(raw===undefined || raw===null) return '';
+  let s = String(raw).trim();
+  if(!s) return '';
+  if(!isNaN(Number(s)) && !s.includes(':')){
+    const val = Number(s);
+    if(val>=0 && val<1){
+      const totalMin=Math.round(val*24*60);
+      const h=String(Math.floor(totalMin/60)).padStart(2,'0');
+      const m=String(totalMin%60).padStart(2,'0');
+      return `${h}:${m}`;
+    }
+  }
+  s = s.replace(/\s+/g,'').toUpperCase();
+  let m = s.match(/^(\d{1,2}):(\d{2})(AM|PM)?$/);
+  if(m){
+    let h=parseInt(m[1],10);
+    const mm=m[2];
+    const ampm=m[3];
+    if(ampm==='PM' && h<12) h+=12;
+    if(ampm==='AM' && h===12) h=0;
+    return `${String(h).padStart(2,'0')}:${mm}`;
+  }
+  m = s.match(/^(\d{1,2}):(\d{2})$/);
+  if(m){
+    const h=String(parseInt(m[1],10)).padStart(2,'0');
+    const mm=m[2];
+    return `${h}:${mm}`;
+  }
+  return '';
+}
+function toMinutes(hhmm){
+  if(!hhmm) return 0;
+  const p = hhmm.split(':').map(Number);
+  if(p.length!==2 || p.some(isNaN)) return 0;
+  return p[0]*60+p[1];
+}
+function minutesToHHMM(mins){
+  const m = Math.max(0,Math.round(mins));
+  const h = Math.floor(m/60);
+  const mm = m%60;
+  return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+}
+function diffTimes(start,end){
+  if(!start || !end) return 0;
+  let s = toMinutes(start), e=toMinutes(end);
+  if(s===0 && e===0) return 0;
+  let d = e-s;
+  if(d<0) d+=24*60;
+  return d;
+}
+function guessDateFromFileName(name){
+  const m = name.match(/(\d{4})[^\d]?(\d{1,2})[^\d]?(\d{1,2})/);
+  if(!m) return '';
+  const y=m[1];
+  const mm=String(m[2]).padStart(2,'0');
+  const dd=String(m[3]).padStart(2,'0');
+  return `${y}-${mm}-${dd}`;
+}
+
+// قراءة الملفات
+async function handleFiles(e){
+  const files = Array.from(e.target.files||[]);
+  if(!files.length) return;
+  if(!reportDateInput.value){
+    alert("يرجى تحديد تاريخ التقرير أولًا.");
+    return;
+  }
+
+  setStatus('جاري قراءة ملفات Excel وتحليلها ...',true);
+  filesInfo.textContent = `${files.length} ملف/ملفات قيد التحليل ...`;
+  allLogs = [];
+  dailyRecords = [];
+  recordsTableWrapper.innerHTML = '<div class="empty-msg">جاري التحميل ...</div>';
+
+  for(const file of files){
+    try{
+      await readExcelFile(file);
+    }catch(err){
+      console.error(err);
+    }
+  }
+
+  if(!allLogs.length){
+    setStatus('لم يتم العثور على سجلات حضور بعد قراءة الملفات. تأكد من أن صف العناوين (اسم الموظف، الرقم الوظيفي، توقيت الحضور، توقيت الانصراف، عدد الساعات) موجود في التقرير.',false);
+    filesInfo.textContent = 'لم يتم العثور على سجلات حضور في الملفات المستوردة.';
+    recordsTableWrapper.innerHTML = '<div class="empty-msg">لم يتم العثور على سجلات حضور بعد قراءة الملفات.</div>';
+    return;
+  }
+
+  setStatus(`تم استيراد ${allLogs.length} سجل حضور من ${files.length} ملف/ملفات.`,false);
+  filesInfo.textContent = `تم الاستيراد من ${files.length} ملف، وعدد السجلات الخام: ${allLogs.length}.`;
+  rebuildDaily();
+}
+
+function readExcelFile(file){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload = evt=>{
+      try{
+        const data=evt.target.result;
+        const wb=XLSX.read(data,{type:'array'});
+        const fallbackDate = guessDateFromFileName(file.name);
+
+        wb.SheetNames.forEach(sheetName=>{
+          const sheet=wb.Sheets[sheetName];
+          const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''});
+          if(!rows.length) return;
+
+          let headerRowIndex = rows.findIndex(r=>{
+            const joined = r.map(c=>String(c)).join(' ');
+            return /اسم\s*الموظف/.test(joined) && /الرقم\s*الوظيفي/.test(joined);
+          });
+          if(headerRowIndex<0) headerRowIndex = 0;
+
+          const headers = rows[headerRowIndex].map(h=>String(h||'').trim());
+
+          const idIdx     = headers.findIndex(h=>/هوية|الرقم الوظيفي|رقم الموظف|رقم المعلم|ID/i.test(h));
+          const dateIdx   = headers.findIndex(h=>/تاريخ/i.test(h));
+          const inIdx     = headers.findIndex(h=>/الحضور|توقيت الحضور|وقت الحضور/i.test(h));
+          const outIdx    = headers.findIndex(h=>/الانصراف|توقيت الانصراف|وقت الانصراف/i.test(h));
+          const hoursIdx  = headers.findIndex(h=>/عدد الساعات|ساعات الدوام|ساعات الدوام الفعلي/i.test(h));
+
+          if(idIdx<0 || inIdx<0 || outIdx<0 || hoursIdx<0){
+            return;
+          }
+
+          for(let r=headerRowIndex+1;r<rows.length;r++){
+            const row = rows[r];
+            const idRaw = idIdx>=0 ? row[idIdx] : '';
+            const id = String(idRaw||'').replace(/[^\d]/g,'');
+            if(!id) continue;
+
+            let dateStr='';
+            if(dateIdx>=0){
+              dateStr = normalizeDate(row[dateIdx]);
+            }
+            if(!dateStr) dateStr = fallbackDate;
+
+            const attend = normalizeTime(row[inIdx]);
+            const leave  = normalizeTime(row[outIdx]);
+            const hoursRaw = normalizeTime(row[hoursIdx]);
+
+            let workMinutes = 0;
+            if(hoursRaw){
+              workMinutes = toMinutes(hoursRaw);
+            }else if(attend && leave){
+              workMinutes = diffTimes(attend,leave);
+            }
+
+            const dutyStartMin = toMinutes(DUTY_START);
+            const dutyEndMin   = toMinutes(DUTY_END);
+            let tardyMinutes = 0;
+            if(attend){
+              const attendMin = toMinutes(attend);
+              tardyMinutes = Math.max(0,attendMin-dutyStartMin);
+            }
+
+            let absent = false;
+            let missingCheckout = false;
+            let afterTwo = false;
+            let lackMinutes = 0;
+
+            if(!attend && !leave && !workMinutes){
+              absent = true;
+            }else{
+              if(!leave){
+                missingCheckout = true;
+              }else{
+                const outMin = toMinutes(leave);
+                if(outMin > dutyEndMin){
+                  afterTwo = true;
+                }
+              }
+              if(workMinutes < REQUIRED_MINUTES){
+                lackMinutes = REQUIRED_MINUTES - workMinutes;
+              }
+            }
+
+            let statusShort = 'سليم';
+            if(absent){
+              statusShort = 'غياب';
+            }else if(missingCheckout){
+              statusShort = 'لم يسجل الانصراف';
+            }else if(afterTwo){
+              statusShort = 'انصراف بعد 2:00م';
+            }else if(tardyMinutes>0){
+              statusShort = 'تأخر';
+            }else if(lackMinutes>0){
+              statusShort = 'دوام أقل من 7 ساعات';
+            }
+
+            const teacher = teacherById[id] || {name:'غير مسجل في القائمة',subject:'',role:''};
+
+            allLogs.push({
+              file:file.name,
+              sheet:sheetName,
+              date:dateStr,
+              id,
+              teacherName:teacher.name,
+              subject:teacher.subject,
+              role:teacher.role,
+              attend,
+              leave,
+              workMinutes,
+              workHHMM:minutesToHHMM(workMinutes),
+              tardyMinutes,
+              lackMinutes,
+              absent,
+              missingCheckout,
+              afterTwo,
+              statusShort
+            });
+          }
+        });
+        resolve();
+      }catch(err){
+        reject(err);
+      }
+    };
+    reader.onerror = reject;
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+// بناء اليوم المحدد
+function rebuildDaily(){
+  updateDateLabel();
+  const targetDate = reportDateInput.value || '';
+
+  if(!allLogs.length){
+    recordsTableWrapper.innerHTML = '<div class="empty-msg">لا توجد سجلات حضور بعد.</div>';
+    absentsCount.textContent = '0';
+    lateCount.textContent = '0';
+    noOutCount.textContent = '0';
+    return;
+  }
+
+  const logsById = {};
+  allLogs.forEach(log=>{
+    if(targetDate && log.date && log.date!==targetDate) return;
+    logsById[log.id] = log;
+  });
+
+  dailyRecords = [];
+
+  teachersData.forEach(t=>{
+    const log = logsById[t.id];
+    if(log){
+      dailyRecords.push(log);
+    }else{
+      dailyRecords.push({
+        date:targetDate,
+        id:t.id,
+        teacherName:t.name,
+        subject:t.subject,
+        role:t.role,
+        attend:'',
+        leave:'',
+        workMinutes:0,
+        workHHMM:'00:00',
+        tardyMinutes:0,
+        lackMinutes:REQUIRED_MINUTES,
+        absent:true,
+        missingCheckout:false,
+        afterTwo:false,
+        statusShort:'غياب'
+      });
+    }
+  });
+
+  renderMainTable();
+  buildModalTables();
+}
+
+// الجدول الرئيس
+function renderMainTable(){
+  if(!dailyRecords.length){
+    recordsTableWrapper.innerHTML='<div class="empty-msg">لا توجد سجلات لليوم المحدد.</div>';
+    return;
+  }
+
+  let rowsHtml = '';
+  dailyRecords.forEach((rec,idx)=>{
+    let badgeClass='badge badge-ok';
+    if(rec.statusShort==='غياب' || rec.missingCheckout || rec.afterTwo) badgeClass='badge badge-danger';
+    else if(rec.statusShort!=='سليم') badgeClass='badge badge-warn';
+
+    rowsHtml += `
+      <tr>
+        <td>${idx+1}</td>
+        <td>${rec.teacherName}</td>
+        <td>${rec.id}</td>
+        <td>${rec.attend || '--:--'}</td>
+        <td>${rec.leave || '--:--'}</td>
+        <td>${rec.workHHMM}</td>
+        <td><span class="${badgeClass}">${rec.statusShort}</span></td>
+      </tr>
+    `;
+  });
+
+  recordsTableWrapper.innerHTML = `
+    <table class="main-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>اسم المعلم</th>
+          <th>رقم الهوية</th>
+          <th>وقت الحضور</th>
+          <th>وقت الانصراف</th>
+          <th>مدة الدوام</th>
+          <th>وصف الحالة المختصر</th>
+        </tr>
+      </thead>
+      <tbody>${rowsHtml}</tbody>
+    </table>
+  `;
+}
+
+// نوع الحالة (غياب / تأخر / خروج/انصراف)
+function getCaseType(rec){
+  if(rec.absent) return 'غياب';
+  if(rec.tardyMinutes>0) return 'تأخر';
+  if(rec.missingCheckout || rec.afterTwo || rec.workMinutes<REQUIRED_MINUTES) return 'انصراف';
+  return 'عام';
+}
+
+// صياغة مدة التأخر بالعربية
+function formatDelayAr(mins){
+  const m = Math.round(mins);
+  const h = Math.floor(m/60);
+  const r = m%60;
+  if(h>0 && r>0) return `${h} ساعة و ${r} دقيقة`;
+  if(h>0) return `${h} ساعة`;
+  return `${r} دقيقة`;
+}
+
+// رسالة واتساب تربوية لكل حالة
+function buildWhatsappMessage(rec){
+  const datePhrase = getDateLabel() || `تاريخ التقرير (${reportDateInput.value})`;
+  const teacherName = rec.teacherName || 'المعلم';
+
+  const caseType = getCaseType(rec);
+  let body = '';
+
+  if(caseType === 'غياب'){
+    body =
+`نحيطكم علمًا بغيابكم عن الدوام الرسمي ${datePhrase} دون عذر نظامي، ويُلزم المعلم برفع العذر الاضطراري أو المرضي عبر نظام فارس خلال المدة المحددة، على أن يتم توثيق الغياب في منصة حضوري، وسيُتابَع ذلك من قبل إدارة المدرسة وفق التعليمات المعتمدة.`;
+  }else if(caseType === 'تأخر'){
+    const delayText = formatDelayAr(rec.tardyMinutes);
+    body =
+`نحيطكم علمًا بأنه تم رصد تأخركم عن الدوام الرسمي ${datePhrase}، حيث تم تسجيل وقت الحضور الساعة (${rec.attend || '--:--'})، وبمدة تأخير قدرها (${delayText})، ونؤكد على ضرورة الالتزام بمواعيد الدوام المعتمدة، وسيُتابَع ذلك وفق الإجراءات النظامية والتعليمات المعتمدة.`;
+  }else if(caseType === 'انصراف'){
+    const extra = rec.afterTwo ? " أو الانصراف بعد الساعة (2:00 م)" : "";
+    body =
+`نحيطكم علمًا بأنه تم رصد الانصراف دون استئذان نظامي أو عدم تسجيل الانصراف ${datePhrase}، حيث تم تسجيل وقت الحضور الساعة (${rec.attend || '--:--'})، وعدم إكمال مدة الدوام النظامية المحددة بـ سبع ساعات عمل${extra}، ونؤكد أن ذلك يخضع للمتابعة واتخاذ الإجراء النظامي وفق تعليمات وزارة التعليم.`;
+  }else{
+    body =
+`نحيطكم علمًا بوجود ملاحظة على الدوام ${datePhrase}، ونؤكد على أهمية الالتزام بمواعيد الحضور والانصراف المعتمدة في المدرسة.`;
+  }
+
+  return `السلام عليكم ورحمة الله وبركاته أ.${teacherName}،
+
+${body}
+
+شاكرين تعاونكم وحرصكم على الانضباط المهني.`;
+}
+
+// بناء جداول الغياب/التأخر/عدم الانصراف
+function buildModalTables(){
+  const absents = dailyRecords.filter(r=>getCaseType(r)==='غياب');
+  const late = dailyRecords.filter(r=>getCaseType(r)==='تأخر');
+  const noOut = dailyRecords.filter(r=>getCaseType(r)==='انصراف');
+
+  absentsCount.textContent = absents.length;
+  lateCount.textContent = late.length;
+  noOutCount.textContent = noOut.length;
+
+  const dLabel = dateInfoLabel.textContent;
+  absentsMeta.textContent = dLabel;
+  lateMeta.textContent = dLabel;
+  noOutMeta.textContent = dLabel;
+
+  absentsTableBody.innerHTML = '';
+  absents.forEach((r,i)=>{
+    const t = teacherById[r.id] || {};
+    const phone = t.phone || '';
+    let waCell='-';
+    if(/^966\d{9}$/.test(phone)){
+      const msg = encodeURIComponent(buildWhatsappMessage(r));
+      const url = `https://wa.me/${phone}?text=${msg}`;
+      waCell = `<a href="${url}" target="_blank" class="btn btn-wa">واتساب</a>`;
+    }
+    const letterBtn = `<button class="btn btn-letter" data-letter-id="${r.id}">مساءلة</button>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${r.teacherName}</td>
+      <td>${r.id}</td>
+      <td>${t.subject || r.subject || ''}</td>
+      <td>${t.role || r.role || ''}</td>
+      <td>${waCell}</td>
+      <td>${letterBtn}</td>
+    `;
+    absentsTableBody.appendChild(tr);
+  });
+
+  lateTableBody.innerHTML = '';
+  late.forEach((r,i)=>{
+    const t = teacherById[r.id] || {};
+    const phone = t.phone || '';
+    let waCell='-';
+    if(/^966\d{9}$/.test(phone)){
+      const msg = encodeURIComponent(buildWhatsappMessage(r));
+      const url = `https://wa.me/${phone}?text=${msg}`;
+      waCell = `<a href="${url}" target="_blank" class="btn btn-wa">واتساب</a>`;
+    }
+    const letterBtn = `<button class="btn btn-letter" data-letter-id="${r.id}">مساءلة</button>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${r.teacherName}</td>
+      <td>${r.id}</td>
+      <td>${r.attend || '--:--'}</td>
+      <td>${r.tardyMinutes ? formatDelayAr(r.tardyMinutes) : '0 دقيقة'}</td>
+      <td>${waCell}</td>
+      <td>${letterBtn}</td>
+    `;
+    lateTableBody.appendChild(tr);
+  });
+
+  noOutTableBody.innerHTML = '';
+  noOut.forEach((r,i)=>{
+    const t = teacherById[r.id] || {};
+    const phone = t.phone || '';
+    let waCell='-';
+    if(/^966\d{9}$/.test(phone)){
+      const msg = encodeURIComponent(buildWhatsappMessage(r));
+      const url = `https://wa.me/${phone}?text=${msg}`;
+      waCell = `<a href="${url}" target="_blank" class="btn btn-wa">واتساب</a>`;
+    }
+    let desc = 'ملاحظة على الانصراف';
+    if(r.missingCheckout) desc = 'عدم تسجيل الانصراف';
+    else if(r.afterTwo) desc = 'انصراف بعد 2:00 م';
+    const letterBtn = `<button class="btn btn-letter" data-letter-id="${r.id}">لفت نظر</button>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${i+1}</td>
+      <td>${r.teacherName}</td>
+      <td>${r.id}</td>
+      <td>${r.attend || '--:--'}</td>
+      <td>${r.leave || '--:--'}</td>
+      <td>${desc}</td>
+      <td>${waCell}</td>
+      <td>${letterBtn}</td>
+    `;
+    noOutTableBody.appendChild(tr);
+  });
+
+  // ربط أزرار المساءلة
+  document.querySelectorAll('[data-letter-id]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = btn.getAttribute('data-letter-id');
+      const rec = dailyRecords.find(x=>x.id===id);
+      if(rec) openLetter(rec);
+    };
+  });
+}
+
+// فتح نافذة
+function openModal(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('active');
+}
+
+// نصوص المساءلة/التنبيه حسب الحالة
+function openLetter(rec){
+  const t = teacherById[rec.id] || {};
+  ltName.textContent = rec.teacherName;
+  ltId.textContent = rec.id;
+  ltSubject.textContent = t.subject || rec.subject || '';
+  ltRole.textContent = t.role || rec.role || '';
+  ltDate.textContent = getDateLabel() || `تاريخ التقرير (${reportDateInput.value})`;
+  ltAttend.textContent = rec.attend || '--:--';
+  ltLeave.textContent = rec.leave || '--:--';
+  ltStatus.textContent = rec.statusShort || '';
+  ltNameInline.textContent = rec.teacherName;
+
+  const caseType = getCaseType(rec);
+  const datePhrase = getDateLabel() || `تاريخ التقرير (${reportDateInput.value})`;
+
+  if(caseType === 'غياب'){
+    ltTitle.textContent = "مساءلة غياب عن الدوام الرسمي";
+    ltP1.textContent = `بناءً على سجلات الحضور الواردة من منصة حضوري، تم رصد غيابكم عن الدوام الرسمي ${datePhrase} دون تسجيل حضور في النظام.`;
+    ltP2.textContent = `وعليه نأمل منكم تزويد إدارة المدرسة بإيضاح خطي عن سبب الغياب، مع رفع العذر النظامي (اضطراري/مرضي) عبر نظام فارس خلال المدة المحددة، ليتم النظر فيه وفق التعليمات المنظمة، مع توثيق الغياب في منصة حضوري.`;
+    ltP3.textContent = `وفي حال تكرار الغياب أو عدم تقديم ما يثبت العذر النظامي؛ سيتم الرفع للجهات المختصة لاستكمال ما يلزم وفق أنظمة وزارة التعليم.`;
+  }else if(caseType === 'تأخر'){
+    const delayText = formatDelayAr(rec.tardyMinutes);
+    ltTitle.textContent = "تنبيه تأخر عن الدوام الرسمي";
+    ltP1.textContent = `تفيدكم إدارة المدرسة بأنه تم رصد تأخركم عن بداية الدوام الرسمي ${datePhrase}، حيث سُجِّل وقت حضوركم الساعة (${rec.attend || '--:--'})، وبمدة تأخير قدرها (${delayText}).`;
+    ltP2.textContent = `ونؤكد على ضرورة الالتزام بمواعيد الدوام المعتمدة، وتحري الدقة في الحضور في الوقت المحدد؛ حفاظًا على سير العملية التعليمية وانتظامها.`;
+    ltP3.textContent = `وسيُتابَع تكرار التأخر ويُتخذ الإجراء النظامي المناسب وفق تعليمات وزارة التعليم في حال استمرار ذلك دون مبرر مقبول.`;
+  }else if(caseType === 'انصراف'){
+    const extra = rec.afterTwo ? " أو الانصراف بعد الساعة (2:00 م)" : "";
+    ltTitle.textContent = "لفت نظر بشأن الانصراف وعدم إكمال ساعات الدوام";
+    ltP1.textContent = `تفيدكم إدارة المدرسة بأنه تم رصد الانصراف دون استئذان نظامي أو عدم تسجيل الانصراف ${datePhrase}، حيث سُجِّل وقت حضوركم الساعة (${rec.attend || '--:--'})، مع عدم إكمال مدة الدوام النظامية المحددة بـ سبع ساعات عمل${extra}.`;
+    ltP2.textContent = `ونؤكد أن الخروج قبل نهاية الدوام، أو عدم تسجيل الانصراف في منصة حضوري، يعد مخالفة للتعليمات المنظمة للدوام الرسمي في المدارس.`;
+    ltP3.textContent = `وسيُتابَع ذلك من قبل إدارة المدرسة، ويُتخذ الإجراء النظامي المناسب وفق ما تقضي به لوائح وزارة التعليم عند تكرار المخالفة أو عدم تقديم مبرر نظامي مقبول.`;
+  }else{
+    ltTitle.textContent = "تنبيه بشأن الالتزام بالدوام";
+    ltP1.textContent = `تمت مراجعة سجلات الحضور والانصراف في منصة حضوري ${datePhrase}، وتبين وجود ملاحظة على الالتزام بالدوام.`;
+    ltP2.textContent = `ونؤكد على أهمية التقيد بمواعيد الحضور والانصراف المعتمدة في المدرسة، بما يضمن انتظام العملية التعليمية.`;
+    ltP3.textContent = `نأمل منكم مراعاة ذلك مستقبلاً، وسيتم متابعة تكرار الملاحظات وفق التعليمات واللوائح المعتمدة.`;
+  }
+
+  modalLetter.classList.add('active');
+}
+
+// تهيئة
+setStatus('النظام جاهز للاستيراد.',false);
+</script>
+</body>
+</html>
