@@ -91,6 +91,15 @@ header p{
   gap:6px;
 }
 
+/* صف الأزرار في الهيدر */
+.top-row{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  justify-content:flex-start;
+  gap:6px;
+}
+
 /* زر الاستيراد */
 .import-btn{
   display:inline-flex;
@@ -122,20 +131,11 @@ header p{
 }
 .import-btn input[type="file"]{display:none;}
 
-/* شريط علوي: الكل في صف واحد */
-.top-row{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:flex-start;
-  gap:6px;
-}
-
-/* حقل التاريخ */
+/* حقل التاريخ اليومي */
 .date-chip{
   display:inline-flex;
   align-items:center;
-  gap:4px;
+  gap:6px;
   padding:3px 8px;
   border-radius:999px;
   background:rgba(255,255,255,.18);
@@ -189,6 +189,9 @@ header p{
 /* محتوى الصفحة */
 .main{
   padding:10px 14px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
 /* الهيدر الرسمي أعلى الجدول */
@@ -219,14 +222,14 @@ header p{
 }
 .official-note{
   color:var(--muted);
-  max-width:340px;
+  max-width:360px;
 }
 
 /* شريط الوصف */
 .info-bar{
   font-size:.8rem;
   color:var(--muted);
-  margin:6px 0 8px;
+  margin:4px 0 6px;
   display:flex;
   justify-content:space-between;
   gap:8px;
@@ -237,11 +240,25 @@ header p{
   color:#0b3f43;
 }
 
+/* البطاقات الداخلية */
+.panel{
+  background:#fff;
+  border-radius:14px;
+  border:1px solid var(--line);
+  padding:8px 10px 10px;
+}
+.panel-title{
+  margin:0 0 4px;
+  font-size:.9rem;
+  font-weight:800;
+  color:#0b3f43;
+}
+
 /* الجدول الرئيس */
 .table-wrapper{
   width:100%;
   overflow:hidden;
-  border-radius:16px;
+  border-radius:10px;
   border:1px solid var(--line);
   background:#fff;
 }
@@ -320,6 +337,51 @@ tbody tr:hover{background:#eaf6f6;}
 .main-table th:nth-child(7),
 .main-table td:nth-child(7){width:23%;}
 
+/* كشف أسبوعي */
+.week-controls{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  margin:4px 0 6px;
+  font-size:.78rem;
+}
+.week-controls label{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:2px 6px;
+  border-radius:999px;
+  background:#f3f7f7;
+}
+.week-controls input{
+  border:none;
+  border-radius:12px;
+  padding:2px 6px;
+  font-family:"Tajawal",sans-serif;
+  font-size:.78rem;
+}
+.week-controls button{
+  border:none;
+  border-radius:999px;
+  padding:3px 9px;
+  font-size:.78rem;
+  cursor:pointer;
+  background:#0b7e88;
+  color:#fff;
+}
+
+/* ألوان حالة الأسبوع */
+.week-cell{
+  border-radius:8px;
+  padding:2px 4px;
+}
+.week-on-time{background:#e3ffe9;color:#166534;}
+.week-late-soft{background:#fef9c3;color:#92400e;}
+.week-late-strong{background:#fee2e2;color:#b91c1c;}
+.week-absent{background:#fee2e2;color:#b91c1c;font-weight:700;}
+.week-empty{color:#9ca3af;}
+
 /* فوتر */
 footer{
   padding:6px 12px 10px;
@@ -355,7 +417,7 @@ footer{
 }
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* النوافذ المنبثقة */
+/* النوافذ المنبثقة (كما هي سابقًا) */
 .modal-backdrop{
   position:fixed;
   inset:0;
@@ -478,7 +540,7 @@ footer{
 .noout-table th:nth-child(8),
 .noout-table td:nth-child(8){width:5%;}
 
-/* الأزرار العامة */
+/* الأزرار العامة للنوافذ */
 .btn{
   display:inline-flex;
   align-items:center;
@@ -508,9 +570,7 @@ footer{
   .date-chip,
   .header-controls,
   .info-bar span.system,
-  .modal-actions-top,
-  .btn-wa,
-  .btn-letter { display:none !important; }
+  .modal-backdrop{ display:none !important; }
 
   .shell{
     max-width:none;
@@ -556,25 +616,25 @@ footer{
         <button id="btnNoOut" class="filter-btn">
           عدم تسجيل الانصراف / بعد 2م <span id="noOutCount" class="count">0</span>
         </button>
-
-        <!-- اختيار التاريخ -->
-        <div class="date-chip">
-          <span>اليوم/التاريخ المطلوب:</span>
-          <input id="reportDate" type="date">
-        </div>
-
-        <!-- زر الاستيراد -->
-        <label class="import-btn">
-          <span class="icon">📁</span>
-          <span>استيراد ملفات حضور Excel من حضوري</span>
-          <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" multiple>
-        </label>
       </div>
+
+      <!-- اختيار التاريخ اليومي -->
+      <div class="date-chip">
+        <span>اليوم/التاريخ المطلوب (للكشف اليومي):</span>
+        <input id="reportDate" type="date">
+      </div>
+
+      <!-- زر الاستيراد -->
+      <label class="import-btn">
+        <span class="icon">📁</span>
+        <span>استيراد ملفات حضور Excel من حضوري</span>
+        <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" multiple>
+      </label>
     </div>
   </header>
 
   <main class="main">
-    <!-- الهيدر الرسمي أعلى الجدول -->
+    <!-- الهيدر الرسمي أعلى الجداول -->
     <div class="official-header">
       <div class="official-lines">
         <p>وزارة التعليم – الإدارة العامة للتعليم بالمنطقة الشرقية</p>
@@ -594,9 +654,30 @@ footer{
       <span class="system" id="filesInfo">لم يتم استيراد ملفات بعد.</span>
     </div>
 
-    <div class="table-wrapper" id="recordsTableWrapper">
-      <div class="empty-msg">الرجاء اختيار تاريخ التقرير ثم استيراد ملف أو أكثر من ملفات Excel الصادرة من منصة حضوري.</div>
-    </div>
+    <!-- الكشف اليومي -->
+    <section class="panel">
+      <h2 class="panel-title">كشف اليوم المحدد حسب التاريخ المختار</h2>
+      <div class="table-wrapper" id="recordsTableWrapper">
+        <div class="empty-msg">الرجاء اختيار تاريخ التقرير ثم استيراد ملف أو أكثر من ملفات Excel الصادرة من منصة حضوري.</div>
+      </div>
+    </section>
+
+    <!-- الكشف الأسبوعي (الأحد – الخميس) -->
+    <section class="panel">
+      <h2 class="panel-title">كشف أسبوعي للحضور والانصراف (الأحد – الخميس)</h2>
+      <div class="week-controls">
+        <label>من:
+          <input id="weekStart" type="date">
+        </label>
+        <label>إلى:
+          <input id="weekEnd" type="date">
+        </label>
+        <button id="buildWeekBtn">بناء الكشف الأسبوعي</button>
+      </div>
+      <div class="table-wrapper" id="weeklyTableWrapper">
+        <div class="empty-msg">لم يتم بناء كشف أسبوعي بعد. الرجاء تحديد تاريخ البداية والنهاية ثم الضغط على زر "بناء الكشف الأسبوعي".</div>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -756,25 +837,19 @@ const DUTY_START = "07:00";
 const DUTY_END   = "14:00";
 const REQUIRED_MINUTES = 7*60;
 
-// بيانات المعلمين
+// قاعدة بيانات المعلمين (محدّثة)
 const teachersData = [
   {name:"موسى صلبان عبده عسيري",id:"1093013116",phone:"966507058931",subject:"فيزيا",role:"معلم ممارس"},
   {name:"مبارك عوضه سفر آل ثابت",id:"1056464405",phone:"966597233399",subject:"كيميا",role:"معلم ممارس"},
-  {name:"يوسف  عيسى العيد",id:"1012646822",phone:"966592038351",subject:"اللغة العربية",role:"معلم ممارس"},
-  {name:"حسن بن يوسف بن حسين الخليفه",id:"1056994203",phone:"966506907431",subject:"احياء",role:"معلم ممارس"},
+  {name:"فرج عبدالعلي يوسف ال سيف",id:"1000397735",phone:"966504113707",subject:"احياء",role:"معلم ممارس"},
   {name:"منذر عامر حمود زميع",id:"1065913053",phone:"966541188974",subject:"انجليزي",role:"معلم ممارس"},
   {name:"عماد محمد جمعان الزهراني",id:"1048667289",phone:"966542203039",subject:"مكتبات",role:"معلم ممارس"},
-  {name:"عبدالمجيد عبدالرحمن عبدالله السالمي",id:"1073861831",phone:"966558151033",subject:"كيمياء",role:"معلم ممارس"},
-  {name:"حسن علي حسن الشهري",id:"1037273594",phone:"966536824355",subject:"اللغة العربية",role:"معلم ممارس"},
-  {name:"حسين بن سعيد سلمان المدن",id:"1022616799",phone:"966556336875",subject:"مكتبات",role:"معلم ممارس"},
-  {name:"يحيى بن محمد بن سعيد القحطاني",id:"1048978892",phone:"966555751385",subject:"اجتماعيات",role:"معلم ممارس"},
-  {name:"فرج عبدالعلي يوسف ال سيف",id:"1000397735",phone:"966504113707",subject:"رياضيات",role:"معلم ممارس"},
+  {name:"ابراهيم حبيب عبدالغني الميمني",id:"1072815481",phone:"966530163027",subject:"رياضيات",role:"معلم ممارس"},
   {name:"بندر عبدالعزيز محمد الغامدي",id:"1046853881",phone:"966546135135",subject:"حاسب",role:"معلم ممارس"},
   {name:"حسين بن محمد بن فهد القحطاني",id:"1014268567",phone:"966504988086",subject:"احياء",role:"معلم ممارس"},
   {name:"ناصر علي ناصر الراشد",id:"1008303370",phone:"966542933888",subject:"حاسب",role:"معلم ممارس"},
   {name:"حسين بن محمد بن حسين الأحمد",id:"1060369202",phone:"966563740777",subject:"اللغة العربية",role:"معلم ممارس"},
   {name:"علي سعد سعيد الاصلعي الاحمري",id:"1023999780",phone:"966590986464",subject:"احياء",role:"معلم ممارس"},
-  {name:"حسن عبدالله علي العبدالله",id:"1005472780",phone:"966543705512",subject:"احياء",role:"معلم ممارس"},
   {name:"محمد حمد عبدالرحمن التويجري",id:"1064745944",phone:"966541381105",subject:"اللغة العربية",role:"معلم ممارس"},
   {name:"عبدالله فيصل بن فطيس الهذلي",id:"1094733290",phone:"966591585407",subject:"رياضيات",role:"معلم ممارس"},
   {name:"احمد عبدالرحيم عبدالحميد ابوعصيده",id:"1033584234",phone:"966546623431",subject:"انجليزي",role:"معلم ممارس"},
@@ -782,24 +857,30 @@ const teachersData = [
   {name:"بشير بن أحمد بن عبدالله آل سليم",id:"1019783917",phone:"966500126925",subject:"مكتبات",role:"معلم ممارس"},
   {name:"ابراهيم بن محمد بن ابراهيم الربيع",id:"1004182687",phone:"966548638056",subject:"انجليزي",role:"معلم ممارس"},
   {name:"عبدالمجيد عبدالله سالم آل حبشان",id:"1004581359",phone:"966500223640",subject:"اجتماعيات",role:"معلم ممارس"},
-  {name:"خالد سعد راشد المرضي",id:"1025640010",phone:"966505877238",subject:"اجتماعيات",role:"معلم ممارس"},
   {name:"فيصل فهد علي الزهراني",id:"1086115373",phone:"966508448455",subject:"رياضيات",role:"معلم ممارس"},
-  {name:"ابراهيم حبيب عبدالغني الميمني",id:"1072815481",phone:"966530163027",subject:"رياضيات",role:"معلم ممارس"},
   {name:"زياد عواض ابن عيضه العمري",id:"1092156742",phone:"966557530102",subject:"علم إدارة",role:"معلم ممارس"},
   {name:"عبدالرحمن عبدالجبار حمود العتيبي",id:"1089635724",phone:"966555741488",subject:"فيزيا",role:"معلم ممارس"},
-  {name:"جميل عبدالمجيد جواد العلي",id:"1029281589",phone:"966566712113",subject:"فيزيا",role:"معلم ممارس"},
   {name:"عبد الله حسن عمر الادريسي",id:"1081556910",phone:"966533025505",subject:"رياضيات",role:"معلم ممارس"},
   {name:"تقي عبد الهادي تقي العلي",id:"1026472363",phone:"966543219321",subject:"كيميا",role:"معلم ممارس"},
-  {name:"خالد أحمد محمد الشهري",id:"1034318301",phone:"966560687900",subject:"كيميا",role:"معلم ممارس"},
   {name:"صالح بن محمد بن صالح السميحي",id:"1003535422",phone:"966506921115",subject:"دين",role:"معلم ممارس"},
-  {name:"عبدالله  خلوفة  عبدالله ال مرعي",id:"1029490875",phone:"966533225515",subject:"دين",role:"معلم ممارس"},
-  {name:"ابراهيم بن أحمد بن ابراهيم العجلان",id:"1001082179",phone:"966559999808",subject:"دين",role:"معلم ممارس"},
   {name:"عادل بن علي بن ناصر البارقي",id:"1007370701",phone:"966530667666",subject:"رياضه",role:"معلم ممارس"},
-  {name:"نبيل بن محسن بن محمد القلاف",id:"1025472604",phone:"966562962766",subject:"رياضه",role:"معلم ممارس"},
+  {name:"ابراهيم بن أحمد بن ابراهيم العجلان",id:"1001082179",phone:"966559999808",subject:"دين",role:"معلم ممارس"},
+  {name:"خالد أحمد محمد الشهري",id:"1034318301",phone:"966560687900",subject:"كيميا",role:"معلم ممارس"},
+  {name:"خالد سعد راشد المرضي",id:"1025640010",phone:"966505877238",subject:"اجتماعيات",role:"معلم ممارس"},
+  {name:"عبدالله بن خلوفة بن عبدالله ال مرعي",id:"1029490875",phone:"966533225515",subject:"دين",role:"معلم ممارس"},
+  {name:"يحيى بن محمد بن سعيد القحطاني",id:"1048978892",phone:"966555751385",subject:"اجتماعيات",role:"معلم ممارس"},
+  {name:"حسين بن سعيد سلمان المدن",id:"1022616799",phone:"966556336875",subject:"مكتبات",role:"معلم ممارس"},
+  {name:"يوسف عيسى عيسى العيد",id:"1012646822",phone:"966592038351",subject:"اللغة العربية",role:"معلم ممارس"},
+  {name:"نبيل بن محسن محمد القلاف",id:"1025472604",phone:"966562962766",subject:"رياضه",role:"معلم ممارس"},
+  {name:"عبدالمجيد عبدالرحمن عبدالله السالمي",id:"1073861831",phone:"966558151033",subject:"انجليزي",role:"معلم ممارس"},
+  {name:"حسن علي حسن الشهري",id:"1037273594",phone:"966500677015",subject:"اللغة العربية",role:"معلم ممارس"},
+  {name:"جميل عبدالمجيد جواد العلي",id:"1029281589",phone:"966566712113",subject:"فيزيا",role:"معلم ممارس"},
+  {name:"حسن يوسف حسين الخليفة",id:"1056994203",phone:"966506907431",subject:"كيميا",role:"معلم ممارس"},
+  {name:"حسن عبدالله علي العبدالله",id:"1005472780",phone:"966543705512",subject:"احياء",role:"معلم ممارس"},
   {name:"عادل بن علي بن سليمان السبعان",id:"1005472780",phone:"966504836200",subject:"موجه طلابي",role:"معلم ممارس"},
-  {name:"ياسر عبدالله محمد النمر",id:"1001443397",phone:"966503834833",subject:"مدخل بيانات",role:"مساعد معلم"},
+  {name:"ياسر عبدالله محمد النمر",id:"1001443397",phone:"966543705512",subject:"مدخل بيانات",role:"مساعد معلم"},
   {name:"علي بن حسن بن علي آل قمبر",id:"1004780860",phone:"966502085389",subject:"سكرتاريه",role:"مساعد معلم"},
-  {name:"حسن بن عامر احمد الشهري",id:"1013124175",phone:"966598893731",subject:"محضر مختبر",role:"مساعد معلم"},
+  {name:"حسن بن عامربن احمد الشهري",id:"1013124175",phone:"966598893731",subject:"محضر مختبر",role:"مساعد معلم"},
   {name:"عدنان علي حسين الزريق",id:"1015776766",phone:"966505808451",subject:"وكيل",role:"معلم ممارس"},
   {name:"فهد حامد علي الزهراني",id:"1024193532",phone:"966504532489",subject:"مدير المدرسة",role:"معلم ممارس"}
 ];
@@ -810,11 +891,14 @@ teachersData.forEach(t=>teacherById[t.id]=t);
 // عناصر DOM
 const excelInput = document.getElementById('excelInput');
 const recordsTableWrapper = document.getElementById('recordsTableWrapper');
+const weeklyTableWrapper = document.getElementById('weeklyTableWrapper');
 const statusText = document.getElementById('statusText');
 const statusSpinner = document.getElementById('statusSpinner');
 const filesInfo = document.getElementById('filesInfo');
 const dateInfoLabel = document.getElementById('dateInfoLabel');
 const reportDateInput = document.getElementById('reportDate');
+const weekStartInput = document.getElementById('weekStart');
+const weekEndInput = document.getElementById('weekEnd');
 const printMainBtn = document.getElementById('printMainBtn');
 const officialDateLine = document.getElementById('officialDateLine');
 
@@ -850,7 +934,7 @@ const absentsTableBody = document.querySelector('#absentsTable tbody');
 const lateTableBody = document.querySelector('#lateTable tbody');
 const noOutTableBody = document.querySelector('#noOutTable tbody');
 
-let allLogs = [];
+let allLogs = [];    // جميع السجلات (لكل الأيام)
 let dailyRecords = [];
 
 // معلومات التاريخ الحالية
@@ -861,6 +945,7 @@ let currentHijri = '';
 // أحداث
 excelInput.addEventListener('change', handleFiles);
 reportDateInput.addEventListener('change', rebuildDaily);
+document.getElementById('buildWeekBtn').addEventListener('click', rebuildWeekly);
 printMainBtn.addEventListener('click', ()=>window.print());
 
 document.getElementById('btnAbsents').addEventListener('click', ()=>openModal('modalAbsents'));
@@ -892,7 +977,10 @@ document.querySelectorAll('[data-print-modal]').forEach(btn=>{
   const yyyy = today.getFullYear();
   const mm = String(today.getMonth()+1).padStart(2,'0');
   const dd = String(today.getDate()).padStart(2,'0');
-  reportDateInput.value = `${yyyy}-${mm}-${dd}`;
+  const iso = `${yyyy}-${mm}-${dd}`;
+  reportDateInput.value = iso;
+  weekStartInput.value = iso;
+  weekEndInput.value = iso;
   updateDateLabel();
 })();
 
@@ -1023,60 +1111,44 @@ async function handleFiles(e){
   const files = Array.from(e.target.files||[]);
   if(!files.length) return;
 
-  const selectedDate = reportDateInput.value || '';
-  if(!selectedDate){
-    alert("يرجى تحديد اليوم/التاريخ المطلوب أولًا قبل استيراد ملفات الحضور.");
-    return;
-  }
-
-  const hadUserDate = !!selectedDate;
-
   setStatus('جاري قراءة ملفات Excel وتحليلها ...',true);
   filesInfo.textContent = `${files.length} ملف/ملفات قيد التحليل ...`;
   allLogs = [];
   dailyRecords = [];
   recordsTableWrapper.innerHTML = '<div class="empty-msg">جاري التحميل ...</div>';
+  weeklyTableWrapper.innerHTML = '<div class="empty-msg">جاري التحميل ...</div>';
 
   for(const file of files){
     try{
-      await readExcelFile(file, selectedDate);
+      await readExcelFile(file);
     }catch(err){
       console.error(err);
     }
   }
 
   if(!allLogs.length){
-    setStatus('لم يتم العثور على سجلات حضور بعد قراءة الملفات. تأكد من أن صف العناوين (اسم الموظف، الرقم الوظيفي، توقيت الحضور، توقيت الانصراف، عدد الساعات) موجود في التقرير.',false);
+    setStatus('لم يتم العثور على سجلات حضور بعد قراءة الملفات. تأكد من أن تقرير حضوري يحتوي على (الرقم الوظيفي، اسم الموظف، توقيت الحضور، توقيت الانصراف، عدد الساعات).',false);
     filesInfo.textContent = 'لم يتم العثور على سجلات حضور في الملفات المستوردة.';
     recordsTableWrapper.innerHTML = '<div class="empty-msg">لم يتم العثور على سجلات حضور بعد قراءة الملفات.</div>';
+    weeklyTableWrapper.innerHTML = '<div class="empty-msg">لا يمكن بناء كشف أسبوعي لعدم وجود بيانات حضور.</div>';
     return;
   }
 
-  // استنتاج نطاق التواريخ من البيانات (ستكون كلها بتاريخ selectedDate في هذه الدفعة)
-  const dates = Array.from(new Set(allLogs.map(l=>l.date).filter(Boolean))).sort();
-  const maxDate = dates[dates.length-1];
-
-  // إن لم يحدد المستخدم تاريخًا مسبقًا (حالة احتياطية)، نستخدم أحدث تاريخ
-  if(!hadUserDate && maxDate){
-    reportDateInput.value = maxDate;
-  }
-
-  updateDateLabel();
-
   setStatus(`تم استيراد ${allLogs.length} سجل حضور من ${files.length} ملف/ملفات.`,false);
   filesInfo.textContent = `تم الاستيراد من ${files.length} ملف، وعدد السجلات الخام: ${allLogs.length}.`;
-
   rebuildDaily();
+  rebuildWeekly();
 }
 
-function readExcelFile(file, forcedDate){
+function readExcelFile(file){
   return new Promise((resolve,reject)=>{
     const reader=new FileReader();
     reader.onload = evt=>{
       try{
         const data=evt.target.result;
         const wb=XLSX.read(data,{type:'array'});
-        const fallbackDate = forcedDate || guessDateFromFileName(file.name);
+        const fallbackFileDate = guessDateFromFileName(file.name);
+        const uiDate = reportDateInput.value || '';
 
         wb.SheetNames.forEach(sheetName=>{
           const sheet=wb.Sheets[sheetName];
@@ -1091,6 +1163,7 @@ function readExcelFile(file, forcedDate){
 
           const headers = rows[headerRowIndex].map(h=>String(h||'').trim());
 
+          const nameIdx   = headers.findIndex(h=>/اسم\s*الموظف|الاسم/i.test(h));
           const idIdx     = headers.findIndex(h=>/هوية|الرقم الوظيفي|رقم الموظف|رقم المعلم|ID/i.test(h));
           const dateIdx   = headers.findIndex(h=>/تاريخ/i.test(h));
           const inIdx     = headers.findIndex(h=>/الحضور|توقيت الحضور|وقت الحضور/i.test(h));
@@ -1103,26 +1176,31 @@ function readExcelFile(file, forcedDate){
 
           for(let r=headerRowIndex+1;r<rows.length;r++){
             const row = rows[r];
+            if(!row || row.every(c=>String(c).trim()==='')) continue;
+
             const idRaw = idIdx>=0 ? row[idIdx] : '';
             const id = String(idRaw||'').replace(/[^\d]/g,'');
             if(!id) continue;
 
-            // هنا نضبط التاريخ: إن كان هناك forcedDate نستخدمه، وإلا نقرأ من الملف
+            // تاريخ السجل
             let dateStr='';
-            if(forcedDate){
-              dateStr = forcedDate;
-            }else if(dateIdx>=0){
-              dateStr = normalizeDate(row[dateIdx]);
-            }
-            if(!dateStr) dateStr = fallbackDate;
+            if(dateIdx>=0) dateStr = normalizeDate(row[dateIdx]);
+            if(!dateStr) dateStr = fallbackFileDate;
+            if(!dateStr) dateStr = uiDate; // اعتماد تاريخ الصفحة عند عدم توفر غيره
+            if(!dateStr) continue; // إن لم يتوفر أي تاريخ نهائياً نتجاوزه
 
             const attend = normalizeTime(row[inIdx]);
             const leave  = normalizeTime(row[outIdx]);
-            const hoursRaw = normalizeTime(row[hoursIdx]);
+            const hoursCell = row[hoursIdx];
 
             let workMinutes = 0;
-            if(hoursRaw){
-              workMinutes = toMinutes(hoursRaw);
+            if(hoursCell!==undefined && hoursCell!==null && String(hoursCell).trim()!==''){
+              const asTime = normalizeTime(hoursCell);
+              if(asTime){
+                workMinutes = toMinutes(asTime);
+              }else if(!isNaN(Number(hoursCell))){
+                workMinutes = Math.round(Number(hoursCell)*60);
+              }
             }else if(attend && leave){
               workMinutes = diffTimes(attend,leave);
             }
@@ -1169,16 +1247,18 @@ function readExcelFile(file, forcedDate){
               statusShort = 'دوام أقل من 7 ساعات';
             }
 
-            const teacher = teacherById[id] || {name:'غير مسجل في القائمة',subject:'',role:''};
+            const t = teacherById[id];
+            const nameFromFile = nameIdx>=0 ? String(row[nameIdx]||'').trim() : '';
+            const teacherName = t ? t.name : (nameFromFile || 'غير مسجل في القائمة');
 
             allLogs.push({
               file:file.name,
               sheet:sheetName,
               date:dateStr,
               id,
-              teacherName:teacher.name,
-              subject:teacher.subject,
-              role:teacher.role,
+              teacherName,
+              subject:t ? t.subject : '',
+              role:t ? t.role : '',
               attend,
               leave,
               workMinutes,
@@ -1218,15 +1298,18 @@ function rebuildDaily(){
   const logsById = {};
   allLogs.forEach(log=>{
     if(targetDate && log.date && log.date!==targetDate) return;
-    logsById[log.id] = log;
+    if(!logsById[log.id] || logsById[log.id].workMinutes < log.workMinutes){
+      logsById[log.id] = log;
+    }
   });
 
   dailyRecords = [];
 
+  // أولاً: جميع المعلمين من القاعدة
   teachersData.forEach(t=>{
     const log = logsById[t.id];
     if(log){
-      dailyRecords.push(log);
+      dailyRecords.push({...log});
     }else{
       dailyRecords.push({
         date:targetDate,
@@ -1248,14 +1331,24 @@ function rebuildDaily(){
     }
   });
 
-  // ترتيب الأولوية: المبكر في الأعلى، ثم البقية، ثم الغائبون في آخر الكشف
+  // ثانياً: أي سجلات في الملفات لأشخاص غير موجودين في قائمة المعلمين
+  Object.keys(logsById).forEach(id=>{
+    if(!teacherById[id]){
+      dailyRecords.push(logsById[id]);
+    }
+  });
+
+  // ترتيب: المبكر أولاً ثم المتأخر ثم الغياب في الأسفل
   dailyRecords.sort((a,b)=>{
-    const aAttend = a.attend ? toMinutes(a.attend) : 99999;
-    const bAttend = b.attend ? toMinutes(b.attend) : 99999;
     if(a.absent && !b.absent) return 1;
     if(!a.absent && b.absent) return -1;
-    if(aAttend === bAttend) return a.teacherName.localeCompare(b.teacherName,'ar');
-    return aAttend - bAttend;
+    if(a.absent && b.absent){
+      return a.teacherName.localeCompare(b.teacherName,'ar');
+    }
+    const ta = a.attend ? toMinutes(a.attend) : 24*60;
+    const tb = b.attend ? toMinutes(b.attend) : 24*60;
+    if(ta!==tb) return ta-tb;
+    return a.teacherName.localeCompare(b.teacherName,'ar');
   });
 
   renderMainTable();
@@ -1504,6 +1597,120 @@ function openLetter(rec){
   }
 
   modalLetter.classList.add('active');
+}
+
+/* بناء الكشف الأسبوعي (الأحد – الخميس) */
+function rebuildWeekly(){
+  if(!allLogs.length){
+    weeklyTableWrapper.innerHTML = '<div class="empty-msg">لا توجد بيانات كافية لبناء كشف أسبوعي.</div>';
+    return;
+  }
+  let start = weekStartInput.value;
+  let end   = weekEndInput.value;
+  if(!start || !end){
+    weeklyTableWrapper.innerHTML = '<div class="empty-msg">الرجاء تحديد تاريخ البداية والنهاية أولًا.</div>';
+    return;
+  }
+  if(start > end){
+    [start,end] = [end,start];
+  }
+
+  const startDate = new Date(start+"T00:00:00");
+  const endDate   = new Date(end+"T00:00:00");
+
+  // تجهيز قائمة الأيام (من الأحد إلى الخميس فقط)
+  const days = [];
+  const labels = [];
+  const dayNames = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+
+  for(let d = new Date(startDate); d<=endDate; d.setDate(d.getDate()+1)){
+    const jsDay = d.getDay(); // 0=الأحد في السعودية؟ في JS: 0=الأحد
+    if(jsDay>=0 && jsDay<=4){ // الأحد–الخميس
+      const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
+      const iso = `${y}-${m}-${dd}`;
+      days.push(iso);
+      labels.push(dayNames[jsDay]);
+    }
+  }
+  if(!days.length){
+    weeklyTableWrapper.innerHTML = '<div class="empty-msg">الفترة المحددة لا تتضمن أيامًا من الأحد إلى الخميس.</div>';
+    return;
+  }
+
+  // فهرسة السجلات بحسب (تاريخ + معلم)
+  const map = {};
+  allLogs.forEach(rec=>{
+    if(rec.date < start || rec.date > end) return;
+    const key = rec.date + '::' + rec.id;
+    if(!map[key] || map[key].workMinutes < rec.workMinutes){
+      map[key] = rec;
+    }
+  });
+
+  // لكل معلم: نبني صف الأسبوع
+  const rows = [];
+  teachersData.forEach(t=>{
+    const row = {teacher:t, cells:[], totalMinutes:0};
+    days.forEach(d=>{
+      const key = d + '::' + t.id;
+      const rec = map[key];
+      if(rec){
+        row.totalMinutes += rec.workMinutes;
+        row.cells.push(rec);
+      }else{
+        // لم توجد سجلات -> نعتبره غياب في ذلك اليوم
+        row.cells.push({
+          absent:true,
+          statusShort:'غياب',
+          attend:'',
+          leave:'',
+          workMinutes:0,
+          tardyMinutes:0
+        });
+      }
+    });
+    rows.push(row);
+  });
+
+  // بناء HTML
+  let headCols = '<th>اسم المعلم</th><th>رقم الهوية</th>';
+  labels.forEach(lbl=>{ headCols += `<th>${lbl}</th>`; });
+  headCols += '<th>مجموع ساعات الدوام التقريبية</th>';
+
+  let bodyHtml = '';
+  rows.forEach(row=>{
+    let tr = `<tr><td>${row.teacher.name}</td><td>${row.teacher.id}</td>`;
+    row.cells.forEach(rec=>{
+      let cls = 'week-empty';
+      let text = '';
+      if(rec.absent){
+        cls = 'week-absent';
+        text = 'غياب';
+      }else{
+        const late = rec.tardyMinutes || 0;
+        if(late<=0){
+          cls = 'week-on-time';
+        }else if(late<=15){
+          cls = 'week-late-soft';
+        }else{
+          cls = 'week-late-strong';
+        }
+        text = `${rec.attend || '--:--'} - ${rec.leave || '--:--'}`;
+      }
+      tr += `<td><div class="week-cell ${cls}">${text}</div></td>`;
+    });
+    tr += `<td>${minutesToHHMM(row.totalMinutes)}</td></tr>`;
+    bodyHtml += tr;
+  });
+
+  weeklyTableWrapper.innerHTML = `
+    <table>
+      <thead>
+        <tr>${headCols}</tr>
+      </thead>
+      <tbody>${bodyHtml}</tbody>
+    </table>
+  `;
 }
 
 // تهيئة
