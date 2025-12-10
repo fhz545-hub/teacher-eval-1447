@@ -122,7 +122,7 @@ header p{
 }
 .import-btn input[type="file"]{display:none;}
 
-/* شريط علوي: طباعة + أزرار + تاريخ */
+/* شريط علوي: الكل في صف واحد */
 .top-row{
   display:flex;
   flex-wrap:wrap;
@@ -135,7 +135,7 @@ header p{
 .date-chip{
   display:inline-flex;
   align-items:center;
-  gap:6px;
+  gap:4px;
   padding:3px 8px;
   border-radius:999px;
   background:rgba(255,255,255,.18);
@@ -508,7 +508,9 @@ footer{
   .date-chip,
   .header-controls,
   .info-bar span.system,
-  .modal-backdrop{ display:none !important; }
+  .modal-actions-top,
+  .btn-wa,
+  .btn-letter { display:none !important; }
 
   .shell{
     max-width:none;
@@ -554,20 +556,20 @@ footer{
         <button id="btnNoOut" class="filter-btn">
           عدم تسجيل الانصراف / بعد 2م <span id="noOutCount" class="count">0</span>
         </button>
-      </div>
 
-      <!-- اختيار التاريخ -->
-      <div class="date-chip">
-        <span>اليوم/التاريخ المطلوب:</span>
-        <input id="reportDate" type="date">
-      </div>
+        <!-- اختيار التاريخ -->
+        <div class="date-chip">
+          <span>اليوم/التاريخ المطلوب:</span>
+          <input id="reportDate" type="date">
+        </div>
 
-      <!-- زر الاستيراد -->
-      <label class="import-btn">
-        <span class="icon">📁</span>
-        <span>استيراد ملفات حضور Excel من حضوري</span>
-        <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" multiple>
-      </label>
+        <!-- زر الاستيراد -->
+        <label class="import-btn">
+          <span class="icon">📁</span>
+          <span>استيراد ملفات حضور Excel من حضوري</span>
+          <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" multiple>
+        </label>
+      </div>
     </div>
   </header>
 
@@ -758,11 +760,10 @@ const REQUIRED_MINUTES = 7*60;
 const teachersData = [
   {name:"موسى صلبان عبده عسيري",id:"1093013116",phone:"966507058931",subject:"فيزيا",role:"معلم ممارس"},
   {name:"مبارك عوضه سفر آل ثابت",id:"1056464405",phone:"966597233399",subject:"كيميا",role:"معلم ممارس"},
-  {name:"يوسف  عيسى العيد",id:"1012646822",phone:"966592038351",subject:"كيميا",role:"معلم ممارس"},
+  {name:"يوسف  عيسى العيد",id:"1012646822",phone:"966592038351",subject:"اللغة العربية",role:"معلم ممارس"},
   {name:"حسن بن يوسف بن حسين الخليفه",id:"1056994203",phone:"966506907431",subject:"احياء",role:"معلم ممارس"},
   {name:"منذر عامر حمود زميع",id:"1065913053",phone:"966541188974",subject:"انجليزي",role:"معلم ممارس"},
   {name:"عماد محمد جمعان الزهراني",id:"1048667289",phone:"966542203039",subject:"مكتبات",role:"معلم ممارس"},
-  {name:"حسن يوسف حسين الخليفة",id:"1056994203",phone:"966506907431",subject:"كيمياء",role:"معلم ممارس"},
   {name:"عبدالمجيد عبدالرحمن عبدالله السالمي",id:"1073861831",phone:"966558151033",subject:"كيمياء",role:"معلم ممارس"},
   {name:"حسن علي حسن الشهري",id:"1037273594",phone:"966536824355",subject:"اللغة العربية",role:"معلم ممارس"},
   {name:"حسين بن سعيد سلمان المدن",id:"1022616799",phone:"966556336875",subject:"مكتبات",role:"معلم ممارس"},
@@ -802,6 +803,7 @@ const teachersData = [
   {name:"عدنان علي حسين الزريق",id:"1015776766",phone:"966505808451",subject:"وكيل",role:"معلم ممارس"},
   {name:"فهد حامد علي الزهراني",id:"1024193532",phone:"966504532489",subject:"مدير المدرسة",role:"معلم ممارس"}
 ];
+
 const teacherById = {};
 teachersData.forEach(t=>teacherById[t.id]=t);
 
@@ -1020,10 +1022,14 @@ function guessDateFromFileName(name){
 async function handleFiles(e){
   const files = Array.from(e.target.files||[]);
   if(!files.length) return;
-  if(!reportDateInput.value){
-    alert("يرجى تحديد تاريخ التقرير أولًا.");
+
+  const selectedDate = reportDateInput.value || '';
+  if(!selectedDate){
+    alert("يرجى تحديد اليوم/التاريخ المطلوب أولًا قبل استيراد ملفات الحضور.");
     return;
   }
+
+  const hadUserDate = !!selectedDate;
 
   setStatus('جاري قراءة ملفات Excel وتحليلها ...',true);
   filesInfo.textContent = `${files.length} ملف/ملفات قيد التحليل ...`;
@@ -1033,7 +1039,7 @@ async function handleFiles(e){
 
   for(const file of files){
     try{
-      await readExcelFile(file);
+      await readExcelFile(file, selectedDate);
     }catch(err){
       console.error(err);
     }
@@ -1046,19 +1052,31 @@ async function handleFiles(e){
     return;
   }
 
+  // استنتاج نطاق التواريخ من البيانات (ستكون كلها بتاريخ selectedDate في هذه الدفعة)
+  const dates = Array.from(new Set(allLogs.map(l=>l.date).filter(Boolean))).sort();
+  const maxDate = dates[dates.length-1];
+
+  // إن لم يحدد المستخدم تاريخًا مسبقًا (حالة احتياطية)، نستخدم أحدث تاريخ
+  if(!hadUserDate && maxDate){
+    reportDateInput.value = maxDate;
+  }
+
+  updateDateLabel();
+
   setStatus(`تم استيراد ${allLogs.length} سجل حضور من ${files.length} ملف/ملفات.`,false);
   filesInfo.textContent = `تم الاستيراد من ${files.length} ملف، وعدد السجلات الخام: ${allLogs.length}.`;
+
   rebuildDaily();
 }
 
-function readExcelFile(file){
+function readExcelFile(file, forcedDate){
   return new Promise((resolve,reject)=>{
     const reader=new FileReader();
     reader.onload = evt=>{
       try{
         const data=evt.target.result;
         const wb=XLSX.read(data,{type:'array'});
-        const fallbackDate = guessDateFromFileName(file.name);
+        const fallbackDate = forcedDate || guessDateFromFileName(file.name);
 
         wb.SheetNames.forEach(sheetName=>{
           const sheet=wb.Sheets[sheetName];
@@ -1089,8 +1107,11 @@ function readExcelFile(file){
             const id = String(idRaw||'').replace(/[^\d]/g,'');
             if(!id) continue;
 
+            // هنا نضبط التاريخ: إن كان هناك forcedDate نستخدمه، وإلا نقرأ من الملف
             let dateStr='';
-            if(dateIdx>=0){
+            if(forcedDate){
+              dateStr = forcedDate;
+            }else if(dateIdx>=0){
               dateStr = normalizeDate(row[dateIdx]);
             }
             if(!dateStr) dateStr = fallbackDate;
@@ -1225,6 +1246,16 @@ function rebuildDaily(){
         statusShort:'غياب'
       });
     }
+  });
+
+  // ترتيب الأولوية: المبكر في الأعلى، ثم البقية، ثم الغائبون في آخر الكشف
+  dailyRecords.sort((a,b)=>{
+    const aAttend = a.attend ? toMinutes(a.attend) : 99999;
+    const bAttend = b.attend ? toMinutes(b.attend) : 99999;
+    if(a.absent && !b.absent) return 1;
+    if(!a.absent && b.absent) return -1;
+    if(aAttend === bAttend) return a.teacherName.localeCompare(b.teacherName,'ar');
+    return aAttend - bAttend;
   });
 
   renderMainTable();
