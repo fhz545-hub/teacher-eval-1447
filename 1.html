@@ -58,12 +58,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 
 @keyframes pulseWarn{
   0%{transform:scale(1); box-shadow:0 0 0 rgba(245,158,11,.0)}
-  50%{transform:scale(1.01); box-shadow:0 0 0 6px rgba(245,158,11,.10)}
+  50%{transform:scale(1.01); box-shadow:0 0 0 7px rgba(245,158,11,.12)}
   100%{transform:scale(1); box-shadow:0 0 0 rgba(245,158,11,.0)}
 }
 .warn{border:1px solid #f59e0b;background:#fffbeb;color:#92400e;border-radius:12px;padding:10px 10px;font-weight:900}
 .warn b{color:#7c2d12}
-.warn.strong{border-width:2px;animation:pulseWarn 1.15s ease-in-out infinite}
+.warn.strong{border-width:2px;animation:pulseWarn 1.05s ease-in-out infinite}
 .warn .cta{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px}
 .warn .cta .btn{height:auto;padding:7px 10px;border-radius:12px}
 .ok{border:1px solid #bbf7d0;background:#ecfdf5;color:#166534;border-radius:12px;padding:8px 10px;font-weight:900}
@@ -194,7 +194,6 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
         <div class="chips" id="kindChips">
           <button class="chip active" data-k="late">تأخر</button>
           <button class="chip" data-k="absent">عدم تواجد</button>
-          <button class="chip" data-k="early">انصراف</button>
           <button class="chip" data-k="gaib">مساءلة غياب</button>
           <button class="chip" data-k="note">لفت نظر</button>
         </div>
@@ -234,7 +233,6 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           <option>عدم دخول الحصة الرسمية والخروج بدون استئذان .</option>
           <option>التقصير في إدخال الدرجات في (نور) ضمن الإطار الزمني المعتمد.</option>
           <option>عدم تسجيل الانصراف في منصة حضوري.</option>
-          <option>عدم استكمال (7) ساعات عمل فعلية حسب تقرير حضوري.</option>
         </select>
       </div>
 
@@ -284,15 +282,17 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
 
       <div class="sep"></div>
+
       <div class="box" id="hadoryBox">
         <div class="pill"><span>📥</span><b>استيراد حضوري</b><span class="mini" id="hadoryStatus">جاهز</span></div>
 
         <div id="hadoryDateWarn" class="warn strong" style="display:none;margin-top:10px">
-          <b>⚠️ تنبيه شديد الأهمية قبل اعتماد أي مخالفة:</b>
-          تم رصد اختلاف/تعدد في تواريخ البيانات أو عدم تطابق التاريخ اليدوي مع تواريخ الملف.
-          <div class="mini" style="margin-top:6px;color:#7c2d12;font-weight:900">
-            راجع "تاريخ التقرير" ثم اضغط زر: (تأكيد مطابقة التاريخ) — وإلا سيتم إيقاف الطباعة/الإرسال تلقائيًا.
+          <b>🚨 تحذير إلزامي قبل اعتماد أي مخالفة:</b>
+          <div style="margin-top:6px">
+            أنت مسؤول عن اختيار <b>تاريخ التقرير يدويًا</b> والتأكد أنه يطابق يوم بيانات الملف المستورد؛
+            <b>وإلا سيتم إيقاف الطباعة/الإرسال تلقائيًا</b>.
           </div>
+          <div class="mini" style="margin-top:6px;color:#7c2d12;font-weight:900" id="warnReason">—</div>
           <div class="cta">
             <span class="pill"><b>الحماية:</b> مفعّلة</span>
             <button id="btnConfirmDateInline" class="btn primary">تأكيد مطابقة التاريخ ✅</button>
@@ -306,20 +306,23 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
         <div class="f" style="margin-top:10px">
           <label>ملفات Excel من منصة حضوري</label>
           <input id="hadoryFiles" class="inp" type="file" accept=".xlsx,.xls,.csv" multiple>
-          <div class="mini">يمكن استيراد ملف/ملفات لأي يوم (حتى لو كان الاستيراد اليوم مختلفًا عن تاريخ البيانات).</div>
+          <div class="mini">يمكن استيراد ملف/ملفات لأي يوم — <b>والتاريخ لا يُحدد تلقائيًا</b> (المستخدم يحدده يدويًا).</div>
         </div>
 
         <div class="f">
-          <label>تاريخ التقرير (اختيار يدوي)</label>
+          <label>تاريخ التقرير (اختيار يدوي إلزامي)</label>
           <div class="row">
             <input id="hadoryManualDate" class="inp" type="date" style="flex:1">
             <button id="btnUseManualDate" class="btn ghost smallbtn">تطبيق</button>
           </div>
-          <div class="mini">بداية التحضير تُحسب من 06:30، والتأخر يُحتسب بعد بداية الدوام الرسمي (مثال الشتوي 07:00).</div>
+          <div class="mini">
+            بداية التحضير المسموح بها: <b>06:30–07:00</b>، وما بعد <b>بداية الدوام الرسمي</b> يُعد تأخرًا.
+            كما يتم رصد: <b>الغياب</b> و<b>عدم تسجيل الانصراف</b> وفق بيانات منصة حضوري.
+          </div>
         </div>
 
         <div class="f">
-          <label>التواريخ المتاحة من الملفات</label>
+          <label>التواريخ التي ظهرت داخل الملفات (للمراجعة فقط)</label>
           <select id="hadoryDates" class="sel">
             <option value="">— لم يتم الاستيراد بعد —</option>
           </select>
@@ -336,7 +339,9 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           <select id="hadoryCases" class="sel">
             <option value="">— اختر من القائمة —</option>
           </select>
-          <div class="mini">قد يظهر للمعلم أكثر من بند (تأخر + عدم تسجيل انصراف + عدم استكمال 7 ساعات) حسب تقرير حضوري.</div>
+          <div class="mini">
+            قد يظهر المعلم <b>أكثر من مرة</b> في القائمة لنفس اليوم (تأخر + عدم تسجيل انصراف).
+          </div>
         </div>
 
         <div class="list" style="margin-top:10px">
@@ -413,14 +418,6 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
                   عدم تواجدكم أثناء العمل من الساعة : ( <span id="tAbsFrom" class="timebox empty" contenteditable="true" data-mask>--:--</span> )
                   إلى الساعة : ( <span id="tAbsTo" class="timebox empty" contenteditable="true" data-mask>--:--</span> ).
                   <span class="calc">— مدة عدم التواجد: <span id="absTotal">0 دقيقة</span> (<span id="absHH">00:00</span> س)</span>
-                </span>
-              </label>
-
-              <label id="lineEarly" class="checkline" style="display:none">
-                <input type="checkbox" checked>
-                <span class="text">
-                  انصرافكم مبكرًا قبل نهاية العمل من الساعة : ( <span id="tEarlyFrom" class="timebox empty" contenteditable="true" data-mask>--:--</span> ).
-                  <span class="calc">— مدة الانصراف المبكر: <span id="earlyTotal">0 دقيقة</span> (<span id="earlyHH">00:00</span> س)</span>
                 </span>
               </label>
             </div>
@@ -576,15 +573,15 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
     </div>
     <div class="b">
       <div class="guard-note">
-        <div>تم تفعيل <span class="k">حماية التاريخ</span> لأن هناك اختلاف/تعدد في تواريخ بيانات حضوري.</div>
-        <div style="margin-top:6px">التاريخ المختار الآن: <span class="k" id="guardDate">—</span></div>
+        <div>تم تفعيل <span class="k">حماية التاريخ</span> — لا يمكن الطباعة/الإرسال قبل التأكيد.</div>
+        <div style="margin-top:6px">التاريخ اليدوي الحالي: <span class="k" id="guardDate">—</span></div>
         <div style="margin-top:6px" class="mini" id="guardWhy" style="color:#7c2d12">—</div>
       </div>
 
       <div class="guard-check">
         <input type="checkbox" id="chkAck">
         <div>
-          أقرّ أن <span style="color:#7c2d12">تاريخ التقرير المختار</span> هو نفس تاريخ بيانات الملفات المستوردة، وأتحمل مسؤولية اعتماد الإجراء.
+          أقرّ أن <span style="color:#7c2d12">تاريخ التقرير الذي أدخلته يدويًا</span> يطابق يوم بيانات الملف المستورد من حضوري، وأتحمل مسؤولية اعتماد الإجراء.
         </div>
       </div>
 
@@ -597,10 +594,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 </div>
 
 <script>
+/* ============= أدوات أرقام ============= */
 const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
 const en2ar=s=>(''+s).replace(/[0-9]/g,d=>AR[d]);
 const ar2en=s=>(''+s).replace(/[٠-٩]/g,d=>EN[AR.indexOf(d)]);
 
+/* ============= بيانات المعلمين ============= */
 const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058931	فيزيا	معلم ممارس
 مبارك عوضه سفر آل ثابت	1056464405	966597233399	كيميا	معلم ممارس
 يوسف  عيسى العيد	1012646822	966592038351	اللغة العربية	معلم ممارس
@@ -663,22 +662,26 @@ function fillTeachers(){
 }
 fillTeachers();
 
+/* ============= حالة عامة ============= */
 let STATE={kind:'late',excuse:'without',accept:'rejected',faris:''};
 
-let DATE_GUARD_ACTIVE=false;
+/* ============= حماية التاريخ ============= */
+let DATE_GUARD_ACTIVE=true;
 let DATE_GUARD_CONFIRMED=false;
-let DATE_GUARD_REASON='';
+let DATE_GUARD_REASON='لم يتم تأكيد تاريخ التقرير يدويًا بعد.';
+const warnReason=document.getElementById('warnReason');
 
 const dateGuardDlg=document.getElementById('dateGuardDlg');
 const guardDate=document.getElementById('guardDate');
 const guardWhy=document.getElementById('guardWhy');
 const chkAck=document.getElementById('chkAck');
 
-function openDateGuard(iso, reason){
+function openDateGuard(reason){
   DATE_GUARD_ACTIVE=true;
   DATE_GUARD_CONFIRMED=false;
-  DATE_GUARD_REASON=reason||'اختلاف تاريخ البيانات أو تعدد تواريخ داخل الملفات.';
+  DATE_GUARD_REASON=reason||DATE_GUARD_REASON||'';
   chkAck.checked=false;
+  const iso=document.getElementById('hadoryManualDate').value||'';
   guardDate.textContent=iso||'—';
   guardWhy.textContent=DATE_GUARD_REASON;
   dateGuardDlg.style.display='flex';
@@ -702,6 +705,7 @@ document.getElementById('btnGuardConfirm').onclick=()=>{
     return;
   }
   DATE_GUARD_CONFIRMED=true;
+  DATE_GUARD_ACTIVE=false;
   closeDateGuard();
   showDateOk(true);
 };
@@ -709,49 +713,52 @@ document.getElementById('btnGuardConfirm').onclick=()=>{
 function requireDateGuard(actionName){
   if(!DATE_GUARD_ACTIVE) return true;
   if(DATE_GUARD_CONFIRMED) return true;
-  const iso=document.getElementById('hadoryDates').value || document.getElementById('hadoryManualDate').value || '';
-  openDateGuard(iso, DATE_GUARD_REASON || ('حماية التاريخ مفعّلة قبل: '+actionName));
+  openDateGuard(DATE_GUARD_REASON || ('حماية التاريخ مفعّلة قبل: '+actionName));
   return false;
 }
 
-const KEY_ARCH='followup_archive_v10';
+/* ============= أرشيف محلي ============= */
+const KEY_ARCH='followup_archive_v11';
 let ARCH=JSON.parse(localStorage.getItem(KEY_ARCH)||'[]');
 function saveARCH(){ localStorage.setItem(KEY_ARCH, JSON.stringify(ARCH)); }
 function clearARCH(){ ARCH=[]; saveARCH(); }
 function nextSerialFor(civil){ const n=ARCH.filter(e=>e.civil===civil).length+1; return en2ar(String(n).padStart(2,'0')); }
 
+/* ============= مراجع عناصر ============= */
 const alertPack=document.getElementById('alertPack');
 const absencePack=document.getElementById('absencePack');
 const notePack=document.getElementById('notePack');
 const lineLate=document.getElementById('lineLate');
 const lineAbs=document.getElementById('lineAbs');
-const lineEarly=document.getElementById('lineEarly');
 const kindTitle=document.getElementById('kindTitle');
 const statsDlg=document.getElementById('statsDlg');
 
 const WORK_RANGE={ winter:{start:'07:00',end:'14:00'}, summer:{start:'06:45',end:'13:45'} };
 let SEASON='winter';
+
 document.getElementById('seasonChips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
   [...e.currentTarget.children].forEach(x=>x.classList.remove('active')); b.classList.add('active');
   SEASON=b.dataset.season;
   recalc();
-  applyHadoryDate(document.getElementById('hadoryDates').value||'');
 });
 
+/* ============= إعداد الباكيت ============= */
 function setPack(kind){
   STATE.kind=kind;
-  document.getElementById('mainTitle').textContent=({late:'تنبيه',absent:'تنبيه',early:'تنبيه',gaib:'مساءلة غياب',note:'لفت نظر'})[kind];
+
+  document.getElementById('mainTitle').textContent=({late:'تنبيه',absent:'تنبيه',gaib:'مساءلة غياب',note:'لفت نظر'})[kind];
   alertPack.style.display=(kind==='gaib'||kind==='note')?'none':'';
   document.getElementById('affidavitPack').style.display=(kind==='gaib'||kind==='note')?'none':'';
   document.getElementById('principalPack').style.display=(kind==='gaib'||kind==='note')?'none':'';
   absencePack.style.display=(kind==='gaib')?'':'none';
   notePack.style.display=(kind==='note')?'':'none';
+
   lineLate.style.display=(kind==='late')?'':'none';
   lineAbs.style.display=(kind==='absent')?'':'none';
-  lineEarly.style.display=(kind==='early')?'':'none';
-  kindTitle.textContent=({late:'تأخر',absent:'عدم تواجد',early:'انصراف قبل إنهاء الدوام الرسمي'})[kind]||'—';
-  document.getElementById('affKind').textContent=({late:'التأخر',absent:'عدم التواجد',early:'الانصراف قبل إنهاء الدوام الرسمي'})[kind]||'المخالفة';
+
+  kindTitle.textContent=({late:'تأخر',absent:'عدم تواجد'})[kind]||'—';
+  document.getElementById('affKind').textContent=({late:'التأخر',absent:'عدم التواجد'})[kind]||'المخالفة';
 
   const frWrap=document.getElementById('frGroup').parentElement;
   if(kind==='gaib'){ frWrap.classList.remove('disabled'); if(!STATE.faris) STATE.faris='not'; }
@@ -762,9 +769,11 @@ function setPack(kind){
 document.getElementById('kindChips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
   [...e.currentTarget.children].forEach(x=>x.classList.remove('active')); b.classList.add('active');
-  setPack(b.dataset.k); recalc();
+  setPack(b.dataset.k);
+  recalc();
 });
 
+/* ============= العذر/القبول/فارس ============= */
 const unifiedPanel=document.getElementById('unifiedPanel'), unifiedText=document.getElementById('unifiedText');
 document.getElementById('btnUnified').onclick=()=> unifiedPanel.style.display=unifiedPanel.style.display?'':'block';
 unifiedPanel.addEventListener('click',e=>{
@@ -780,6 +789,7 @@ function updUnifiedText(){
   unifiedText.textContent=excTxt+frTxt;
 }
 
+/* ============= التاريخ هجري/ميلادي ============= */
 let CAL_MODE='h';
 const pickHijri=document.getElementById('pickHijri'), pickGreg=document.getElementById('pickGreg');
 document.getElementById('btnCalToggle').onclick=()=>{
@@ -789,6 +799,7 @@ document.getElementById('btnCalToggle').onclick=()=>{
   pickGreg.style.display=CAL_MODE==='g'?'flex':'none';
   if(CAL_MODE==='h') syncFromHijri(); else syncFromGregInputs();
 };
+
 function hijriToGregorian(y,m,d){
   let lo=new Date(1937,0,1), hi=new Date(2077,11,31);
   const fmt=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'numeric',day:'numeric'});
@@ -821,9 +832,11 @@ function syncFromHijri(){
   const g=hijriToGregorian(y,m,d);
   const dayName=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{weekday:'long'}).format(g);
   const hij=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).format(g);
+
   metaDay.textContent=dayName; metaHijri.textContent=hij;
   dynDay.textContent=dayName; dynHijri.textContent=hij;
   noteDay.textContent=dayName; noteHijri.textContent=hij;
+
   document.getElementById('affTeacher').textContent=document.getElementById('t_name').textContent||'—';
   document.getElementById('absDayP').textContent=dayName;
   document.getElementById('absDateYMD').textContent=hij;
@@ -837,9 +850,11 @@ function syncFromGregInputs(){
   const g=new Date(y,m-1,d);
   const dayName=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{weekday:'long'}).format(g);
   const hij=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).format(g);
+
   metaDay.textContent=dayName; metaHijri.textContent=hij;
   dynDay.textContent=dayName; dynHijri.textContent=hij;
   noteDay.textContent=dayName; noteHijri.textContent=hij;
+
   document.getElementById('affTeacher').textContent=document.getElementById('t_name').textContent||'—';
   document.getElementById('absDayP').textContent=dayName;
   document.getElementById('absDateYMD').textContent=hij;
@@ -848,6 +863,7 @@ function syncFromGregInputs(){
   updatePrincipalAbs();
 }
 
+/* ============= وقت ============= */
 function toMin(hhmm){
   const m=/^(\d{1,2}):(\d{2})$/.exec(ar2en(hhmm||'')); if(!m) return null;
   const h=+m[1], mi=+m[2]; if(h>23||mi>59) return null;
@@ -856,15 +872,6 @@ function toMin(hhmm){
 function fmtHM(mins){
   const h=Math.floor(mins/60), m=mins%60;
   return en2ar(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'));
-}
-
-function earliestAllowedStartMin(){ return 6*60+30; } // 06:30
-function requiredEndAfter7Hours(attendHM){
-  const a=toMin(attendHM);
-  const e=earliestAllowedStartMin();
-  if(a==null || e==null) return null;
-  const effectiveStart = Math.max(a, e);
-  return effectiveStart + 7*60;
 }
 
 function attachTimeMask(el){
@@ -879,8 +886,9 @@ function attachTimeMask(el){
   el.addEventListener('click',()=>openClock(el));
 }
 function placeCaretAtEnd(el){ const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
-['tLateIn','tAbsFrom','tAbsTo','tEarlyFrom'].forEach(id=>attachTimeMask(document.getElementById(id)));
+['tLateIn','tAbsFrom','tAbsTo'].forEach(id=>attachTimeMask(document.getElementById(id)));
 
+/* ساعة اختيار */
 let CLOCK_TARGET=null;
 const clockDlg=document.getElementById('clockDlg');
 const clockHour=document.getElementById('clockHour');
@@ -903,20 +911,36 @@ document.getElementById('btnClockOk').onclick=()=>{ if(!CLOCK_TARGET) return; co
 document.getElementById('btnClockClose').onclick=hideClock;
 clockDlg.addEventListener('click',(e)=>{ if(e.target===clockDlg) hideClock(); });
 
+/* حسابات */
 function recalc(){
-  const wsM=toMin(WORK_RANGE[SEASON].start), weM=toMin(WORK_RANGE[SEASON].end);
+  const wsM=toMin(WORK_RANGE[SEASON].start);
   const tLateM=toMin(document.getElementById('tLateIn').textContent.trim());
-  if(tLateM!=null&&wsM!=null&&tLateM>wsM){ const mins=tLateM-wsM; lateTotal.textContent=en2ar(mins)+' دقيقة'; lateHH.textContent=fmtHM(mins); } else { lateTotal.textContent='0 دقيقة'; lateHH.textContent='00:00'; }
+  if(tLateM!=null&&wsM!=null&&tLateM>wsM){
+    const mins=tLateM-wsM;
+    lateTotal.textContent=en2ar(mins)+' دقيقة';
+    lateHH.textContent=fmtHM(mins);
+  } else {
+    lateTotal.textContent='0 دقيقة';
+    lateHH.textContent='00:00';
+  }
+
   const aFM=toMin(document.getElementById('tAbsFrom').textContent.trim()), aTM=toMin(document.getElementById('tAbsTo').textContent.trim());
-  if(aFM!=null&&aTM!=null&&aTM>aFM){ const mins=aTM-aFM; absTotal.textContent=en2ar(mins)+' دقيقة'; absHH.textContent=fmtHM(mins);} else { absTotal.textContent='0 دقيقة'; absHH.textContent='00:00'; }
-  const eFM=toMin(document.getElementById('tEarlyFrom').textContent.trim());
-  if(eFM!=null&&weM!=null&&weM>eFM){ const mins=weM-eFM; earlyTotal.textContent=en2ar(mins)+' دقيقة'; earlyHH.textContent=fmtHM(mins);} else { earlyTotal.textContent='0 دقيقة'; earlyHH.textContent='00:00'; }
+  if(aFM!=null&&aTM!=null&&aTM>aFM){
+    const mins=aTM-aFM;
+    absTotal.textContent=en2ar(mins)+' دقيقة';
+    absHH.textContent=fmtHM(mins);
+  } else {
+    absTotal.textContent='0 دقيقة';
+    absHH.textContent='00:00';
+  }
 }
 
+/* سبب لفت النظر */
 document.getElementById('noteReason').addEventListener('change', e=>{
   document.getElementById('noteReasonText').textContent=e.target.value||'المهمة المحددة';
 });
 
+/* اختيار معلم */
 selTeacher.addEventListener('change',e=>{
   const i=+e.target.value; const t=Number.isInteger(i)?TEACHERS[i]:null; if(!t) return;
   t_name.textContent=t.name||'—'; t_spec.textContent=t.spec||'—'; t_level.textContent=t.level||'—';
@@ -927,6 +951,7 @@ selTeacher.addEventListener('change',e=>{
   updatePrincipalAbs();
 });
 
+/* تضمين صور للطباعة */
 async function embedImageToDataURL(imgEl){
   try{
     const src=imgEl.getAttribute('src')||''; if(!src) return;
@@ -941,12 +966,21 @@ async function ensureAllImagesEmbedded(root){
   for(const im of imgs){ if(!im.src.startsWith('data:')) await embedImageToDataURL(im); }
 }
 
+/* طباعة/حفظ PDF */
 document.getElementById('btnPrintSave').addEventListener('click', async function(){
   if(!requireDateGuard('الطباعة/الحفظ')) return;
 
   const i=+selTeacher.value; if(!Number.isInteger(i)) { alert('اختر معلماً أولاً'); return; }
   const t=TEACHERS[i];
-  ARCH.push({ ts:Date.now(), civil:t.civil, name:t.name, kind:STATE.kind, excuse:STATE.excuse, accept:STATE.accept, faris:(STATE.kind==='gaib'?(STATE.faris||'not'):''), hijri:metaHijri.textContent, day:metaDay.textContent });
+
+  ARCH.push({
+    ts:Date.now(),
+    civil:t.civil, name:t.name,
+    kind:STATE.kind,
+    excuse:STATE.excuse, accept:STATE.accept,
+    faris:(STATE.kind==='gaib'?(STATE.faris||'not'):''),
+    hijri:metaHijri.textContent, day:metaDay.textContent
+  });
   saveARCH();
 
   const { jsPDF }=window.jspdf;
@@ -964,6 +998,7 @@ document.getElementById('btnPrintSave').addEventListener('click', async function
   finally{ btn.disabled=false; btn.textContent=old; }
 });
 
+/* الإحصائيات */
 document.getElementById('btnStats').onclick=openStats;
 document.getElementById('btnCloseStats').onclick=()=>{ statsDlg.style.display='none'; statsDlg.setAttribute('aria-hidden','true'); };
 document.getElementById('btnResetStats').onclick=()=>{ if(confirm('تأكيد: هل تريد تصفير الأرشيف؟')){ clearARCH(); openStats(); } };
@@ -979,7 +1014,6 @@ document.getElementById('btnStatsPDF').onclick=async()=>{
 function shortDetails(r){
   if(r.kind==='late'){ return `تنبيه تأخر`; }
   if(r.kind==='absent'){ return `تنبيه عدم تواجد`; }
-  if(r.kind==='early'){ return `انصراف قبل إنهاء الدوام الرسمي`; }
   if(r.kind==='gaib'){ return `غياب`; }
   if(r.kind==='note'){ const rs=document.getElementById('noteReasonText')?.textContent||'—'; return `لفت نظر — ${rs}`; }
   return '—';
@@ -994,7 +1028,7 @@ function openStats(){
       const tr=document.createElement('tr');
       if(idx===0){ const td=document.createElement('td'); td.rowSpan=rows.length; td.style.fontWeight='900'; td.textContent=name; tr.appendChild(td); }
       tr.innerHTML += `
-        <td>${({late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',early:'تنبيه انصراف قبل إنهاء الدوام الرسمي',gaib:'مساءلة غياب',note:'لفت نظر'})[r.kind]}</td>
+        <td>${({late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',gaib:'مساءلة غياب',note:'لفت نظر'})[r.kind]}</td>
         <td>${r.day}</td>
         <td>${r.hijri}</td>
         <td>${r.excuse==='with'?'بعذر':'بدون عذر'}</td>
@@ -1018,6 +1052,7 @@ document.getElementById('tblStats').addEventListener('click',(e)=>{
   }
 });
 
+/* توقيع الغياب */
 const PRINCIPAL_NAME='فهد حامد علي الزهراني';
 function updatePrincipalAbs(){
   const nameEl=document.getElementById('principalNameAbs');
@@ -1030,7 +1065,7 @@ function updatePrincipalAbs(){
 }
 
 /* =========================
-   حضوري
+   حضوري (متاخر/غياب/عدم تسجيل انصراف فقط)
    ========================= */
 const hadoryFiles = document.getElementById('hadoryFiles');
 const hadoryManualDate = document.getElementById('hadoryManualDate');
@@ -1046,28 +1081,23 @@ const hadoryDateWarn = document.getElementById('hadoryDateWarn');
 const hadoryDateOk = document.getElementById('hadoryDateOk');
 
 document.getElementById('btnConfirmDateInline').onclick=()=>{
-  if(!DATE_GUARD_ACTIVE){
-    showDateOk(true);
-    DATE_GUARD_CONFIRMED=true;
-    return;
-  }
-  const iso=hadoryDates.value||hadoryManualDate.value||'';
-  openDateGuard(iso, DATE_GUARD_REASON||'');
+  openDateGuard(DATE_GUARD_REASON || 'يرجى التأكد من تاريخ التقرير يدويًا ثم الإقرار بالمطابقة.');
 };
 
 let HADORY_LOGS=[];
 let HADORY_DAILY=[];
 let HADORY_CASES=[];
-let HADORY_IMPORT_INFO={ datesFromCells:new Set(), datesFromNames:new Set(), usedFallbackDates:new Set(), sheetsRead:0, rowsRead:0, rowsAccepted:0 };
+let HADORY_IMPORT_DATES=[];
 
 function setHadoryStatus(txt){ hadoryStatus.textContent = txt; }
 function showDateWarn(on, reason){
   hadoryDateWarn.style.display=on?'block':'none';
+  warnReason.textContent=reason||'—';
   if(on){
     hadoryDateOk.style.display='none';
     DATE_GUARD_ACTIVE=true;
     DATE_GUARD_CONFIRMED=false;
-    DATE_GUARD_REASON=reason||'اختلاف/تعدد تواريخ داخل الملفات أو عدم تطابق التاريخ اليدوي.';
+    DATE_GUARD_REASON=reason||'يلزم التأكد من تاريخ التقرير.';
   }
 }
 function showDateOk(on){
@@ -1169,25 +1199,10 @@ function bestHeaderRow(rows){
     const inIdx=findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
     const outIdx=findIdxByAny(headers,[/الانصراف/,/وقت الانصراف/,/توقيت الانصراف/,/وقت الخروج/,/توقيت الخروج/]);
     const nameIdx=findIdxByAny(headers,[/اسم الموظف/,/اسم المعلم/,/الاسم/]);
-    const lateIdx=findIdxByAny(headers,[/متأخر/,/تأخر/,/late/,/delay/,/مدة التأخر/]);
-    const score=(idIdx>-1?5:0)+(inIdx>-1?3:0)+(outIdx>-1?2:0)+(nameIdx>-1?2:0)+(lateIdx>-1?2:0);
+    const score=(idIdx>-1?5:0)+(inIdx>-1?3:0)+(outIdx>-1?2:0)+(nameIdx>-1?2:0);
     if(score>best.score){ best={i,score,headers}; }
   }
   return best.i>-1?best.i:0;
-}
-function parseDelayMinutes(raw){
-  if(raw===undefined||raw===null) return null;
-  const s=String(raw).trim();
-  if(!s) return null;
-  const num = s.replace(/[^\d.]/g,'');
-  const n=Number(num);
-  if(Number.isFinite(n) && n>0 && n<1000 && /دقيقة|دق|min|minute|تاخر|تأخر|late|delay/i.test(s)) return Math.round(n);
-  const t=normalizeTime(s);
-  if(t){
-    const m=toMin(t);
-    if(m!=null && m<10*60) return m;
-  }
-  return null;
 }
 
 hadoryFiles.addEventListener('change', async (e)=>{
@@ -1195,24 +1210,26 @@ hadoryFiles.addEventListener('change', async (e)=>{
   if(!files.length) return;
 
   setHadoryStatus('جاري القراءة...');
-  showDateWarn(false); showDateOk(false);
-  HADORY_LOGS=[];
-  HADORY_IMPORT_INFO={ datesFromCells:new Set(), datesFromNames:new Set(), usedFallbackDates:new Set(), sheetsRead:0, rowsRead:0, rowsAccepted:0 };
+  HADORY_LOGS=[]; HADORY_DAILY=[]; HADORY_CASES=[]; HADORY_IMPORT_DATES=[];
+  renderHadoryEmpty();
 
-  const manual = hadoryManualDate.value || '';
+  showDateWarn(true,'بعد الاستيراد: أدخل تاريخ التقرير يدويًا ثم اضغط (تطبيق) ثم أكد المطابقة.');
+  setHadoryStatus('تم تفعيل حماية التاريخ — أدخل التاريخ يدويًا ثم طبّق.');
+
+  const datesFromCells=new Set();
+  const datesFromNames=new Set();
+
   for(const f of files){
     try{
       const ab=await f.arrayBuffer();
       const wb=XLSX.read(ab,{type:'array'});
-      const fallback = guessDateFromFileName(f.name) || manual || '';
-      if(fallback) HADORY_IMPORT_INFO.datesFromNames.add(fallback);
+      const fnDate=guessDateFromFileName(f.name);
+      if(fnDate) datesFromNames.add(fnDate);
 
       wb.SheetNames.forEach(sn=>{
         const sh=wb.Sheets[sn];
         const rows=XLSX.utils.sheet_to_json(sh,{header:1,defval:''});
         if(!rows.length) return;
-
-        HADORY_IMPORT_INFO.sheetsRead++;
 
         const headerRowIndex = bestHeaderRow(rows);
         const headers=(rows[headerRowIndex]||[]).map(h=>String(h||'').trim());
@@ -1224,11 +1241,7 @@ hadoryFiles.addEventListener('change', async (e)=>{
         const inIdx=findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
         const outIdx=findIdxByAny(headers,[/الانصراف/,/وقت الانصراف/,/توقيت الانصراف/,/وقت الخروج/,/توقيت الخروج/]);
 
-        const hoursIdx=findIdxByAny(headers,[/عدد الساعات/,/ساعات الدوام/,/ساعات الدوام الفعلي/,/work hours/,/hours/]);
         const outTypeIdx=findIdxByAny(headers,[/نوع الانصراف/,/طريقة الانصراف/,/حالة الانصراف/,/ملاحظة/,/ملاحظات/,/note/]);
-
-        const delayIdx=findIdxByAny(headers,[/مدة التأخر/,/وقت التأخر/,/التأخر/,/متأخر/,/late/,/delay/]);
-        const statusIdx=findIdxByAny(headers,[/الحالة/,/نوع الحركة/,/نوع الحالة/,/status/,/event/]);
 
         if(idIdx<0) return;
 
@@ -1236,32 +1249,18 @@ hadoryFiles.addEventListener('change', async (e)=>{
           const row=rows[r];
           if(!row || row.every(c=>String(c).trim()==='')) continue;
 
-          HADORY_IMPORT_INFO.rowsRead++;
-
           const civil = String(row[idIdx]||'').replace(/[^\d]/g,'');
           if(!civil) continue;
 
           let dateStr='';
           if(dateIdx>=0) dateStr=normalizeDate(row[dateIdx]);
-          if(dateStr) HADORY_IMPORT_INFO.datesFromCells.add(dateStr);
-
-          if(!dateStr) dateStr=fallback;
-          if(!dateStr) continue;
-          if(dateIdx<0) HADORY_IMPORT_INFO.usedFallbackDates.add(dateStr);
+          if(dateStr) datesFromCells.add(dateStr);
 
           let attend= (inIdx>=0) ? normalizeTime(row[inIdx]) : '';
           let leave = (outIdx>=0) ? normalizeTime(row[outIdx]) : '';
 
           let workMinutes=0;
-          if(hoursIdx>=0){
-            const hoursCell=row[hoursIdx];
-            if(hoursCell!==undefined && hoursCell!==null && String(hoursCell).trim()!==''){
-              const asTime=normalizeTime(hoursCell);
-              if(asTime) workMinutes = toMin(asTime) ?? 0;
-              else if(!isNaN(Number(hoursCell))) workMinutes = Math.round(Number(hoursCell)*60);
-            }
-          }
-          if(!workMinutes && attend && leave) workMinutes = diffMin(attend,leave);
+          if(attend && leave) workMinutes = diffMin(attend,leave);
 
           const outTypeRaw = (outTypeIdx>=0)? String(row[outTypeIdx]||'').trim() : '';
           const autoOut = isAutoOutText(outTypeRaw);
@@ -1270,92 +1269,41 @@ hadoryFiles.addEventListener('change', async (e)=>{
           const t=TEACHER_BY_CIVIL[civil] || null;
           const name = (t?.name) || nameFromFile || 'غير مسجل في القائمة';
 
-          let delayMin=null;
-          if(delayIdx>=0) delayMin=parseDelayMinutes(row[delayIdx]);
-          if(delayMin==null && statusIdx>=0){
-            const s=String(row[statusIdx]||'').trim();
-            if(/متأخر|تأخر|late/i.test(s)){
-              delayMin=parseDelayMinutes(s) || delayMin || 1;
-            }
-          }
-          if(!attend && delayMin!=null){
-            const wsM=toMin(WORK_RANGE[SEASON].start);
-            if(wsM!=null){
-              const approx=wsM + Math.max(1,delayMin);
-              attend = `${String(Math.floor(approx/60)).padStart(2,'0')}:${String(approx%60).padStart(2,'0')}`;
-            }
-          }
-
-          HADORY_LOGS.push({ date:dateStr, civil, name, attend, leave, workMinutes, outType: outTypeRaw, autoOut, _srcFile:f.name, _sheet:sn });
-          HADORY_IMPORT_INFO.rowsAccepted++;
+          HADORY_LOGS.push({
+            date: dateStr, civil, name,
+            attend, leave, workMinutes, outType: outTypeRaw, autoOut,
+            _srcFile:f.name, _sheet:sn
+          });
         }
       });
     }catch(err){ console.error(err); }
   }
 
-  if(!HADORY_LOGS.length){
-    setHadoryStatus('لا توجد سجلات');
-    hadoryDates.innerHTML = `<option value="">— لم يتم العثور على بيانات —</option>`;
-    renderHadoryEmpty();
-    showDateWarn(false);
-    return;
-  }
+  const allDates=[...new Set([...datesFromCells, ...datesFromNames].filter(Boolean))].sort();
+  HADORY_IMPORT_DATES=allDates;
 
-  const dates=[...new Set(HADORY_LOGS.map(x=>x.date).filter(Boolean))].sort();
-  hadoryDates.innerHTML = `<option value="">— اختر التاريخ —</option>` + dates.map(d=>`<option value="${d}">${d}</option>`).join('');
-  setHadoryStatus(`تم الاستيراد (${HADORY_IMPORT_INFO.rowsAccepted} سجل) — ✅ تم تفعيل كشف المخالفات المتعددة`);
+  hadoryDates.innerHTML = `<option value="">— (للمراجعة) —</option>` + allDates.map(d=>`<option value="${d}">${d}</option>`).join('');
+  setHadoryStatus(`تم الاستيراد (${HADORY_LOGS.length} سجل) — أدخل التاريخ يدويًا ثم طبّق`);
 
-  const manualISO = hadoryManualDate.value || '';
-  const multiDates = dates.length>1;
-  const manualMismatch = (manualISO && dates.length && !dates.includes(manualISO));
-
-  if(multiDates || manualMismatch){
-    const reason = multiDates
-      ? 'تم العثور على أكثر من تاريخ داخل الملفات. يلزم تأكيد التاريخ قبل اعتماد أي مخالفة.'
-      : 'التاريخ اليدوي لا يطابق تواريخ البيانات داخل الملفات. يلزم التأكد قبل اعتماد المخالفات.';
-    showDateWarn(true, reason);
-  }else{
-    showDateOk(true);
-  }
-
-  const pick = (manualISO && dates.includes(manualISO)) ? manualISO : dates[dates.length-1];
-  hadoryDates.value = pick;
-  hadoryManualDate.value = pick;
-  setGregFromISO(pick);
-  applyHadoryDate(pick);
+  showDateWarn(true, allDates.length
+    ? `تواريخ ظهرت في الملف: ${allDates.join(' ، ')} — أدخل تاريخ التقرير الصحيح يدويًا ثم أكد المطابقة.`
+    : 'لم يظهر تاريخ واضح داخل الملف/الاسم — أدخل تاريخ التقرير الصحيح يدويًا ثم أكد المطابقة.'
+  );
 });
 
 btnUseManualDate.addEventListener('click', ()=>{
   const iso=hadoryManualDate.value||'';
-  if(!iso){ alert('حدد التاريخ أولاً'); return; }
+  if(!iso){ alert('حدد التاريخ يدويًا أولاً'); return; }
+
   setGregFromISO(iso);
 
-  const hasOpt=!!hadoryDates.querySelector(`option[value="${iso}"]`);
-  if(!hasOpt){
-    showDateWarn(true,'التاريخ اليدوي لا يطابق تواريخ البيانات داخل الملفات. راجع التاريخ قبل أي اعتماد.');
-    setHadoryStatus('حماية التاريخ مفعّلة: راجع تاريخ التقرير ثم أكد المطابقة.');
+  if(HADORY_IMPORT_DATES.length && !HADORY_IMPORT_DATES.includes(iso)){
+    showDateWarn(true,'🚨 التاريخ اليدوي لا يطابق أي تاريخ ظهر داخل الملفات — راجع التاريخ قبل اعتماد أي مخالفة.');
   }else{
-    hadoryDates.value=iso;
-    applyHadoryDate(iso);
-    const allDates=[...new Set(HADORY_LOGS.map(x=>x.date).filter(Boolean))];
-    if(allDates.length>1) showDateWarn(true,'تم العثور على أكثر من تاريخ داخل الملفات. اختر التاريخ الصحيح ثم أكد المطابقة.');
-    else showDateOk(true);
+    showDateWarn(true,'تم تطبيق التاريخ يدويًا — الآن اضغط (تأكيد مطابقة التاريخ) لإلغاء الحماية ثم تابع.');
   }
-});
 
-hadoryDates.addEventListener('change', ()=>{
-  const iso=hadoryDates.value||'';
-  if(!iso) return;
-  hadoryManualDate.value=iso;
-  setGregFromISO(iso);
-  applyHadoryDate(iso);
-
-  const allDates=[...new Set(HADORY_LOGS.map(x=>x.date).filter(Boolean))];
-  if(allDates.length>1){
-    showDateWarn(true,'تم العثور على أكثر من تاريخ داخل الملفات. اختر التاريخ الصحيح ثم أكد المطابقة قبل اعتماد المخالفات.');
-  }else{
-    showDateOk(true);
-  }
+  applyHadoryForManualDate(iso);
 });
 
 function renderHadoryEmpty(){
@@ -1365,20 +1313,19 @@ function renderHadoryEmpty(){
   HADORY_CASES=[];
 }
 
-/* ✅ التعديل المطلوب:
-   - المعلم قد يظهر بأكثر من مخالفة في نفس اليوم (تأخر + عدم تسجيل انصراف + عدم استكمال 7 ساعات).
-   - لا يتم إخفاء "التأخر" بسبب عدم وجود انصراف.
-*/
-function applyHadoryDate(iso){
+/* التحليل (فقط: غياب/تأخر/عدم تسجيل انصراف) */
+function applyHadoryForManualDate(iso){
   if(!iso){ renderHadoryEmpty(); return; }
+  if(!HADORY_LOGS.length){ renderHadoryEmpty(); return; }
 
-  const wsM=toMin(WORK_RANGE[SEASON].start);
+  const wsM=toMin(WORK_RANGE[SEASON].start); // بداية الدوام الرسمي
 
   const byCivil={};
   HADORY_LOGS.forEach(r=>{
-    if(r.date!==iso) return;
+    if(r.date && r.date!==iso) return;
+
     const prev=byCivil[r.civil];
-    if(!prev) { byCivil[r.civil]=r; return; }
+    if(!prev){ byCivil[r.civil]=r; return; }
     const prevScore = (prev.leave?100000:0) + (prev.workMinutes||0) + (prev.attend?500:0);
     const curScore  = (r.leave?100000:0) + (r.workMinutes||0) + (r.attend?500:0);
     if(curScore>prevScore) byCivil[r.civil]=r;
@@ -1397,7 +1344,6 @@ function applyHadoryDate(iso){
 
   HADORY_DAILY.forEach(r=>{
     const attendM = toMin(r.attend);
-    const leaveM  = toMin(r.leave);
 
     const isAbsent = !r.attend && !r.leave && (!r.workMinutes);
     if(isAbsent){
@@ -1406,43 +1352,19 @@ function applyHadoryDate(iso){
       return;
     }
 
-    // 1) ✅ التأخر: أي حضور بعد بداية الدوام الرسمي
+    // 1) التأخر
     if(attendM!=null && wsM!=null && attendM>wsM){
       const lateMin = attendM-wsM;
       nLate++;
       addCase({type:'late', label:'تأخر', order:2, civil:r.civil, name:r.name, attend:r.attend, leave:r.leave||'', badge:'amber', sortA:lateMin});
     }
 
-    // 2) ✅ عدم تسجيل الانصراف: (لا يوجد انصراف) أو (انصراف تلقائي)
+    // 2) عدم تسجيل الانصراف: لا يوجد انصراف أو انصراف تلقائي
     const noOut = (r.attend && !r.leave) || (r.attend && r.leave && r.autoOut);
     if(noOut){
       nNoOut++;
       const lbl = r.autoOut ? 'عدم تسجيل الانصراف (انصراف تلقائي)' : 'عدم تسجيل الانصراف في منصة حضوري';
       addCase({type:'noout', label:lbl, order:3, civil:r.civil, name:r.name, attend:r.attend||'', leave:r.leave||'', badge:'amber', sortA:0});
-    }
-
-    // 3) ✅ عدم استكمال 7 ساعات:
-    //    - إذا يوجد انصراف: نحسب نقص الدقائق من 7 ساعات (من وقت حضور لا يقل عن 06:30).
-    //    - إذا لا يوجد انصراف لكن حضوري أعطى ساعات فعلية (workMinutes): نعتمدها ونحسب النقص.
-    let deficit=null;
-
-    if(attendM!=null && leaveM!=null){
-      const reqEnd = requiredEndAfter7Hours(r.attend);
-      if(reqEnd!=null && leaveM < reqEnd){
-        deficit = reqEnd - leaveM;
-      }
-    }else if(r.workMinutes && r.workMinutes>0 && r.workMinutes < 420){
-      deficit = 420 - r.workMinutes;
-    }
-
-    if(deficit!=null && deficit>0){
-      // إذا يوجد انصراف: هذا "انصراف قبل إنهاء الدوام الرسمي"
-      if(leaveM!=null){
-        addCase({type:'early', label:'انصراف قبل إنهاء الدوام الرسمي', order:4, civil:r.civil, name:r.name, attend:r.attend||'', leave:r.leave||'', badge:'amber', sortA:deficit});
-      }else{
-        // لا يوجد انصراف: "عدم استكمال 7 ساعات" (تظهر كبند مستقل)
-        addCase({type:'short7', label:'عدم استكمال (7) ساعات عمل', order:4, civil:r.civil, name:r.name, attend:r.attend||'', leave:r.leave||'', badge:'amber', sortA:deficit});
-      }
     }
   });
 
@@ -1450,13 +1372,11 @@ function applyHadoryDate(iso){
   cLate.textContent=String(nLate);
   cNoOut.textContent=String(nNoOut);
 
-  // ترتيب: غياب → تأخر (الأكثر أولاً) → عدم تسجيل الانصراف → عدم استكمال/انصراف مبكر (الأكبر نقصاً أولاً)
   cases.sort((a,b)=>{
     if(a.order!==b.order) return a.order-b.order;
-    if(a.order===2 || a.order===4){
+    if(a.order===2){
       if((b.sortA||0)!==(a.sortA||0)) return (b.sortA||0)-(a.sortA||0);
     }
-    if(a.type!==b.type) return (a.type||'').localeCompare(b.type||'','ar');
     return a.name.localeCompare(b.name,'ar');
   });
 
@@ -1465,7 +1385,6 @@ function applyHadoryDate(iso){
   hadoryCases.innerHTML = `<option value="">— اختر من القائمة —</option>` + cases.map((c,i)=>{
     let extra='';
     if(c.type==='late') extra=` — ${en2ar(c.sortA)} د`;
-    if(c.type==='early' || c.type==='short7') extra=` — نقص ${en2ar(c.sortA)} د`;
     const txt = `${c.label}${extra} — ${c.name} — ${c.attend||'--:--'} / ${c.leave||'--:--'}`;
     return `<option value="${i}">${txt}</option>`;
   }).join('');
@@ -1474,13 +1393,11 @@ function applyHadoryDate(iso){
     hadoryMiniTable.innerHTML=`<tr><td colspan="4" class="mini" style="text-align:center;padding:12px">لا توجد حالات تستوجب إجراء في التاريخ المحدد.</td></tr>`;
   }else{
     hadoryMiniTable.innerHTML = cases.slice(0,22).map(c=>{
-      const tagClass = c.badge==='red'?'tag red':(c.badge==='green'?'tag green':'tag amber');
+      const tagClass = c.badge==='red'?'tag red':'tag amber';
       const kindLabel =
         (c.type==='gaib')?'غياب':
         (c.type==='late')?`تأخر (${en2ar(c.sortA)}د)`:
-        (c.type==='noout')?'لم يُغلق الدوام':
-        (c.type==='short7')?`نقص 7 ساعات (${en2ar(c.sortA)}د)`:
-        `انصراف قبل 7 ساعات (${en2ar(c.sortA)}د)`;
+        'لم يُغلق الدوام';
       return `<tr>
         <td><span class="${tagClass}">${kindLabel}</span></td>
         <td style="text-align:right;font-weight:900">${c.name}</td>
@@ -1503,9 +1420,6 @@ function applyHadoryDate(iso){
       selTeacher.dispatchEvent(new Event('change'));
     }
 
-    hadoryManualDate.value=iso;
-    setGregFromISO(iso);
-
     if(c.type==='gaib'){
       setChipActive('kindChips','gaib'); setPack('gaib');
     }else if(c.type==='late'){
@@ -1514,26 +1428,16 @@ function applyHadoryDate(iso){
       el.textContent=en2ar(ar2en(c.attend||'--:--'));
       el.classList.toggle('empty', !c.attend);
       recalc();
-    }else if(c.type==='early'){
-      setChipActive('kindChips','early'); setPack('early');
-      const el=document.getElementById('tEarlyFrom');
-      el.textContent=en2ar(ar2en(c.leave||'--:--'));
-      el.classList.toggle('empty', !c.leave);
-      recalc();
-    }else if(c.type==='noout'){
+    }else{
       setChipActive('kindChips','note'); setPack('note');
       document.getElementById('noteReason').value='عدم تسجيل الانصراف في منصة حضوري.';
-      document.getElementById('noteReason').dispatchEvent(new Event('change'));
-    }else{ // short7
-      setChipActive('kindChips','note'); setPack('note');
-      document.getElementById('noteReason').value='عدم استكمال (7) ساعات عمل فعلية حسب تقرير حضوري.';
       document.getElementById('noteReason').dispatchEvent(new Event('change'));
     }
 
     setHadoryStatus('تم تطبيق الحالة على النموذج');
   };
 
-  setHadoryStatus('تم تحليل اليوم المحدد بدقة (مخالفات متعددة)');
+  setHadoryStatus('تم التحليل وفق التاريخ اليدوي — (قد تتكرر المخالفات للمعلم الواحد)');
 }
 
 function setChipActive(containerId, key){
@@ -1543,18 +1447,26 @@ function setChipActive(containerId, key){
   if(btn) btn.classList.add('active');
 }
 
+/* واتساب */
 document.getElementById('btnWA').addEventListener('click', ()=>{
   if(!requireDateGuard('إرسال واتساب')) return;
 
   const i=+selTeacher.value; if(!Number.isInteger(i)) return alert('اختر معلماً أولاً');
   const t=TEACHERS[i]; const kind=STATE.kind;
-  const kindLabel={late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',early:'تنبيه انصراف قبل إنهاء الدوام الرسمي',gaib:'مساءلة غياب',note:'لفت نظر'}[kind];
+
+  const kindLabel={late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',gaib:'مساءلة غياب',note:'لفت نظر'}[kind];
+
   let details='';
-  if(kind==='late'){ details=`تأخّر عن بداية الدوام الرسمي، ووقت الحضور: ${document.getElementById('tLateIn').textContent.trim()}؛ نأمل معالجة السبب والالتزام بمواعيد العمل.`; }
-  else if(kind==='absent'){ details=`عدم تواجد خلال ساعات الدوام؛ نأمل إيضاح السبب وإرفاق ما يؤيده.`; }
-  else if(kind==='early'){ details=`انصراف قبل إنهاء الدوام الرسمي؛ وقت الانصراف: ${document.getElementById('tEarlyFrom').textContent.trim()}؛ نأمل الالتزام باستكمال ساعات الدوام (7 ساعات من وقت الحضور المعتمد، مع احتساب التحضير من 06:30).`; }
-  else if(kind==='gaib'){ details=`تم تسجيل مساءلة غياب لليوم الموضّح.`; }
-  else if(kind==='note'){ details=`لفت نظر بسبب: ${document.getElementById('noteReasonText').textContent.trim()}`; }
+  if(kind==='late'){
+    details=`تأخّر عن بداية الدوام الرسمي، ووقت الحضور: ${document.getElementById('tLateIn').textContent.trim()}؛ نأمل معالجة السبب والالتزام بمواعيد العمل.`;
+  } else if(kind==='absent'){
+    details=`عدم تواجد خلال ساعات الدوام؛ نأمل إيضاح السبب وإرفاق ما يؤيده.`;
+  } else if(kind==='gaib'){
+    details=`تم تسجيل مساءلة غياب لليوم الموضّح.`;
+  } else if(kind==='note'){
+    details=`لفت نظر بسبب: ${document.getElementById('noteReasonText').textContent.trim()}`;
+  }
+
   const msg=`السلام عليكم
 ${kindLabel}
 الاسم: ${t.name}
@@ -1562,11 +1474,11 @@ ${kindLabel}
 التاريخ (هـ): ${metaHijri.textContent}
 ${details}
 *نظام الشؤون الإدارية والمتابعة*`;
+
   window.open(`https://wa.me/${t.phone||'966500000000'}?text=${encodeURIComponent(msg)}`,'_blank');
 });
 
-const hadoryStatusEl=document.getElementById('hadoryStatus');
-
+/* تهيئة */
 function init(){
   buildHijriPicker();
   setPack('late');
@@ -1576,11 +1488,8 @@ function init(){
   closeDateGuard();
   updatePrincipalAbs();
 
-  const now=new Date();
-  const iso = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-  hadoryManualDate.value=iso;
-
-  showDateWarn(false);
+  hadoryManualDate.value='';
+  showDateWarn(true,'أدخل تاريخ التقرير يدويًا (حسب ملف حضوري) ثم اضغط تطبيق ثم أكد المطابقة.');
   showDateOk(false);
 }
 init();
