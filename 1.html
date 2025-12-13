@@ -335,11 +335,9 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           ✅ تم تأكيد التاريخ — يمكنك اعتماد الإجراءات بثقة.
         </div>
 
-        <!-- إصلاح الاستيراد: زرّان بنفس المقاس (زر استيراد + زر حضوري) -->
         <div class="f" style="margin-top:10px">
           <label>ملفات Excel من منصة حضوري</label>
 
-          <!-- input مخفي والاستيراد يتم عبر زر لتفادي مشاكل عدم الفتح -->
           <input id="hadoryFiles" class="inp" type="file" accept=".xlsx,.xls,.csv" multiple style="display:none">
 
           <div class="row" style="margin-top:6px">
@@ -601,13 +599,17 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
     </div>
     <div style="padding:12px">
-      <div class="mini" style="margin:0 0 10px">
+      <!-- تعديل مطلوب: توسيط العبارة + تكبيرها + جعلها منسقة مع الجدول -->
+      <div class="mini" style="margin:0 0 10px;text-align:center;font-size:12.8px;font-weight:900;color:#064b50;background:#f2fafb;border:1px solid #dbe9e9;border-radius:12px;padding:8px 10px">
         سجل الحضور والإنصراف اليومي للمعلمين
       </div>
+
       <table id="tblHadoryReport" class="tbl2">
         <thead>
           <tr>
-            <th style="width:42%">الاسم</th>
+            <!-- تعديل مطلوب: إضافة عمود رقم تسلسلي قبل الاسم -->
+            <th style="width:6%">م</th>
+            <th style="width:36%">الاسم</th>
             <th style="width:18%">رقم الهوية</th>
             <th style="width:13%">الحضور</th>
             <th style="width:13%">الانصراف</th>
@@ -1198,12 +1200,10 @@ const cNoOut = document.getElementById('cNoOut');
 const hadoryDateWarn = document.getElementById('hadoryDateWarn');
 const hadoryDateOk = document.getElementById('hadoryDateOk');
 
-/* زر الاستيراد (إصلاح فعلي) */
 document.getElementById('btnHadoryImport').addEventListener('click', ()=>{
   try{ hadoryFiles.click(); }catch(e){ alert('تعذر فتح نافذة اختيار الملفات.'); }
 });
 
-/* زر حضوري (الرابط المطلوب) */
 document.getElementById('btnHadoryDrive').addEventListener('click', ()=>{
   window.open('https://drive.google.com/drive/folders/1pjqnwJ47M93BkLSygUZ7u3xrZFUYHCtY?usp=sharing','_blank');
 });
@@ -1418,7 +1418,6 @@ hadoryFiles.addEventListener('change', async (e)=>{
     : 'لم يظهر تاريخ واضح داخل الملف/الاسم — أدخل تاريخ التقرير الصحيح يدويًا ثم أكد المطابقة.'
   );
 
-  /* إعادة التهيئة للسماح باستيراد نفس الملف مرة أخرى إن لزم */
   hadoryFiles.value='';
 });
 
@@ -1444,12 +1443,11 @@ function renderHadoryEmpty(){
   HADORY_CASES=[];
 }
 
-/* التحليل (فقط: غياب/تأخر/عدم تسجيل انصراف) */
 function applyHadoryForManualDate(iso){
   if(!iso){ renderHadoryEmpty(); return; }
   if(!HADORY_LOGS.length){ renderHadoryEmpty(); return; }
 
-  const wsM=toMin(WORK_RANGE[SEASON].start); // بداية الدوام الرسمي
+  const wsM=toMin(WORK_RANGE[SEASON].start);
 
   const byCivil={};
   HADORY_LOGS.forEach(r=>{
@@ -1483,14 +1481,12 @@ function applyHadoryForManualDate(iso){
       return;
     }
 
-    // 1) التأخر
     if(attendM!=null && wsM!=null && attendM>wsM){
       const lateMin = attendM-wsM;
       nLate++;
       addCase({type:'late', label:'تأخر', order:2, civil:r.civil, name:r.name, attend:r.attend, leave:r.leave||'', badge:'amber', sortA:lateMin});
     }
 
-    // 2) عدم تسجيل الانصراف: لا يوجد انصراف أو انصراف تلقائي
     const noOut = (r.attend && !r.leave) || (r.attend && r.leave && r.autoOut);
     if(noOut){
       nNoOut++;
@@ -1610,7 +1606,7 @@ ${details}
 });
 
 /* =========================
-   كشف حضوري (زر جديد)
+   كشف حضوري (اليومي)
    ========================= */
 const hadoryReportDlg=document.getElementById('hadoryReportDlg');
 const tblHadoryReport=document.querySelector('#tblHadoryReport tbody');
@@ -1622,7 +1618,6 @@ function openHadoryReport(){
   if(!iso){ alert('حدد تاريخ التقرير يدويًا ثم اضغط (تطبيق) أولاً.'); return; }
   if(!HADORY_DAILY.length){ alert('استورد ملف حضوري ثم اضغط (تطبيق) ليتم إنشاء الكشف.'); return; }
 
-  // ترتيب: حضور تصاعدي حسب وقت الحضور، ثم الغياب في الأسفل
   const present=[], absent=[];
   HADORY_DAILY.forEach(r=>{
     const isAbsent=!r.attend && !r.leave && (!r.workMinutes);
@@ -1639,10 +1634,11 @@ function openHadoryReport(){
 
   const rows=[...present, ...absent];
 
-  tblHadoryReport.innerHTML = rows.map(r=>{
+  tblHadoryReport.innerHTML = rows.map((r,idx)=>{
     const isAbsent=!r.attend && !r.leave && (!r.workMinutes);
     const status = isAbsent ? `<span class="tag red">غائب</span>` : `<span class="tag green">حاضر</span>`;
     return `<tr>
+      <td style="font-weight:900">${en2ar(idx+1)}</td>
       <td style="font-weight:900">${r.name||'—'}</td>
       <td>${r.civil||'—'}</td>
       <td>${r.attend||'--:--'}</td>
