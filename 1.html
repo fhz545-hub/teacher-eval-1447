@@ -56,6 +56,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .tag.amber{background:#fef3c7;border-color:#fde68a;color:#92400e}
 .tag.green{background:#dcfce7;border-color:#bbf7d0;color:#166534}
 
+/* ألوان زرَّي حضوري */
+.btn.importSoft{background:#ffe7e7;border-color:#fecaca;color:#7c2d12}
+.btn.driveSoft{background:#e8fff1;border-color:#bbf7d0;color:#166534}
+.btn.importSoft:hover{filter:brightness(.98)}
+.btn.driveSoft:hover{filter:brightness(.98)}
+
 @keyframes pulseWarn{
   0%{transform:scale(1); box-shadow:0 0 0 rgba(245,158,11,.0)}
   50%{transform:scale(1.01); box-shadow:0 0 0 7px rgba(245,158,11,.12)}
@@ -124,6 +130,15 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .tbl2 td{border:1px solid #2b4949;padding:6px 8px}
 .tbl2 .no-print{}
 
+/* كشف حضوري */
+#hadoryReportDlg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:55;align-items:center;justify-content:center;padding:12px}
+.report-card{background:#fff;border-radius:16px;max-width:1100px;width:96%;max-height:90vh;overflow:auto;border:1px solid var(--b)}
+.report-card .h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef4f4}
+.report-hdr{position:relative;margin:8px 8px 10px}
+.report-hdr img{width:100%;display:block;border-radius:12px}
+.report-meta{position:absolute;inset-inline-end:12px;top:12px;display:flex;flex-direction:column;gap:6px;min-width:130px}
+.report-meta .rowB{background:transparent;border:0;border-radius:10px;padding:6px 10px;font-weight:900;text-align:center}
+
 #clockDlg{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);align-items:center;justify-content:center;padding:16px}
 .clock-card{background:#fff;border:1px solid var(--b);border-radius:16px;max-width:360px;width:96%}
 .clock-card .h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef4f4}
@@ -151,6 +166,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 @media print{
   @page{size:A4;margin:10mm}
   body{background:#fff}
+
   body[data-print="stats"] .app{display:none !important}
   body[data-print="stats"] #statsDlg[aria-hidden="false"]{display:block !important; position:static !important; inset:auto !important;background:#fff !important; padding:0 !important}
   body[data-print="stats"] #statsDlg .stats-card{border:0 !important;border-radius:0 !important;width:210mm !important;max-width:none !important;min-height:auto !important;max-height:none !important;overflow:visible !important;box-shadow:none !important;margin:0 auto !important;page-break-inside:avoid}
@@ -165,12 +181,28 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
   body[data-print="stats"] #tblStats tr{page-break-inside:avoid}
   body[data-print="stats"] #tblStats th:last-child, body[data-print="stats"] #tblStats td:last-child, body[data-print="stats"] #tblStats .no-print{display:none !important}
 
-  body:not([data-print="stats"]) .sidebar, body:not([data-print="stats"]) .rights, body:not([data-print="stats"]) #clockDlg, body:not([data-print="stats"]) #dateGuardDlg{display:none !important}
-  body:not([data-print="stats"]) .content{padding:0}
-  body:not([data-print="stats"]) .sheet{width:210mm;min-height:auto;border:0;box-shadow:none;page-break-inside:avoid}
-  body:not([data-print="stats"]) .pad{padding:7mm 9mm 8mm}
-  body:not([data-print="stats"]) .hdr{margin:0 0 4mm}
-  body:not([data-print="stats"]) .hdr img{max-height:40mm;object-fit:cover;border-radius:8px}
+  body[data-print="hadory"] .app{display:none !important}
+  body[data-print="hadory"] #hadoryReportDlg[aria-hidden="false"]{display:block !important; position:static !important; inset:auto !important;background:#fff !important; padding:0 !important}
+  body[data-print="hadory"] #hadoryReportDlg .report-card{border:0 !important;border-radius:0 !important;width:210mm !important;max-width:none !important;min-height:auto !important;max-height:none !important;overflow:visible !important;box-shadow:none !important;margin:0 auto !important}
+  body[data-print="hadory"] #hadoryReportDlg .report-hdr{display:block !important;margin:0 0 6mm !important}
+  body[data-print="hadory"] #hadoryReportDlg .report-hdr img{width:100% !important;height:auto !important;border-radius:8px !important}
+  body[data-print="hadory"] #hadoryReportDlg .h, body[data-print="hadory"] #hadoryReportDlg .report-actions{display:none !important}
+  body[data-print="hadory"] #tblHadoryReport thead{display:table-header-group}
+  body[data-print="hadory"] #tblHadoryReport th, body[data-print="hadory"] #tblHadoryReport td{border-color:#000 !important}
+  body[data-print="hadory"] #tblHadoryReport th{background:#0b5e63 !important;color:#fff !important}
+  body[data-print="hadory"] #tblHadoryReport tr{page-break-inside:avoid}
+
+  body:not([data-print="stats"]):not([data-print="hadory"]) .sidebar,
+  body:not([data-print="stats"]):not([data-print="hadory"]) .rights,
+  body:not([data-print="stats"]):not([data-print="hadory"]) #clockDlg,
+  body:not([data-print="stats"]):not([data-print="hadory"]) #dateGuardDlg,
+  body:not([data-print="stats"]):not([data-print="hadory"]) #hadoryReportDlg{display:none !important}
+
+  body:not([data-print="stats"]):not([data-print="hadory"]) .content{padding:0}
+  body:not([data-print="stats"]):not([data-print="hadory"]) .sheet{width:210mm;min-height:auto;border:0;box-shadow:none;page-break-inside:avoid}
+  body:not([data-print="stats"]):not([data-print="hadory"]) .pad{padding:7mm 9mm 8mm}
+  body:not([data-print="stats"]):not([data-print="hadory"]) .hdr{margin:0 0 4mm}
+  body:not([data-print="stats"]):not([data-print="hadory"]) .hdr img{max-height:40mm;object-fit:cover;border-radius:8px}
 
   #alertPack, #absencePack{line-height:1.45 !important}
   #alertPack p, #absencePack p{margin:2mm 0 1.5mm !important}
@@ -303,9 +335,18 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           ✅ تم تأكيد التاريخ — يمكنك اعتماد الإجراءات بثقة.
         </div>
 
+        <!-- إصلاح الاستيراد: زرّان بنفس المقاس (زر استيراد + زر حضوري) -->
         <div class="f" style="margin-top:10px">
           <label>ملفات Excel من منصة حضوري</label>
-          <input id="hadoryFiles" class="inp" type="file" accept=".xlsx,.xls,.csv" multiple>
+
+          <!-- input مخفي والاستيراد يتم عبر زر لتفادي مشاكل عدم الفتح -->
+          <input id="hadoryFiles" class="inp" type="file" accept=".xlsx,.xls,.csv" multiple style="display:none">
+
+          <div class="row" style="margin-top:6px">
+            <button id="btnHadoryImport" class="btn importSoft" style="flex:1">استيراد حضوري</button>
+            <button id="btnHadoryDrive" class="btn driveSoft" style="flex:1">حضوري</button>
+          </div>
+
           <div class="mini">يمكن استيراد ملف/ملفات لأي يوم — <b>والتاريخ لا يُحدد تلقائيًا</b> (المستخدم يحدده يدويًا).</div>
         </div>
 
@@ -355,6 +396,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
 
       <div class="sb-actions">
+        <button id="btnHadoryReport" class="btn ghost">كشف حضوري 🗂️</button>
         <button id="btnStats" class="btn ghost">الإحصائيات 📊</button>
         <button id="btnWA" class="btn wh">واتساب</button>
         <button id="btnPrintSave" class="btn primary">طباعة / حفظ</button>
@@ -508,6 +550,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
   </main>
 </div>
 
+<!-- الإحصائيات -->
 <div id="statsDlg" aria-hidden="true" style="display:none">
   <div class="stats-card" id="statsCard">
     <div class="stats-hdr">
@@ -539,6 +582,46 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
   </div>
 </div>
 
+<!-- كشف حضوري -->
+<div id="hadoryReportDlg" aria-hidden="true">
+  <div class="report-card" id="reportCard">
+    <div class="report-hdr">
+      <img id="reportHdrImg" src="hhh.png" alt="هيدر كشف حضوري" crossorigin="anonymous">
+      <div class="report-meta">
+        <div class="rowB" id="repDay">—</div>
+        <div class="rowB" id="repHijri">—</div>
+      </div>
+    </div>
+    <div class="h">
+      <div style="font-weight:900;color:#064b50">كشف حضوري (اليومي)</div>
+      <div class="report-actions" style="display:flex;gap:6px">
+        <button id="btnReportPDF" class="btn primary" title="حفظ PDF">حفظ PDF</button>
+        <button id="btnReportPrint" class="btn ghost" title="طباعة">طباعة</button>
+        <button id="btnCloseReport" class="btn ghost">إغلاق</button>
+      </div>
+    </div>
+    <div style="padding:12px">
+      <div class="mini" style="margin:0 0 10px">
+        يعرض جميع الأسماء في صفحة واحدة قدر الإمكان مع ترتيب الحضور تصاعديًا، والغياب في الأسفل.
+      </div>
+      <table id="tblHadoryReport" class="tbl2">
+        <thead>
+          <tr>
+            <th style="width:42%">الاسم</th>
+            <th style="width:18%">رقم الهوية</th>
+            <th style="width:13%">الحضور</th>
+            <th style="width:13%">الانصراف</th>
+            <th style="width:14%">الحالة</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- اختيار الوقت -->
 <div id="clockDlg" aria-hidden="true">
   <div class="clock-card">
     <div class="h">
@@ -565,6 +648,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
   </div>
 </div>
 
+<!-- حماية التاريخ -->
 <div id="dateGuardDlg" aria-hidden="true">
   <div class="guard-card">
     <div class="h">
@@ -598,6 +682,37 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
 const en2ar=s=>(''+s).replace(/[0-9]/g,d=>AR[d]);
 const ar2en=s=>(''+s).replace(/[٠-٩]/g,d=>EN[AR.indexOf(d)]);
+
+/* ============= مراجع عناصر (لتفادي تعطل السكربت) ============= */
+const metaDay=document.getElementById('metaDay');
+const metaHijri=document.getElementById('metaHijri');
+const metaNo=document.getElementById('metaNo');
+const dynDay=document.getElementById('dynDay');
+const dynHijri=document.getElementById('dynHijri');
+const noteDay=document.getElementById('noteDay');
+const noteHijri=document.getElementById('noteHijri');
+
+const t_name=document.getElementById('t_name');
+const t_spec=document.getElementById('t_spec');
+const t_level=document.getElementById('t_level');
+const t_job=document.getElementById('t_job');
+const t_work=document.getElementById('t_work');
+const t_civil=document.getElementById('t_civil');
+const teacherNameInline=document.getElementById('teacherNameInline');
+const noteTeacherName=document.getElementById('noteTeacherName');
+
+const lateTotal=document.getElementById('lateTotal');
+const lateHH=document.getElementById('lateHH');
+const absTotal=document.getElementById('absTotal');
+const absHH=document.getElementById('absHH');
+
+const hY=document.getElementById('hY');
+const hM=document.getElementById('hM');
+const hD=document.getElementById('hD');
+
+const gY=document.getElementById('gY');
+const gM=document.getElementById('gM');
+const gD=document.getElementById('gD');
 
 /* ============= بيانات المعلمين ============= */
 const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058931	فيزيا	معلم ممارس
@@ -813,18 +928,17 @@ function hijriToGregorian(y,m,d){
   return new Date();
 }
 function buildHijriPicker(){
-  const y=document.getElementById('hY'),m=document.getElementById('hM'),d=document.getElementById('hD');
-  y.innerHTML=m.innerHTML=d.innerHTML='';
+  hY.innerHTML=hM.innerHTML=hD.innerHTML='';
   const now=new Date();
   const currAH=parseInt(ar2en(new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric'}).format(now)),10);
-  for(let i=currAH-1;i<=currAH+1;i++) y.add(new Option(en2ar(i),i));
-  for(let i=1;i<=12;i++) m.add(new Option(en2ar(String(i).padStart(2,'0')),i));
-  for(let i=1;i<=30;i++) d.add(new Option(en2ar(String(i).padStart(2,'0')),i));
+  for(let i=currAH-1;i<=currAH+1;i++) hY.add(new Option(en2ar(i),i));
+  for(let i=1;i<=12;i++) hM.add(new Option(en2ar(String(i).padStart(2,'0')),i));
+  for(let i=1;i<=30;i++) hD.add(new Option(en2ar(String(i).padStart(2,'0')),i));
   const parts=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
-  d.value=+ar2en(parts.find(p=>p.type==='day').value);
-  m.value=+ar2en(parts.find(p=>p.type==='month').value);
-  y.value=+ar2en(parts.find(p=>p.type==='year').value);
-  y.onchange=m.onchange=d.onchange=syncFromHijri;
+  hD.value=+ar2en(parts.find(p=>p.type==='day').value);
+  hM.value=+ar2en(parts.find(p=>p.type==='month').value);
+  hY.value=+ar2en(parts.find(p=>p.type==='year').value);
+  hY.onchange=hM.onchange=hD.onchange=syncFromHijri;
   syncFromHijri();
 }
 function syncFromHijri(){
@@ -842,6 +956,8 @@ function syncFromHijri(){
   document.getElementById('absDateYMD').textContent=hij;
   document.getElementById('statsDay').textContent=dayName;
   document.getElementById('statsHijri').textContent=hij;
+  document.getElementById('repDay').textContent=dayName;
+  document.getElementById('repHijri').textContent=hij;
   updatePrincipalAbs();
 }
 ['gY','gM','gD'].forEach(id=>document.getElementById(id).addEventListener('input',syncFromGregInputs));
@@ -860,6 +976,8 @@ function syncFromGregInputs(){
   document.getElementById('absDateYMD').textContent=hij;
   document.getElementById('statsDay').textContent=dayName;
   document.getElementById('statsHijri').textContent=hij;
+  document.getElementById('repDay').textContent=dayName;
+  document.getElementById('repHijri').textContent=hij;
   updatePrincipalAbs();
 }
 
@@ -1080,6 +1198,16 @@ const cNoOut = document.getElementById('cNoOut');
 const hadoryDateWarn = document.getElementById('hadoryDateWarn');
 const hadoryDateOk = document.getElementById('hadoryDateOk');
 
+/* زر الاستيراد (إصلاح فعلي) */
+document.getElementById('btnHadoryImport').addEventListener('click', ()=>{
+  try{ hadoryFiles.click(); }catch(e){ alert('تعذر فتح نافذة اختيار الملفات.'); }
+});
+
+/* زر حضوري (الرابط المطلوب) */
+document.getElementById('btnHadoryDrive').addEventListener('click', ()=>{
+  window.open('https://drive.google.com/drive/folders/1pjqnwJ47M93BkLSygUZ7u3xrZFUYHCtY?usp=sharing','_blank');
+});
+
 document.getElementById('btnConfirmDateInline').onclick=()=>{
   openDateGuard(DATE_GUARD_REASON || 'يرجى التأكد من تاريخ التقرير يدويًا ثم الإقرار بالمطابقة.');
 };
@@ -1289,6 +1417,9 @@ hadoryFiles.addEventListener('change', async (e)=>{
     ? `تواريخ ظهرت في الملف: ${allDates.join(' ، ')} — أدخل تاريخ التقرير الصحيح يدويًا ثم أكد المطابقة.`
     : 'لم يظهر تاريخ واضح داخل الملف/الاسم — أدخل تاريخ التقرير الصحيح يدويًا ثم أكد المطابقة.'
   );
+
+  /* إعادة التهيئة للسماح باستيراد نفس الملف مرة أخرى إن لزم */
+  hadoryFiles.value='';
 });
 
 btnUseManualDate.addEventListener('click', ()=>{
@@ -1476,6 +1607,93 @@ ${details}
 *نظام الشؤون الإدارية والمتابعة*`;
 
   window.open(`https://wa.me/${t.phone||'966500000000'}?text=${encodeURIComponent(msg)}`,'_blank');
+});
+
+/* =========================
+   كشف حضوري (زر جديد)
+   ========================= */
+const hadoryReportDlg=document.getElementById('hadoryReportDlg');
+const tblHadoryReport=document.querySelector('#tblHadoryReport tbody');
+
+function openHadoryReport(){
+  if(!requireDateGuard('فتح كشف حضوري')) return;
+
+  const iso=hadoryManualDate.value||'';
+  if(!iso){ alert('حدد تاريخ التقرير يدويًا ثم اضغط (تطبيق) أولاً.'); return; }
+  if(!HADORY_DAILY.length){ alert('استورد ملف حضوري ثم اضغط (تطبيق) ليتم إنشاء الكشف.'); return; }
+
+  // ترتيب: حضور تصاعدي حسب وقت الحضور، ثم الغياب في الأسفل
+  const present=[], absent=[];
+  HADORY_DAILY.forEach(r=>{
+    const isAbsent=!r.attend && !r.leave && (!r.workMinutes);
+    if(isAbsent) absent.push(r); else present.push(r);
+  });
+
+  present.sort((a,b)=>{
+    const am=toMin(a.attend)||99999;
+    const bm=toMin(b.attend)||99999;
+    if(am!==bm) return am-bm;
+    return (a.name||'').localeCompare(b.name||'','ar');
+  });
+  absent.sort((a,b)=> (a.name||'').localeCompare(b.name||'','ar'));
+
+  const rows=[...present, ...absent];
+
+  tblHadoryReport.innerHTML = rows.map(r=>{
+    const isAbsent=!r.attend && !r.leave && (!r.workMinutes);
+    const status = isAbsent ? `<span class="tag red">غائب</span>` : `<span class="tag green">حاضر</span>`;
+    return `<tr>
+      <td style="font-weight:900">${r.name||'—'}</td>
+      <td>${r.civil||'—'}</td>
+      <td>${r.attend||'--:--'}</td>
+      <td>${r.leave||'--:--'}</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('repDay').textContent=metaDay.textContent;
+  document.getElementById('repHijri').textContent=metaHijri.textContent;
+
+  hadoryReportDlg.style.display='flex';
+  hadoryReportDlg.setAttribute('aria-hidden','false');
+}
+document.getElementById('btnHadoryReport').addEventListener('click', openHadoryReport);
+
+document.getElementById('btnCloseReport').addEventListener('click', ()=>{
+  hadoryReportDlg.style.display='none';
+  hadoryReportDlg.setAttribute('aria-hidden','true');
+});
+hadoryReportDlg.addEventListener('click',(e)=>{
+  if(e.target===hadoryReportDlg){
+    hadoryReportDlg.style.display='none';
+    hadoryReportDlg.setAttribute('aria-hidden','true');
+  }
+});
+
+document.getElementById('btnReportPrint').addEventListener('click', async ()=>{
+  const card=document.getElementById('reportCard');
+  await ensureAllImagesEmbedded(card);
+  hadoryReportDlg.setAttribute('aria-hidden','false');
+  document.body.setAttribute('data-print','hadory');
+  window.print();
+  setTimeout(()=>document.body.removeAttribute('data-print'),300);
+});
+
+document.getElementById('btnReportPDF').addEventListener('click', async ()=>{
+  const iso=hadoryManualDate.value||'';
+  if(!iso){ alert('حدد تاريخ التقرير يدويًا أولاً.'); return; }
+  const card=document.getElementById('reportCard');
+  const { jsPDF }=window.jspdf;
+  try{
+    await ensureAllImagesEmbedded(card);
+    const canvas=await html2canvas(card,{ scale:2, background:'#fff', useCORS:true, allowTaint:false, imageTimeout:0, logging:false });
+    const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+    const w=210, h=canvas.height*210/canvas.width;
+    pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
+    pdf.save(`كشف حضوري - ${iso}.pdf`);
+  }catch(err){
+    alert('تعذّر إنشاء PDF: '+(err.message||err));
+  }
 });
 
 /* تهيئة */
