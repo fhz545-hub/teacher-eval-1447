@@ -118,6 +118,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .footer-note{margin-top:10mm}
 .footer-note span{display:inline-block;margin-inline-end:auto;color:#333;font-size:10.5px;font-weight:800}
 
+/* الإحصائيات */
 #statsDlg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:50;align-items:center;justify-content:center;padding:12px}
 .stats-card{background:#fff;border-radius:16px;max-width:1100px;width:96%;max-height:90vh;overflow:auto;border:1px solid var(--b)}
 .stats-card .h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef4f4}
@@ -139,6 +140,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .report-meta{position:absolute;inset-inline-end:12px;top:12px;display:flex;flex-direction:column;gap:6px;min-width:130px}
 .report-meta .rowB{background:transparent;border:0;border-radius:10px;padding:6px 10px;font-weight:900;text-align:center}
 
+/* اختيار الوقت */
 #clockDlg{display:none;position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.35);align-items:center;justify-content:center;padding:16px}
 .clock-card{background:#fff;border:1px solid var(--b);border-radius:16px;max-width:360px;width:96%}
 .clock-card .h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef4f4}
@@ -150,6 +152,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .clock-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
 .clock-actions .btn{height:auto;padding:7px 10px}
 
+/* حماية التاريخ */
 #dateGuardDlg{display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.42);align-items:center;justify-content:center;padding:14px}
 .guard-card{background:#fff;border:1px solid var(--b);border-radius:16px;max-width:520px;width:96%;box-shadow:0 16px 48px rgba(0,0,0,.18)}
 .guard-card .h{display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border-bottom:1px solid #eef4f4}
@@ -171,11 +174,8 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
   body[data-print="stats"] #statsDlg[aria-hidden="false"]{display:block !important; position:static !important; inset:auto !important;background:#fff !important; padding:0 !important}
   body[data-print="stats"] #statsDlg .stats-card{border:0 !important;border-radius:0 !important;width:210mm !important;max-width:none !important;min-height:auto !important;max-height:none !important;overflow:visible !important;box-shadow:none !important;margin:0 auto !important;page-break-inside:avoid}
   body[data-print="stats"] #statsDlg .stats-hdr{display:block !important;margin:0 0 6mm !important}
-  body[data-print="stats"] #statsDlg .stats-hdr img{width:100% !important;height:auto !important;border-radius:8px !important}
-  body[data-print="stats"] #statsDlg .stats-meta .rowB{background:transparent !important;border:0 !important}
   body[data-print="stats"] #statsDlg .h, body[data-print="stats"] #statsDlg .stats-actions{display:none !important}
   body[data-print="stats"] #tblStats thead{display:table-header-group}
-  body[data-print="stats"] #tblStats tfoot{display:table-footer-group}
   body[data-print="stats"] #tblStats th, body[data-print="stats"] #tblStats td{border-color:#000 !important}
   body[data-print="stats"] #tblStats th{background:#0b5e63 !important;color:#fff !important}
   body[data-print="stats"] #tblStats tr{page-break-inside:avoid}
@@ -185,7 +185,6 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
   body[data-print="hadory"] #hadoryReportDlg[aria-hidden="false"]{display:block !important; position:static !important; inset:auto !important;background:#fff !important; padding:0 !important}
   body[data-print="hadory"] #hadoryReportDlg .report-card{border:0 !important;border-radius:0 !important;width:210mm !important;max-width:none !important;min-height:auto !important;max-height:none !important;overflow:visible !important;box-shadow:none !important;margin:0 auto !important}
   body[data-print="hadory"] #hadoryReportDlg .report-hdr{display:block !important;margin:0 0 6mm !important}
-  body[data-print="hadory"] #hadoryReportDlg .report-hdr img{width:100% !important;height:auto !important;border-radius:8px !important}
   body[data-print="hadory"] #hadoryReportDlg .h, body[data-print="hadory"] #hadoryReportDlg .report-actions{display:none !important}
   body[data-print="hadory"] #tblHadoryReport thead{display:table-header-group}
   body[data-print="hadory"] #tblHadoryReport th, body[data-print="hadory"] #tblHadoryReport td{border-color:#000 !important}
@@ -337,14 +336,11 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 
         <div class="f" style="margin-top:10px">
           <label>ملفات Excel من منصة حضوري</label>
-
           <input id="hadoryFiles" class="inp" type="file" accept=".xlsx,.xls,.csv" multiple style="display:none">
-
           <div class="row" style="margin-top:6px">
             <button id="btnHadoryImport" class="btn importSoft" style="flex:1">استيراد حضوري</button>
             <button id="btnHadoryDrive" class="btn driveSoft" style="flex:1">حضوري</button>
           </div>
-
           <div class="mini">يمكن استيراد ملف/ملفات لأي يوم — <b>والتاريخ لا يُحدد تلقائيًا</b> (المستخدم يحدده يدويًا).</div>
         </div>
 
@@ -408,7 +404,6 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
     <div class="sheet-wrap">
       <div class="sheet" id="sheet" aria-label="صفحة A4">
         <div class="pad">
-
           <div class="hdr">
             <img id="hdrImg" src="hhh.png" alt="هيدر" crossorigin="anonymous">
             <div class="meta-stack">
@@ -434,6 +429,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
             <div class="badge"><span class="tag">السجل المدني</span><span id="t_civil">—</span></div>
           </div>
 
+          <!-- محتوى النماذج كما هو -->
           <div id="alertPack" class="sec">
             <h3>( 1 ) خطاب التنبيه — <span id="kindTitle">تأخر</span></h3>
             <div class="rule-row"><span class="label">المكرم المعلم :</span>
@@ -547,9 +543,8 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
     </div>
   </main>
 </div>
-
 <!-- الإحصائيات -->
-<div id="statsDlg" aria-hidden="true" style="display:none">
+<div id="statsDlg" aria-hidden="true">
   <div class="stats-card" id="statsCard">
     <div class="stats-hdr">
       <img id="statsHdrImg" src="hhh.png" alt="هيدر الإحصائيات" crossorigin="anonymous">
@@ -598,16 +593,18 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
         <button id="btnCloseReport" class="btn ghost">إغلاق</button>
       </div>
     </div>
+
     <div style="padding:12px">
-      <!-- تعديل مطلوب: توسيط العبارة + تكبيرها + جعلها منسقة مع الجدول -->
-      <div class="mini" style="margin:0 0 10px;text-align:center;font-size:12.8px;font-weight:900;color:#064b50;background:#f2fafb;border:1px solid #dbe9e9;border-radius:12px;padding:8px 10px">
-        سجل الحضور والإنصراف اليومي للمعلمين
+      <div class="mini" style="margin:0 0 10px;text-align:center;font-size:12.8px;font-weight:900;color:#064b50;background:#f2fafb;border:1px solid #dbe9e9;border-radius:12px;padding:8px 10px;line-height:1.9">
+        سجل الحضور والإنصراف اليومي للمعلمين<br>
+        <span style="font-size:12px;color:#0b5e63">
+          اليوم: <span id="repDayTxt">—</span> — التاريخ: <span id="repHijriTxt">—</span>
+        </span>
       </div>
 
       <table id="tblHadoryReport" class="tbl2">
         <thead>
           <tr>
-            <!-- تعديل مطلوب: إضافة عمود رقم تسلسلي قبل الاسم -->
             <th style="width:6%">م</th>
             <th style="width:36%">الاسم</th>
             <th style="width:18%">رقم الهوية</th>
@@ -661,7 +658,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       <div class="guard-note">
         <div>تم تفعيل <span class="k">حماية التاريخ</span> — لا يمكن الطباعة/الإرسال قبل التأكيد.</div>
         <div style="margin-top:6px">التاريخ اليدوي الحالي: <span class="k" id="guardDate">—</span></div>
-        <div style="margin-top:6px" class="mini" id="guardWhy" style="color:#7c2d12">—</div>
+        <div style="margin-top:6px" class="mini" id="guardWhy">—</div>
       </div>
 
       <div class="guard-check">
@@ -680,12 +677,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 </div>
 
 <script>
-/* ============= أدوات أرقام ============= */
+/* ================= أدوات أرقام ================= */
 const AR='٠١٢٣٤٥٦٧٨٩', EN='0123456789';
 const en2ar=s=>(''+s).replace(/[0-9]/g,d=>AR[d]);
 const ar2en=s=>(''+s).replace(/[٠-٩]/g,d=>EN[AR.indexOf(d)]);
 
-/* ============= مراجع عناصر (لتفادي تعطل السكربت) ============= */
+/* ================= مراجع عناصر ================= */
 const metaDay=document.getElementById('metaDay');
 const metaHijri=document.getElementById('metaHijri');
 const metaNo=document.getElementById('metaNo');
@@ -716,57 +713,65 @@ const gY=document.getElementById('gY');
 const gM=document.getElementById('gM');
 const gD=document.getElementById('gD');
 
-/* ============= بيانات المعلمين ============= */
+/* ================= بيانات المعلمين ================= */
 const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058931	فيزيا	معلم ممارس
 مبارك عوضه سفر آل ثابت	1056464405	966597233399	كيميا	معلم ممارس
 يوسف  عيسى العيد	1012646822	966592038351	اللغة العربية	معلم ممارس
 منذر عامر حمود زميع	1065913053	966541188974	انجليزي	معلم ممارس
 عماد محمد جمعان الزهراني	1048667289	966542203039	مكتبات	معلم ممارس
-حسن يوسف حسين الخليفة	1056994203	966506907431	كيمياء	معلم ممارس
+حسن يوسف حسين الخليفة		1056994203	966506907431	كيمياء	معلم ممارس
 عبدالمجيد عبدالرحمن عبدالله السالمي	1073861831	966558151033	كيمياء	معلم ممارس
-حسن علي حسن الشهري	1037273594	966536824355	اللغة العربية	معلم ممارس
+حسن علي حسن الشهري		1037273594	966536824355	اللغة العربية	معلم ممارس
 حسين بن سعيد سلمان المدن	1022616799	966556336875	مكتبات	معلم ممارس
 يحيى بن محمد بن سعيد القحطاني	1048978892	966555751385	اجتماعيات	معلم ممارس
-فرج عبدالعلي يوسف ال سيف	1000397735	رياضيات	معلم ممارس
+فرج عبدالعلي يوسف ال سيف	1000397735	966504113707	رياضيات	معلم ممارس
 بندر عبدالعزيز محمد الغامدي	1046853881	966546135135	حاسب	معلم ممارس
-حسين بن محمد بن فهد القحطاني	1014268567	احياء	معلم ممارس
-ناصر علي ناصر الراشد	1008303370	حاسب	معلم ممارس
-حسين بن محمد بن حسين الأحمد	1060369202	اللغة العربية	معلم ممارس
-علي سعد سعيد الاصلعي الاحمري	1023999780	احياء	معلم ممارس
-حسن عبدالله علي العبدالله	1005472780	احياء	معلم ممارس
-محمد حمد عبدالرحمن التويجري	1064745944	اللغة العربية	معلم ممارس
-عبدالله فيصل بن فطيس الهذلي	1094733290	رياضيات	معلم ممارس
-احمد عبدالرحيم عبدالحميد ابوعصيده	1033584234	انجليزي	معلم ممارس
-عبدالله بن عبدالعزيز بن سيف السهلي	1063175010	علم اجتماع	معلم ممارس
-بشير بن أحمد بن عبدالله آل سليم	1019783917	مكتبات	معلم ممارس
-ابراهيم بن محمد بن ابراهيم الربيع	1004182687	انجليزي	معلم ممارس
-عبدالمجيد عبدالله سالم آل حبشان	1004581359	اجتماعيات	معلم ممارس
-خالد سعد راشد المرضي	1025640010	اجتماعيات	معلم ممارس
-فيصل فهد علي الزهراني	1086115373	رياضيات	معلم ممارس
-ابراهيم حبيب عبدالغني الميمني	1072815481	رياضيات	معلم ممارس
-زياد عواض ابن عيضه العمري	1092156742	علم إدارة	معلم ممارس
-عبدالرحمن عبدالجبار حمود العتيبي	1089635724	فيزيا	معلم ممارس
-جميل عبدالمجيد جواد العلي	1029281589	فيزيا	معلم ممارس
-عبد الله حسن عمر الادريسي	1081556910	رياضيات	معلم ممارس
-تقي عبد الهادي تقي العلي	1026472363	كيميا	معلم ممارس
-خالد أحمد محمد الشهري	1034318301	كيميا	معلم ممارس
-صالح بن محمد بن صالح السميحي	1003535422	دين	معلم ممارس
-عبدالله  خلوفة  عبدالله ال مرعي	1029490875	دين	معلم ممارس
-ابراهيم بن أحمد بن ابراهيم العجلان	1001082179	دين	معلم ممارس
-عادل بن علي بن ناصر البارقي	1007370701	رياضه	معلم ممارس
-نبيل بن محسن بن محمد القلاف  	1025472604	رياضه	معلم ممارس
-عادل بن علي بن سليمان السبعان	1003700802	موجه طلابي	معلم ممارس
-ياسر عبدالله محمد النمر	1001443397	مدخل بيانات	مساعد معلم
-علي بن حسن بن علي آل قمبر	1004780860	سكرتاريه	مساعد معلم
-حسن بن عامر احمد الشهري	1013124175	محضر مختبر	مساعد معلم
-عدنان علي حسين الزريق	1015776766	وكيل	معلم ممارس
-فهد حامد علي الزهراني	1024193532	مدير المدرسة	معلم ممارس`;
+حسين بن محمد بن فهد القحطاني	1014268567	966504988086	احياء	معلم ممارس
+ناصر علي ناصر الراشد	1008303370	966542933888	حاسب	معلم ممارس
+حسين بن محمد بن حسين الأحمد	1060369202	966563740777	اللغة العربية	معلم ممارس
+علي سعد سعيد الاصلعي الاحمري	1023999780	966590986464	احياء	معلم ممارس
+حسن عبدالله علي العبدالله	1005472780	966543705512	احياء	معلم ممارس
+محمد حمد عبدالرحمن التويجري	1064745944	966541381105	اللغة العربية	معلم ممارس
+عبدالله فيصل بن فطيس الهذلي	1094733290	966591585407	رياضيات	معلم ممارس
+احمد عبدالرحيم عبدالحميد ابوعصيده	1033584234	966546623431	انجليزي	معلم ممارس
+عبدالله بن عبدالعزيز بن سيف السهلي	1063175010	966546221133	علم اجتماع	معلم ممارس
+بشير بن أحمد بن عبدالله آل سليم	1019783917	966500126925	مكتبات	معلم ممارس
+ابراهيم بن محمد بن ابراهيم الربيع	1004182687	966548638056	انجليزي	معلم ممارس
+عبدالمجيد عبدالله سالم آل حبشان	1004581359	966500223640	اجتماعيات	معلم ممارس
+خالد سعد راشد المرضي	1025640010	966505877238	اجتماعيات	معلم ممارس
+فيصل فهد علي الزهراني	1086115373	966508448455	رياضيات	معلم ممارس
+ابراهيم حبيب عبدالغني الميمني	1072815481	966530163027	رياضيات	معلم ممارس
+زياد عواض ابن عيضه العمري	1092156742	966557530102	علم إدارة	معلم ممارس
+عبدالرحمن عبدالجبار حمود العتيبي	1089635724	966555741488	فيزيا	معلم ممارس
+جميل عبدالمجيد جواد العلي		1029281589	966566712113	فيزيا	معلم ممارس
+عبد الله حسن عمر الادريسي	1081556910	966533025505	رياضيات	معلم ممارس
+تقي عبد الهادي تقي العلي	1026472363	966543219321	كيميا	معلم ممارس
+خالد أحمد محمد الشهري	1034318301	966560687900	كيميا	معلم ممارس
+صالح بن محمد بن صالح السميحي	1003535422	966506921115	دين	معلم ممارس
+عبدالله  خلوفة  عبدالله ال مرعي		1029490875	966533225515	دين	معلم ممارس
+ابراهيم بن أحمد بن ابراهيم العجلان	1001082179	966559999808	دين	معلم ممارس
+عادل بن علي بن ناصر البارقي	1007370701	966530667666	رياضه	معلم ممارس
+نبيل بن محسن بن محمد القلاف  	1025472604	966562962766	رياضه	معلم ممارس
+عادل بن علي بن سليمان السبعان	1003700802	966504836200	موجه طلابي	معلم ممارس
+ياسر عبدالله محمد النمر	1001443397	966503834833	مدخل بيانات	مساعد معلم
+علي بن حسن بن علي آل قمبر	1004780860	966502085389	سكرتاريه	مساعد معلم
+حسن بن عامر احمد الشهري	1013124175	966598893731	محضر مختبر	مساعد معلم
+عدنان علي حسين الزريق	1015776766	966505808451	وكيل	معلم ممارس
+فهد حامد علي الزهراني	1024193532	966504532489	مدير المدرسة	معلم ممارس`;
 
 function parseTeachersCSV(csv){
   return csv.trim().split(/\r?\n/).map(line=>{
     const parts=line.split(/\t+/);
     const [name,civil,phone,spec,level]=[parts[0]||'',parts[1]||'',parts[2]||'',parts[3]||'',parts[4]||''];
-    return {name:name.trim(), civil:(civil||'').replace(/[^\d]/g,'').trim(), phone:(phone||'').replace(/[^\d]/g,''), spec:spec.trim(), level:level.trim(), job:'', work:'معلم'};
+    return {
+      name:name.trim(),
+      civil:(civil||'').replace(/[^\d]/g,'').trim(),
+      phone:(phone||'').replace(/[^\d]/g,''),
+      spec:spec.trim(),
+      level:level.trim(),
+      job:'',
+      work:'معلم'
+    };
   }).filter(r=>r.name);
 }
 const TEACHERS=parseTeachersCSV(TEACHERS_CSV);
@@ -782,10 +787,13 @@ fillTeachers();
 /* ============= حالة عامة ============= */
 let STATE={kind:'late',excuse:'without',accept:'rejected',faris:''};
 
+/* ============= حضوري مستخدم؟ (✅ جديد) ============= */
+let HADORY_USED=false;
+
 /* ============= حماية التاريخ ============= */
-let DATE_GUARD_ACTIVE=true;
-let DATE_GUARD_CONFIRMED=false;
-let DATE_GUARD_REASON='لم يتم تأكيد تاريخ التقرير يدويًا بعد.';
+let DATE_GUARD_ACTIVE=false;        // ✅ لا تعمل قبل استخدام حضوري
+let DATE_GUARD_CONFIRMED=true;      // ✅ مسموح افتراضيًا
+let DATE_GUARD_REASON='—';
 const warnReason=document.getElementById('warnReason');
 
 const dateGuardDlg=document.getElementById('dateGuardDlg');
@@ -827,7 +835,9 @@ document.getElementById('btnGuardConfirm').onclick=()=>{
   showDateOk(true);
 };
 
+/* ✅ تعديل مهم: لا تمنع أي إجراء إذا حضوري غير مستخدم */
 function requireDateGuard(actionName){
+  if(!HADORY_USED) return true;
   if(!DATE_GUARD_ACTIVE) return true;
   if(DATE_GUARD_CONFIRMED) return true;
   openDateGuard(DATE_GUARD_REASON || ('حماية التاريخ مفعّلة قبل: '+actionName));
@@ -839,7 +849,12 @@ const KEY_ARCH='followup_archive_v11';
 let ARCH=JSON.parse(localStorage.getItem(KEY_ARCH)||'[]');
 function saveARCH(){ localStorage.setItem(KEY_ARCH, JSON.stringify(ARCH)); }
 function clearARCH(){ ARCH=[]; saveARCH(); }
-function nextSerialFor(civil){ const n=ARCH.filter(e=>e.civil===civil).length+1; return en2ar(String(n).padStart(2,'0')); }
+
+/* ✅ ترقيم ذكي: يمنع تداخل من ليس لديهم هوية */
+function nextSerialForKey(key){
+  const n=ARCH.filter(e=>((e.civil||e.name)===key)).length+1;
+  return en2ar(String(n).padStart(2,'0'));
+}
 
 /* ============= مراجع عناصر ============= */
 const alertPack=document.getElementById('alertPack');
@@ -892,20 +907,22 @@ document.getElementById('kindChips').addEventListener('click',e=>{
 
 /* ============= العذر/القبول/فارس ============= */
 const unifiedPanel=document.getElementById('unifiedPanel'), unifiedText=document.getElementById('unifiedText');
-document.getElementById('btnUnified').onclick=()=> unifiedPanel.style.display=unifiedPanel.style.display?'':'block';
+document.getElementById('btnUnified').onclick=()=>{
+  unifiedPanel.style.display = (unifiedPanel.style.display==='block') ? 'none' : 'block';
+};
 unifiedPanel.addEventListener('click',e=>{
   const c=e.target.closest('.chip'); if(!c) return;
   if(c.dataset.exc){ c.parentElement.querySelectorAll('[data-exc]').forEach(x=>x.classList.remove('active')); c.classList.add('active'); STATE.excuse=c.dataset.exc; }
   if(c.dataset.acc){ c.parentElement.querySelectorAll('[data-acc]').forEach(x=>x.classList.remove('active')); c.classList.add('active'); STATE.accept=c.dataset.acc; }
   if(c.dataset.fr && STATE.kind==='gaib'){ c.parentElement.querySelectorAll('[data-fr]').forEach(x=>x.classList.remove('active')); c.classList.add('active'); STATE.faris=c.dataset.fr; }
   updUnifiedText();
+  unifiedPanel.style.display='none'; // ✅ جديد: يغلق تلقائيًا بعد الاختيار
 });
 function updUnifiedText(){
   const excTxt=(STATE.excuse==='with')?'بعذر':'بدون عذر';
   const frTxt=(STATE.kind==='gaib')?(' • فارس: '+(STATE.faris==='raised'?'مرفوع':'لم يُرفع')):'';
   unifiedText.textContent=excTxt+frTxt;
 }
-
 /* ============= التاريخ هجري/ميلادي ============= */
 let CAL_MODE='h';
 const pickHijri=document.getElementById('pickHijri'), pickGreg=document.getElementById('pickGreg');
@@ -960,6 +977,12 @@ function syncFromHijri(){
   document.getElementById('statsHijri').textContent=hij;
   document.getElementById('repDay').textContent=dayName;
   document.getElementById('repHijri').textContent=hij;
+
+  const repDayTxt=document.getElementById('repDayTxt');
+  const repHijriTxt=document.getElementById('repHijriTxt');
+  if(repDayTxt) repDayTxt.textContent=dayName;
+  if(repHijriTxt) repHijriTxt.textContent=hij;
+
   updatePrincipalAbs();
 }
 ['gY','gM','gD'].forEach(id=>document.getElementById(id).addEventListener('input',syncFromGregInputs));
@@ -980,6 +1003,12 @@ function syncFromGregInputs(){
   document.getElementById('statsHijri').textContent=hij;
   document.getElementById('repDay').textContent=dayName;
   document.getElementById('repHijri').textContent=hij;
+
+  const repDayTxt=document.getElementById('repDayTxt');
+  const repHijriTxt=document.getElementById('repHijriTxt');
+  if(repDayTxt) repDayTxt.textContent=dayName;
+  if(repHijriTxt) repHijriTxt.textContent=hij;
+
   updatePrincipalAbs();
 }
 
@@ -993,7 +1022,6 @@ function fmtHM(mins){
   const h=Math.floor(mins/60), m=mins%60;
   return en2ar(String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'));
 }
-
 function attachTimeMask(el){
   el.addEventListener('beforeinput',(e)=>{ if(e.inputType==='insertText'){ const ch=e.data; if(!(/[0-9٠-٩:]/.test(ch))) e.preventDefault(); }});
   el.addEventListener('input',()=>{
@@ -1067,7 +1095,11 @@ selTeacher.addEventListener('change',e=>{
   t_job.textContent=t.job||'—'; t_work.textContent=t.work||'—'; t_civil.textContent=t.civil||'—';
   teacherNameInline.textContent=t.name||'—'; noteTeacherName.textContent=t.name||'—'; document.getElementById('affTeacher').textContent=t.name||'—';
   document.getElementById('abs-name-top').textContent=t.name||'—'; document.getElementById('abs-teacher-name').textContent=t.name||'—';
-  metaNo.textContent=nextSerialFor(t.civil);
+
+  /* ✅ ترقيم مضبوط */
+  const key = t.civil || t.name;
+  metaNo.textContent = nextSerialForKey(key);
+
   updatePrincipalAbs();
 });
 
@@ -1094,12 +1126,18 @@ document.getElementById('btnPrintSave').addEventListener('click', async function
   const t=TEACHERS[i];
 
   ARCH.push({
-    ts:Date.now(),
-    civil:t.civil, name:t.name,
-    kind:STATE.kind,
-    excuse:STATE.excuse, accept:STATE.accept,
-    faris:(STATE.kind==='gaib'?(STATE.faris||'not'):''),
-    hijri:metaHijri.textContent, day:metaDay.textContent
+    ts: Date.now(),
+    civil: t.civil,
+    name: t.name,
+    kind: STATE.kind,
+    excuse: STATE.excuse,
+    accept: STATE.accept,
+    faris: (STATE.kind === 'gaib' ? (STATE.faris || 'not') : ''),
+    hijri: metaHijri.textContent,
+    day: metaDay.textContent,
+    noteReason: (STATE.kind === 'note')
+      ? (document.getElementById('noteReasonText')?.textContent || '')
+      : ''
   });
   saveARCH();
 
@@ -1113,7 +1151,10 @@ document.getElementById('btnPrintSave').addEventListener('click', async function
     const w=210,h=canvas.height*210/canvas.width;
     pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
     pdf.save(`إجراء - ${t.name}.pdf`);
-    setTimeout(()=>window.print(),200);
+
+    /* ✅ بدل الطباعة التلقائية */
+    if(confirm('تم حفظ ملف PDF. هل تريد الطباعة الآن؟')) setTimeout(()=>window.print(),200);
+
   }catch(err){ alert('تعذّر إنشاء PDF: '+(err.message||err)); }
   finally{ btn.disabled=false; btn.textContent=old; }
 });
@@ -1132,16 +1173,16 @@ document.getElementById('btnStatsPDF').onclick=async()=>{
   setTimeout(()=>document.body.removeAttribute('data-print'),300);
 };
 function shortDetails(r){
-  if(r.kind==='late'){ return `تنبيه تأخر`; }
-  if(r.kind==='absent'){ return `تنبيه عدم تواجد`; }
-  if(r.kind==='gaib'){ return `غياب`; }
-  if(r.kind==='note'){ const rs=document.getElementById('noteReasonText')?.textContent||'—'; return `لفت نظر — ${rs}`; }
+  if(r.kind === 'late') return 'تنبيه تأخر';
+  if(r.kind === 'absent') return 'تنبيه عدم تواجد';
+  if(r.kind === 'gaib') return 'غياب';
+  if(r.kind === 'note') return `لفت نظر — ${r.noteReason || '—'}`;
   return '—';
 }
 function openStats(){
   const tb=document.querySelector('#tblStats tbody'); tb.innerHTML='';
   const byTeacher=new Map();
-  ARCH.forEach(r=>{const k=r.civil||r.name; if(!byTeacher.has(k)) byTeacher.set(k,{name:r.name,rows:[]}); byTeacher.get(k).rows.push(r);});
+  ARCH.forEach(r=>{const k=(r.civil||r.name); if(!byTeacher.has(k)) byTeacher.set(k,{name:r.name,rows:[]}); byTeacher.get(k).rows.push(r);});
   for(const {name,rows} of byTeacher.values()){
     rows.sort((a,b)=>a.ts-b.ts);
     rows.forEach((r,idx)=>{
@@ -1185,7 +1226,7 @@ function updatePrincipalAbs(){
 }
 
 /* =========================
-   حضوري (متاخر/غياب/عدم تسجيل انصراف فقط)
+   حضوري
    ========================= */
 const hadoryFiles = document.getElementById('hadoryFiles');
 const hadoryManualDate = document.getElementById('hadoryManualDate');
@@ -1209,6 +1250,7 @@ document.getElementById('btnHadoryDrive').addEventListener('click', ()=>{
 });
 
 document.getElementById('btnConfirmDateInline').onclick=()=>{
+  if(!HADORY_USED) return;
   openDateGuard(DATE_GUARD_REASON || 'يرجى التأكد من تاريخ التقرير يدويًا ثم الإقرار بالمطابقة.');
 };
 
@@ -1218,10 +1260,12 @@ let HADORY_CASES=[];
 let HADORY_IMPORT_DATES=[];
 
 function setHadoryStatus(txt){ hadoryStatus.textContent = txt; }
+
+/* ✅ لا تفعّل الحماية إلا إذا حضوري مستخدم فعلاً */
 function showDateWarn(on, reason){
   hadoryDateWarn.style.display=on?'block':'none';
   warnReason.textContent=reason||'—';
-  if(on){
+  if(on && HADORY_USED){
     hadoryDateOk.style.display='none';
     DATE_GUARD_ACTIVE=true;
     DATE_GUARD_CONFIRMED=false;
@@ -1230,7 +1274,7 @@ function showDateWarn(on, reason){
 }
 function showDateOk(on){
   hadoryDateOk.style.display=on?'block':'none';
-  if(on){
+  if(on && HADORY_USED){
     hadoryDateWarn.style.display='none';
     DATE_GUARD_ACTIVE=false;
     DATE_GUARD_CONFIRMED=true;
@@ -1336,6 +1380,11 @@ function bestHeaderRow(rows){
 hadoryFiles.addEventListener('change', async (e)=>{
   const files=[...e.target.files||[]];
   if(!files.length) return;
+
+  /* ✅ حضوري بدأ */
+  HADORY_USED=true;
+  DATE_GUARD_ACTIVE=true;
+  DATE_GUARD_CONFIRMED=false;
 
   setHadoryStatus('جاري القراءة...');
   HADORY_LOGS=[]; HADORY_DAILY=[]; HADORY_CASES=[]; HADORY_IMPORT_DATES=[];
@@ -1606,7 +1655,7 @@ ${details}
 });
 
 /* =========================
-   كشف حضوري (اليومي)
+   كشف حضوري (اليومي) ✅ محسّن: حاضر/متأخر/لم يغلق/غائب
    ========================= */
 const hadoryReportDlg=document.getElementById('hadoryReportDlg');
 const tblHadoryReport=document.querySelector('#tblHadoryReport tbody');
@@ -1633,17 +1682,32 @@ function openHadoryReport(){
   absent.sort((a,b)=> (a.name||'').localeCompare(b.name||'','ar'));
 
   const rows=[...present, ...absent];
+  const wsM=toMin(WORK_RANGE[SEASON].start);
 
   tblHadoryReport.innerHTML = rows.map((r,idx)=>{
     const isAbsent=!r.attend && !r.leave && (!r.workMinutes);
-    const status = isAbsent ? `<span class="tag red">غائب</span>` : `<span class="tag green">حاضر</span>`;
+
+    let statusHTML = `<span class="tag green">حاضر</span>`;
+
+    const attendM=toMin(r.attend);
+    if(attendM!=null && wsM!=null && attendM>wsM && !isAbsent){
+      statusHTML = `<span class="tag amber">متأخر</span>`;
+    }
+
+    const noOut = (r.attend && !r.leave) || (r.attend && r.leave && r.autoOut);
+    if(noOut && !isAbsent){
+      statusHTML = `<span class="tag amber">لم يُغلق الدوام</span>`;
+    }
+
+    if(isAbsent) statusHTML = `<span class="tag red">غائب</span>`;
+
     return `<tr>
       <td style="font-weight:900">${en2ar(idx+1)}</td>
       <td style="font-weight:900">${r.name||'—'}</td>
       <td>${r.civil||'—'}</td>
       <td>${r.attend||'--:--'}</td>
       <td>${r.leave||'--:--'}</td>
-      <td>${status}</td>
+      <td>${statusHTML}</td>
     </tr>`;
   }).join('');
 
@@ -1702,9 +1766,11 @@ function init(){
   closeDateGuard();
   updatePrincipalAbs();
 
+  /* ✅ لا نفعل التحذير ولا الحماية قبل الاستيراد */
   hadoryManualDate.value='';
-  showDateWarn(true,'أدخل تاريخ التقرير يدويًا (حسب ملف حضوري) ثم اضغط تطبيق ثم أكد المطابقة.');
-  showDateOk(false);
+  hadoryDateWarn.style.display='none';
+  hadoryDateOk.style.display='none';
+  setHadoryStatus('جاهز');
 }
 init();
 </script>
