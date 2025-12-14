@@ -215,7 +215,6 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 
 <body>
 <div class="app">
-
   <aside class="sidebar" id="sidebar">
     <div class="sb-head">لوحة التعليمات</div>
     <div class="sb-body">
@@ -786,12 +785,12 @@ fillTeachers();
 /* ============= حالة عامة ============= */
 let STATE={kind:'late',excuse:'without',accept:'rejected',faris:''};
 
-/* ============= حضوري مستخدم؟ (✅ جديد) ============= */
+/* ============= حضوري مستخدم؟ ============= */
 let HADORY_USED=false;
 
 /* ============= حماية التاريخ ============= */
-let DATE_GUARD_ACTIVE=false;        // ✅ لا تعمل قبل استخدام حضوري
-let DATE_GUARD_CONFIRMED=true;      // ✅ مسموح افتراضيًا
+let DATE_GUARD_ACTIVE=false;
+let DATE_GUARD_CONFIRMED=true;
 let DATE_GUARD_REASON='—';
 const warnReason=document.getElementById('warnReason');
 
@@ -834,7 +833,6 @@ document.getElementById('btnGuardConfirm').onclick=()=>{
   showDateOk(true);
 };
 
-/* ✅ تعديل مهم: لا تمنع أي إجراء إذا حضوري غير مستخدم */
 function requireDateGuard(actionName){
   if(!HADORY_USED) return true;
   if(!DATE_GUARD_ACTIVE) return true;
@@ -849,7 +847,6 @@ let ARCH=JSON.parse(localStorage.getItem(KEY_ARCH)||'[]');
 function saveARCH(){ localStorage.setItem(KEY_ARCH, JSON.stringify(ARCH)); }
 function clearARCH(){ ARCH=[]; saveARCH(); }
 
-/* ✅ ترقيم ذكي: يمنع تداخل من ليس لديهم هوية */
 function nextSerialForKey(key){
   const n=ARCH.filter(e=>((e.civil||e.name)===key)).length+1;
   return en2ar(String(n).padStart(2,'0'));
@@ -915,13 +912,14 @@ unifiedPanel.addEventListener('click',e=>{
   if(c.dataset.acc){ c.parentElement.querySelectorAll('[data-acc]').forEach(x=>x.classList.remove('active')); c.classList.add('active'); STATE.accept=c.dataset.acc; }
   if(c.dataset.fr && STATE.kind==='gaib'){ c.parentElement.querySelectorAll('[data-fr]').forEach(x=>x.classList.remove('active')); c.classList.add('active'); STATE.faris=c.dataset.fr; }
   updUnifiedText();
-  unifiedPanel.style.display='none'; // ✅ جديد: يغلق تلقائيًا بعد الاختيار
+  unifiedPanel.style.display='none';
 });
 function updUnifiedText(){
   const excTxt=(STATE.excuse==='with')?'بعذر':'بدون عذر';
   const frTxt=(STATE.kind==='gaib')?(' • فارس: '+(STATE.faris==='raised'?'مرفوع':'لم يُرفع')):'';
   unifiedText.textContent=excTxt+frTxt;
 }
+
 /* ============= التاريخ هجري/ميلادي ============= */
 let CAL_MODE='h';
 const pickHijri=document.getElementById('pickHijri'), pickGreg=document.getElementById('pickGreg');
@@ -1095,7 +1093,6 @@ selTeacher.addEventListener('change',e=>{
   teacherNameInline.textContent=t.name||'—'; noteTeacherName.textContent=t.name||'—'; document.getElementById('affTeacher').textContent=t.name||'—';
   document.getElementById('abs-name-top').textContent=t.name||'—'; document.getElementById('abs-teacher-name').textContent=t.name||'—';
 
-  /* ✅ ترقيم مضبوط */
   const key = t.civil || t.name;
   metaNo.textContent = nextSerialForKey(key);
 
@@ -1151,7 +1148,6 @@ document.getElementById('btnPrintSave').addEventListener('click', async function
     pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
     pdf.save(`إجراء - ${t.name}.pdf`);
 
-    /* ✅ بدل الطباعة التلقائية */
     if(confirm('تم حفظ ملف PDF. هل تريد الطباعة الآن؟')) setTimeout(()=>window.print(),200);
 
   }catch(err){ alert('تعذّر إنشاء PDF: '+(err.message||err)); }
@@ -1178,26 +1174,56 @@ function shortDetails(r){
   if(r.kind === 'note') return `لفت نظر — ${r.noteReason || '—'}`;
   return '—';
 }
+
+/* ✅ openStats محسّن بدون تغيير النتائج */
 function openStats(){
   const tb=document.querySelector('#tblStats tbody'); tb.innerHTML='';
   const byTeacher=new Map();
-  ARCH.forEach(r=>{const k=(r.civil||r.name); if(!byTeacher.has(k)) byTeacher.set(k,{name:r.name,rows:[]}); byTeacher.get(k).rows.push(r);});
+  ARCH.forEach(r=>{
+    const k=(r.civil||r.name);
+    if(!byTeacher.has(k)) byTeacher.set(k,{name:r.name,rows:[]});
+    byTeacher.get(k).rows.push(r);
+  });
+
   for(const {name,rows} of byTeacher.values()){
     rows.sort((a,b)=>a.ts-b.ts);
+
     rows.forEach((r,idx)=>{
       const tr=document.createElement('tr');
-      if(idx===0){ const td=document.createElement('td'); td.rowSpan=rows.length; td.style.fontWeight='900'; td.textContent=name; tr.appendChild(td); }
-      tr.innerHTML += `
-        <td>${({late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',gaib:'مساءلة غياب',note:'لفت نظر'})[r.kind]}</td>
-        <td>${r.day}</td>
-        <td>${r.hijri}</td>
-        <td>${r.excuse==='with'?'بعذر':'بدون عذر'}</td>
-        <td>${r.kind==='gaib' ? ((r.faris==='raised')?'مرفوع':'لم يُرفع') : ''}</td>
-        <td>${shortDetails(r)}</td>
-        <td class="no-print"><button class="btn ghost delRow" data-ts="${r.ts}" title="حذف">حذف</button></td>`;
+
+      if(idx===0){
+        const td=document.createElement('td');
+        td.rowSpan=rows.length;
+        td.style.fontWeight='900';
+        td.textContent=name;
+        tr.appendChild(td);
+      }
+
+      const tdType=document.createElement('td');
+      tdType.textContent=({late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',gaib:'مساءلة غياب',note:'لفت نظر'})[r.kind]||'—';
+
+      const tdDay=document.createElement('td'); tdDay.textContent=r.day||'—';
+      const tdHij=document.createElement('td'); tdHij.textContent=r.hijri||'—';
+      const tdExc=document.createElement('td'); tdExc.textContent=(r.excuse==='with'?'بعذر':'بدون عذر');
+      const tdF=document.createElement('td'); tdF.textContent=(r.kind==='gaib'?((r.faris==='raised')?'مرفوع':'لم يُرفع'):'');
+      const tdDet=document.createElement('td'); tdDet.textContent=shortDetails(r);
+
+      const tdAct=document.createElement('td');
+      tdAct.className='no-print';
+      tdAct.innerHTML=`<button class="btn ghost delRow" data-ts="${r.ts}" title="حذف">حذف</button>`;
+
+      tr.appendChild(tdType);
+      tr.appendChild(tdDay);
+      tr.appendChild(tdHij);
+      tr.appendChild(tdExc);
+      tr.appendChild(tdF);
+      tr.appendChild(tdDet);
+      tr.appendChild(tdAct);
+
       tb.appendChild(tr);
     });
   }
+
   statsDlg.style.display='flex';
   statsDlg.setAttribute('aria-hidden','false');
   document.getElementById('statsDay').textContent=document.getElementById('metaDay').textContent;
@@ -1260,7 +1286,6 @@ let HADORY_IMPORT_DATES=[];
 
 function setHadoryStatus(txt){ hadoryStatus.textContent = txt; }
 
-/* ✅ لا تفعّل الحماية إلا إذا حضوري مستخدم فعلاً */
 function showDateWarn(on, reason){
   hadoryDateWarn.style.display=on?'block':'none';
   warnReason.textContent=reason||'—';
@@ -1380,7 +1405,6 @@ hadoryFiles.addEventListener('change', async (e)=>{
   const files=[...e.target.files||[]];
   if(!files.length) return;
 
-  /* ✅ حضوري بدأ */
   HADORY_USED=true;
   DATE_GUARD_ACTIVE=true;
   DATE_GUARD_CONFIRMED=false;
@@ -1654,7 +1678,7 @@ ${details}
 });
 
 /* =========================
-   كشف حضوري (اليومي) ✅ محسّن: حاضر/متأخر/لم يغلق/غائب
+   كشف حضوري (اليومي)
    ========================= */
 const hadoryReportDlg=document.getElementById('hadoryReportDlg');
 const tblHadoryReport=document.querySelector('#tblHadoryReport tbody');
@@ -1729,6 +1753,7 @@ hadoryReportDlg.addEventListener('click',(e)=>{
   }
 });
 
+/* ✅ إصلاح نهائي: زر طباعة كشف حضوري (بدون أي كتل يتيمة بعده) */
 document.getElementById('btnReportPrint').addEventListener('click', async ()=>{
   const card=document.getElementById('reportCard');
   await ensureAllImagesEmbedded(card);
@@ -1736,22 +1761,6 @@ document.getElementById('btnReportPrint').addEventListener('click', async ()=>{
   document.body.setAttribute('data-print','hadory');
   window.print();
   setTimeout(()=>document.body.removeAttribute('data-print'),300);
-});
-
-  const iso=hadoryManualDate.value||'';
-  if(!iso){ alert('حدد تاريخ التقرير يدويًا أولاً.'); return; }
-  const card=document.getElementById('reportCard');
-  const { jsPDF }=window.jspdf;
-  try{
-    await ensureAllImagesEmbedded(card);
-    const canvas=await html2canvas(card,{ scale:2, background:'#fff', useCORS:true, allowTaint:false, imageTimeout:0, logging:false });
-    const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
-    const w=210, h=canvas.height*210/canvas.width;
-    pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
-    pdf.save(`كشف حضوري - ${iso}.pdf`);
-  }catch(err){
-    alert('تعذّر إنشاء PDF: '+(err.message||err));
-  }
 });
 
 /* تهيئة */
@@ -1764,7 +1773,6 @@ function init(){
   closeDateGuard();
   updatePrincipalAbs();
 
-  /* ✅ لا نفعل التحذير ولا الحماية قبل الاستيراد */
   hadoryManualDate.value='';
   hadoryDateWarn.style.display='none';
   hadoryDateOk.style.display='none';
