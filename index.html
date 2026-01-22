@@ -399,13 +399,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
 
       <div class="sb-actions">
-  <button id="btnHadoryReport" class="btn ghost">كشف حضوري 🗂️</button>
-  <button id="btnStats" class="btn ghost">الإحصائيات 📊</button>
-  <button id="btnWA" class="btn wh">واتساب</button>
-  <button id="btnPrintSave" class="btn primary">طباعة / حفظ</button>
-
-  <button id="btnMonthlyStats" class="btn monthlyStats">حصائيات الحضور والانصراف شهري 📈</button>
-</div>
+        <button id="btnHadoryReport" class="btn ghost">كشف حضوري 🗂️</button>
+        <button id="btnStats" class="btn ghost">الإحصائيات 📊</button>
+        <button id="btnWA" class="btn wh">واتساب</button>
+        <button id="btnPrintSave" class="btn primary">طباعة / حفظ</button>
+        <button id="btnMonthlyStats" class="btn monthlyStats">حصائيات الحضور والانصراف شهري 📈</button>
+      </div>
 
     </div>
 
@@ -768,21 +767,47 @@ const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058
 عدنان علي حسين الزريق	1015776766	966505808451	وكيل	معلم ممارس
 فهد حامد علي الزهراني	1024193532	966504532489	مدير المدرسة	معلم ممارس`;
 
+/* ✅ تحسين قراءة CSV: يدعم الحالات التي فيها تبويب زائد (عمود فارغ) */
 function parseTeachersCSV(csv){
+  const digitsOnly = (s)=>String(s||'').replace(/[^\d]/g,'').trim();
+  const looksCivil = (s)=>digitsOnly(s).length===10;
+  const looksPhone = (s)=>{ const d=digitsOnly(s); return d.startsWith('966') && d.length>=11; };
+
   return csv.trim().split(/\r?\n/).map(line=>{
-    const parts=line.split(/\t+/);
-    const [name,civil,phone,spec,level]=[parts[0]||'',parts[1]||'',parts[2]||'',parts[3]||'',parts[4]||''];
+    const parts=line.split(/\t+/).map(x=>String(x||'').trim());
+    const name=(parts[0]||'').trim();
+    const rest=parts.slice(1).filter(x=>x!=='');
+
+    let civil='', phone='', spec='', level='';
+
+    // 1) التقط الهوية والجوال من أي مكان
+    rest.forEach(tok=>{
+      if(!civil && looksCivil(tok)) civil=digitsOnly(tok);
+      else if(!phone && looksPhone(tok)) phone=digitsOnly(tok);
+    });
+
+    // 2) المتبقي: تخصص + مرتبة
+    const remaining = rest.filter(tok=>{
+      const d=digitsOnly(tok);
+      if(civil && d===civil) return false;
+      if(phone && d===phone) return false;
+      return true;
+    });
+
+    if(remaining.length){ spec=remaining[0]||''; level=remaining[1]||''; }
+
     return {
       name:name.trim(),
-      civil:(civil||'').replace(/[^\d]/g,'').trim(),
-      phone:(phone||'').replace(/[^\d]/g,''),
-      spec:spec.trim(),
-      level:level.trim(),
+      civil:civil,
+      phone:phone,
+      spec:(spec||'').trim(),
+      level:(level||'').trim(),
       job:'',
       work:'معلم'
     };
   }).filter(r=>r.name);
 }
+
 const TEACHERS=parseTeachersCSV(TEACHERS_CSV);
 const TEACHER_BY_CIVIL={}; TEACHERS.forEach(t=>{ if(t.civil) TEACHER_BY_CIVIL[t.civil]=t; });
 
@@ -1125,7 +1150,7 @@ async function ensureAllImagesEmbedded(root){
   for(const im of imgs){ if(!im.src.startsWith('data:')) await embedImageToDataURL(im); }
 }
 
-/* طباعة/حفظ PDF — ✅ إصلاح: ربط الزر + منع return خارج دالة */
+/* طباعة/حفظ PDF — ✅ إصلاح: إزالة الكتلة المكررة التي كانت تكسر التنفيذ */
 document.getElementById('btnPrintSave').addEventListener('click', async (e)=>{
   if(!requireDateGuard('الطباعة/الحفظ')) return;
 
@@ -1187,40 +1212,6 @@ document.getElementById('btnPrintSave').addEventListener('click', async (e)=>{
     btn.disabled = false;
     btn.textContent = old;
   }
-});
-
-/* فتح صفحة حصائيات الحضور والانصراف (شهري) */
-const btnMonthlyStats = document.getElementById('btnMonthlyStats');
-if(btnMonthlyStats){
-  btnMonthlyStats.addEventListener('click', (e)=>{
-    e.preventDefault();
-    const url = 'https://fhz545-hub.github.io/teacher-eval-1447/2';
-
-    // محاولة فتح تبويب جديد
-    const w = window.open(url, '_blank');
-
-    // إذا المتصفح منع الـ popup افتحها في نفس الصفحة كخطة بديلة
-    if(!w) window.location.href = url;
-  });
-}
-
-  saveARCH();
-
-  const { jsPDF }=window.jspdf;
-  const btn=this; const old=btn.textContent; btn.disabled=true; btn.textContent='جارٍ إنشاء PDF...';
-  try{
-    const sheet=document.getElementById('sheet');
-    await ensureAllImagesEmbedded(sheet);
-    const canvas=await html2canvas(sheet,{ scale:2, background:'#fff', useCORS:true, allowTaint:false, imageTimeout:0, logging:false });
-    const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
-    const w=210,h=canvas.height*210/canvas.width;
-    pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,0,w,h);
-    pdf.save(`إجراء - ${t.name}.pdf`);
-
-    if(confirm('تم حفظ ملف PDF. هل تريد الطباعة الآن؟')) setTimeout(()=>window.print(),200);
-
-  }catch(err){ alert('تعذّر إنشاء PDF: '+(err.message||err)); }
-  finally{ btn.disabled=false; btn.textContent=old; }
 });
 
 /* الإحصائيات */
@@ -1822,7 +1813,7 @@ hadoryReportDlg.addEventListener('click',(e)=>{
   }
 });
 
-/* ✅ إصلاح نهائي: زر طباعة كشف حضوري (بدون أي كتل يتيمة بعده) */
+/* ✅ زر طباعة كشف حضوري */
 document.getElementById('btnReportPrint').addEventListener('click', async ()=>{
   const card=document.getElementById('reportCard');
   await ensureAllImagesEmbedded(card);
@@ -1846,6 +1837,17 @@ function init(){
   hadoryDateWarn.style.display='none';
   hadoryDateOk.style.display='none';
   setHadoryStatus('جاهز');
+
+  // ✅ ربط زر "حصائيات الحضور والانصراف شهري" بالرابط
+  const btnMonthlyStats = document.getElementById('btnMonthlyStats');
+  if (btnMonthlyStats) {
+    btnMonthlyStats.addEventListener('click', (e) => {
+      e.preventDefault();
+      const url = 'https://fhz545-hub.github.io/teacher-eval-1447/2';
+      const w = window.open(url, '_blank');
+      if (!w) window.location.href = url;
+    });
+  }
 }
 init();
 </script>
