@@ -37,6 +37,16 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 .btn.ghost{background:#eef7f7}
 .btn.primary{background:var(--moe);color:#fff;border-color:transparent}
 .btn.wh{background:#25D366;color:#fff;border-color:#1aae53}
+/* زر حصائيات الحضور والانصراف شهري */
+.btn.monthlyStats{
+  background:linear-gradient(90deg,#0ea5e9,#2563eb);
+  color:#fff;
+  border-color:transparent;
+  box-shadow:0 10px 26px rgba(37,99,235,.18);
+}
+.btn.monthlyStats:hover{filter:brightness(.98)}
+.btn.monthlyStats:active{transform:translateY(1px)}
+
 .sb-actions{margin-top:8px;display:flex;flex-direction:column;gap:10px}
 .rights{font-size:10px;color:#7a8790;text-align:center;padding:8px 10px;border-top:1px dashed #eef4f4;margin-top:auto}
 .disabled{opacity:.45;pointer-events:none;filter:grayscale(1)}
@@ -389,11 +399,14 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
 
       <div class="sb-actions">
-        <button id="btnHadoryReport" class="btn ghost">كشف حضوري 🗂️</button>
-        <button id="btnStats" class="btn ghost">الإحصائيات 📊</button>
-        <button id="btnWA" class="btn wh">واتساب</button>
-        <button id="btnPrintSave" class="btn primary">طباعة / حفظ</button>
-      </div>
+  <button id="btnHadoryReport" class="btn ghost">كشف حضوري 🗂️</button>
+  <button id="btnStats" class="btn ghost">الإحصائيات 📊</button>
+  <button id="btnWA" class="btn wh">واتساب</button>
+  <button id="btnPrintSave" class="btn primary">طباعة / حفظ</button>
+
+  <button id="btnMonthlyStats" class="btn monthlyStats">حصائيات الحضور والانصراف شهري 📈</button>
+</div>
+
     </div>
 
     <div class="rights">مبادرة اليعقوبي — تطوير: فهد حامد الزهراني (لا تظهر في الطباعة)</div>
@@ -1133,6 +1146,12 @@ document.getElementById('btnPrintSave').addEventListener('click', async function
       ? (document.getElementById('noteReasonText')?.textContent || '')
       : ''
   });
+/* فتح صفحة حصائيات الحضور والانصراف (شهري) */
+document.getElementById('btnMonthlyStats').addEventListener('click', ()=>{
+  const url='https://fhz545-hub.github.io/teacher-eval-1447/2';
+  const w=window.open(url,'_blank','noopener,noreferrer');
+  if(w) w.opener=null;
+});
   saveARCH();
 
   const { jsPDF }=window.jspdf;
