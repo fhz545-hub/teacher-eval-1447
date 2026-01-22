@@ -1,3 +1,4 @@
+<!-- ===================== PART 1 / 7 ===================== -->
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -8,6 +9,9 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- ✅ PDF Export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
   <style>
     :root{
@@ -22,6 +26,10 @@
       --warn:#fff6ec;
       --bad:#ffefef;
       --r:18px;
+
+      /* ✅ صفوف الجدول */
+      --rowAbs: rgba(220, 38, 38, .10);   /* أحمر شفاف */
+      --rowOpen: rgba(245, 158, 11, .16); /* أصفر شفاف */
     }
     *{box-sizing:border-box}
     html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial}
@@ -108,16 +116,37 @@
       box-shadow:var(--shadow);
       padding:22px 22px 18px;
     }
-    .pageHeader{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
-      margin-bottom:10px;
+
+    /* ✅ الهيدر داخل الكشف: بنر فقط (بدون كتابة) */
+    .pageHeader{margin-bottom:12px}
+    .pageHeader .meta{display:none !important} /* نحافظ على العناصر للبرمجة لكن نخفيها */
+    .bannerWrap{
+      width:100%;
+      border-radius:18px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      box-shadow:0 10px 24px rgba(7, 38, 43, .08);
+      background:#0b5f66;
     }
-    .pageHeader .meta{display:flex; flex-direction:column; gap:6px; font-weight:1000}
-    .pageHeader .meta .dow{font-size:16px}
-    .pageHeader .meta .hijri{font-size:14px; color:var(--muted)}
-    .pageHeader .headline{
-      flex:1; text-align:center; font-weight:1100; font-size:22px; letter-spacing:.2px;
-      color:#0b5660; margin-top:4px; line-height:1.25;
+    .bannerWrap img{
+      width:100%;
+      height:132px;
+      display:block;
+      object-fit:cover;
+    }
+    @media (max-width:560px){
+      .bannerWrap img{height:112px}
+    }
+
+    /* عنوان الكشف يبقى كما هو */
+    .headline{
+      text-align:center;
+      font-weight:1100;
+      font-size:22px;
+      letter-spacing:.2px;
+      color:#0b5660;
+      margin:10px 0 6px;
+      line-height:1.25;
     }
 
     table{width:100%; border-collapse:collapse}
@@ -125,6 +154,11 @@
     th{background:#0b5f66; color:#fff; font-weight:1000; font-size:13px}
     td{background:#fff; font-weight:900; color:#20383b}
     .tight td{padding:9px 10px}
+
+    /* ✅ تلوين صفوف تفصيل الأيام */
+    #daysBody tr.absent td{background:var(--rowAbs) !important}
+    #daysBody tr.open td{background:var(--rowOpen) !important}
+
     .sectionTitle{margin:18px 0 10px; font-weight:1100; color:#0b5660; font-size:16px; text-align:right}
     .note{margin-top:10px; color:#5e7377; font-weight:900; font-size:12px}
     .footerNote{margin-top:12px; color:#2f4f53; font-weight:1000; text-align:right}
@@ -221,11 +255,12 @@
     }
   </style>
 </head>
-
+<!-- ===================== PART 2 / 7 ===================== -->
 <body>
   <header class="topbar">
     <div class="btns">
       <button class="btn primary" id="btnExport">تنزيل Excel</button>
+      <button class="btn primary" id="btnPDF">تنزيل PDF</button>
       <button class="btn primary" id="btnPrint">طباعة</button>
       <button class="btn wa" id="btnWA">رسالة واتساب</button>
 
@@ -270,14 +305,22 @@
 
   <main class="paper">
     <section class="page" id="reportPage">
+
+      <!-- ✅ الهيدر داخل الكشف: بنر فقط -->
       <div class="pageHeader">
-        <div class="meta">
+        <!-- نُبقي العناصر للبرمجة فقط بدون عرض -->
+        <div class="meta" aria-hidden="true">
           <div class="dow" id="todayDow">—</div>
           <div class="hijri" id="todayHijri">—</div>
         </div>
 
-        <div class="headline" id="reportHeadline">احصائيات الحضور والانصراف</div>
+        <div class="bannerWrap" aria-label="بنر وزارة التعليم">
+          <img id="bannerImg" src="shree.png" alt="" />
+        </div>
       </div>
+
+      <!-- ✅ عنوان الكشف كما هو -->
+      <div class="headline" id="reportHeadline">احصائيات الحضور والانصراف</div>
 
       <table class="tight" aria-label="بيانات المعلم">
         <thead>
@@ -329,7 +372,8 @@
       </div>
 
       <div class="note">
-        • تُستبعد تلقائيًا أيام <b>الجمعة والسبت</b> و<b>الإجازات الرسمية</b> من العرض والحسابات، وتُحتسب الساعات ضمن نطاق (<b id="clampMin">06:30</b> → <b id="clampMax">14:25</b>) لضبط الإحصاءات بصورة عادلة.
+        • تُستبعد تلقائيًا أيام <b>الجمعة والسبت</b> و<b>الإجازات الرسمية</b> من العرض والحسابات، وتُحتسب الساعات ضمن نطاق (<b id="clampMin">06:30</b> → <b id="clampMax">14:25</b>) لضبط الإحصاءات بصورة عادلة.<br>
+        • في حال <b>لم يُغلق الدوام</b> (عدم تسجيل الانصراف) يُحتسب <b>نصف دوام فقط</b> (3:30) وفق التنظيم.
       </div>
 
       <div class="sectionTitle">تفصيل أيام الشهر (من الأحدث إلى الأقدم)</div>
@@ -349,10 +393,10 @@
         </tbody>
       </table>
 
-      <div class="footerNote">تحفظ في ملف المتابعة</div>
+      <div class="footerNote">وفق منصة حضوري الرسمية لتسهيل المتابعة</div>
     </section>
   </main>
-
+<!-- ===================== PART 3 / 7 ===================== -->
   <!-- WhatsApp Modal -->
   <div class="overlay" id="waOverlay"></div>
   <div class="modal" id="waModal" aria-hidden="true">
@@ -414,12 +458,17 @@
   const CLAMP_MIN  = "06:30";
   const CLAMP_MAX  = "14:25";
 
+  // ✅ نصف دوام عند عدم تسجيل الانصراف (نصف 7 ساعات)
+  const HALF_SHIFT_MIN = 210; // 3:30
+
+  /* =========================
+     إعداد البنر داخل الكشف
+     ضع ملف الصورة shree.png بجانب ملف HTML
+  ========================== */
+  const BANNER_SRC = "shree.png";
+
   /* =========================
      إعدادات العام الدراسي (ميلادي)
-     ✅ حل مشكلة السنة تلقائياً:
-     - أشهر (8–12): سنة بداية العام الدراسي
-     - أشهر (1–7): سنة بداية العام + 1
-     ملاحظة: إن وُجدت سنة صريحة في اسم المجلد (مثل 2025-11) تُعتمد مباشرة.
   ========================== */
   const ACADEMIC_START_GREG_YEAR = 2025;   // 2025/2026
   const DEFAULT_GREG_YEAR = ACADEMIC_START_GREG_YEAR;
@@ -431,22 +480,38 @@
 
   /* =========================
      استبعاد الجمعة/السبت + الإجازات الرسمية
-     ✅ بناءً على المرفقات (الفصلين) ويمكن تعديلها بسهولة عند الحاجة
+     ✅ مُحدّث حسب تقويم 1447هـ (الفصلين)
   ========================== */
   const SKIP_WEEKEND = true;         // الجمعة + السبت
   const SKIP_HOLIDAYS = true;        // الإجازات الرسمية/الإضافية
 
   // نطاقات إجازات (YYYY-MM-DD) شاملة للطرفين
   const HOLIDAY_RANGES = [
+    // ===== الفصل الدراسي الأول 1447هـ =====
     { start:"2025-09-23", end:"2025-09-23", label:"إجازة اليوم الوطني" },
     { start:"2025-10-12", end:"2025-10-12", label:"إجازة إضافية" },
-    { start:"2025-11-20", end:"2025-11-29", label:"إجازة الخريف" },
+
+    // إجازة الخريف: تبدأ نهاية دوام الخميس 2025-11-20 => يُستبعد من الجمعة 2025-11-21
+    { start:"2025-11-21", end:"2025-11-29", label:"إجازة الخريف" },
+
     { start:"2025-12-11", end:"2025-12-11", label:"إجازة إضافية" },
     { start:"2025-12-14", end:"2025-12-14", label:"إجازة إضافية" },
+
+    // إجازة منتصف العام: تبدأ نهاية دوام الخميس 2026-01-08 => يُستبعد من الجمعة 2026-01-09 حتى السبت 2026-01-17
+    { start:"2026-01-09", end:"2026-01-17", label:"إجازة منتصف العام" },
+
+    // ===== الفصل الدراسي الثاني 1447–1448هـ =====
     { start:"2026-02-22", end:"2026-02-22", label:"إجازة يوم التأسيس" },
-    { start:"2026-03-05", end:"2026-03-28", label:"إجازة عيد الفطر" },
-    // يمكن تعديل نطاق عيد الأضحى وفق التعميم المعتمد (المرفق يُظهر أيامًا داخله)
-    { start:"2026-05-21", end:"2026-06-01", label:"إجازة عيد الأضحى" }
+
+    // عيد الفطر: تبدأ نهاية دوام الخميس 2026-03-05 => يُستبعد من الجمعة 2026-03-06 إلى السبت 2026-03-28
+    { start:"2026-03-06", end:"2026-03-28", label:"إجازة عيد الفطر" },
+
+    // عيد الأضحى: تبدأ نهاية دوام الخميس 2026-05-21 => يُستبعد من الجمعة 2026-05-22 إلى الإثنين 2026-06-01
+    { start:"2026-05-22", end:"2026-06-01", label:"إجازة عيد الأضحى" },
+
+    // نهاية العام: تبدأ نهاية دوام الخميس 2026-06-25 => يُستبعد من الجمعة 2026-06-26
+    // ⚠️ نهاية تقريبية، عدّلها عند توفر المقابل الميلادي الرسمي لـ (9 صفر 1448هـ)
+    { start:"2026-06-26", end:"2026-07-25", label:"إجازة نهاية العام" }
   ];
 
   const shiftStartM = hhmmToMinutes(SHIFT_START);
@@ -465,6 +530,16 @@
   const stateEl = el("state");
   const monthChipEl = el("monthChip");
   const reportHeadlineEl = el("reportHeadline");
+
+  // بنر
+  const bannerImg = el("bannerImg");
+  if (bannerImg){
+    bannerImg.src = BANNER_SRC;
+    bannerImg.onerror = () => {
+      // fallback صامت (بدون تعطيل)
+      bannerImg.style.display = "none";
+    };
+  }
 
   // مؤشرات
   const mAttendance = el("mAttendance");
@@ -506,8 +581,6 @@
 
   /* =========================
      بيانات المعلمين (مزروعة)
-     ✅ المفتاح الفريد: رقم الهوية (هو الرقم الوظيفي)
-     الاسم | الهوية | الجوال | التخصص | المرتبة
   ========================== */
   const TEACHERS_TSV = `
 موسى صلبان عبده عسيري\t1093013116\t966507058931\tفيزيا\tمعلم ممارس
@@ -555,7 +628,7 @@
 عدنان علي حسين الزريق\t1015776766\t966505808451.00\tوكيل\tمعلم ممارس
 فهد حامد علي الزهراني\t1024193532\t966504532489.00\tمدير المدرسة\tمعلم ممارس
 `.trim();
-
+<!-- ===================== PART 4 / 7 ===================== -->
   // ✅ بناء السجل + رصد المشكلات
   const registryBuild = buildRegistryById(TEACHERS_TSV); // {map, issues}
   const registryById = registryBuild.map;                // id -> reg
@@ -594,6 +667,8 @@
     else document.documentElement.style.display = "none";
   });
   el("btnExport").addEventListener("click", exportCurrentTeacherExcel);
+  el("btnPDF").addEventListener("click", exportCurrentTeacherPDF);
+
   teacherSelect.addEventListener("change", renderSelectedTeacher);
 
   // بحث بالهوية ثم Enter
@@ -700,7 +775,7 @@
     const name = (f && f.name) ? f.name.toLowerCase() : "";
     return name.endsWith(".xlsx") || name.endsWith(".xls") || name.endsWith(".csv");
   }
-
+<!-- ===================== PART 5 / 7 ===================== -->
   /* =========================
      الاستيراد (بالهوية كمفتاح فريد)
   ========================== */
@@ -737,14 +812,14 @@
           const dateKey = r.dateKey || ctx.dayKey || "";
           if (!dateKey) continue;
 
-          // ✅ استبعاد الجمعة/السبت + الإجازات (حسب التقويم/أو حالة السجل)
+          // ✅ استبعاد الجمعة/السبت + الإجازات
           const ex = isExcludedDayKey(dateKey, r.status);
           if (ex.excluded) continue;
 
           // ✅ تسجيل اليوم ضمن الأيام المستوردة
           importedDates.add(dateKey);
 
-          // ✅ تحديث بيانات قد تأتي من الملف (مع الحفاظ على بيانات السجل الأوثق)
+          // ✅ تحديث بيانات قد تأتي من الملف
           if (r.phone) {
             const p = normalizeKsaMobile(r.phone);
             if (p && (!teacher.phone || teacher.phone === "—")) teacher.phone = p;
@@ -892,7 +967,7 @@
       fr.readAsArrayBuffer(file);
     });
   }
-
+<!-- ===================== PART 6 / 7 ===================== -->
   /* =========================
      الشهر من اسم المجلد
   ========================== */
@@ -959,9 +1034,6 @@
 
   /* =========================
      سياق اليوم من اسم الملف
-     أمثلة:
-     - 1 و 1.2 => يوم 1
-     - 2025-11-01 => يوم 01
   ========================== */
   function buildFileContext(file){
     const year = monthCtx.year || DEFAULT_GREG_YEAR;
@@ -974,22 +1046,19 @@
   }
 
   function parseDayFromFileName(name){
-    const base = String(name||"").trim().replace(/\.[^.]+$/,""); // remove extension
+    const base = String(name||"").trim().replace(/\.[^.]+$/,"");
     const w = toWesternDigits(base);
 
-    // 1.2 / 01.3 => اليوم = الرقم قبل النقطة
     const dot = w.match(/^(\d{1,2})\s*\.\s*\d+/);
     if (dot){
       const d = parseInt(dot[1],10);
       if (Number.isFinite(d) && d>=1 && d<=31) return d;
     }
 
-    // 2025-11-01 => خذ آخر جزء
     const parts = w.split(/[^\d]+/).filter(Boolean);
     const cand = parts.filter(p => p.length<=2).map(p => parseInt(p,10)).filter(n => Number.isFinite(n) && n>=1 && n<=31);
     if (cand.length) return cand[cand.length-1];
 
-    // fallback: أول رقم 1-2
     const m = w.match(/(\d{1,2})/);
     if (!m) return null;
     const d = parseInt(m[1],10);
@@ -1005,10 +1074,9 @@
 
   /* =========================
      ✅ الغياب عند عدم وجود الاسم بالملف
-     (على أيام الدوام فقط بعد الاستبعاد)
   ========================== */
   function ensureAbsencesForAllTeachers(){
-    const allDays = Array.from(importedDates).sort(); // asc
+    const allDays = Array.from(importedDates).sort();
     if (!allDays.length) return;
 
     for (const t of teachers.values()){
@@ -1062,7 +1130,6 @@
     }
     const teacher = teachers.get(id);
 
-    // ✅ ترتيب من الجديد إلى الأقدم (البيانات هنا أصلاً بعد الاستبعاد)
     const days = Array.from(teacher.days.entries()).sort((a,b)=> b[0].localeCompare(a[0]));
 
     tName.textContent = teacher.name || "—";
@@ -1080,7 +1147,6 @@
     const bodyRows = [];
 
     for (const [dateKey, day] of days){
-      // طبقة أمان: إن ظهر يوم مستبعد لأي سبب لا يُعرض ولا يُحسب
       const ex = isExcludedDayKey(dateKey, day.statusRaw);
       if (ex.excluded) continue;
 
@@ -1095,6 +1161,8 @@
       totalWork += calc.workMin;
       totalLate += calc.lateMin;
 
+      const rowClass = status.isAbsent ? "absent" : (status.notClosed ? "open" : "");
+
       bodyRows.push({
         dayLabel,
         inTxt: calc.inTxt,
@@ -1102,7 +1170,7 @@
         workTxt: minsToHM(calc.workMin),
         lateTxt: minsToHM(calc.lateMin),
         statusTxt: status.label,
-        tone: status.isAbsent ? "bad" : (status.notClosed || calc.lateMin>0 ? "warn" : "ok")
+        rowClass
       });
     }
 
@@ -1127,7 +1195,7 @@
     }
 
     daysBody.innerHTML = bodyRows.map(r => `
-      <tr>
+      <tr class="${r.rowClass}">
         <td>${escapeHtml(r.dayLabel)}</td>
         <td>${escapeHtml(r.inTxt)}</td>
         <td>${escapeHtml(r.outTxt)}</td>
@@ -1212,16 +1280,17 @@
     let inTxt = (inM !== null) ? minutesToHHMM(inM) : "—";
     let outTxt = (outM !== null) ? minutesToHHMM(outM) : "—";
 
-    if (day.hasIn && !day.hasOut){
-      outM = clampMaxM;
+    // ✅ إذا لم يُغلق الدوام: الانصراف "—" ويُحتسب نصف دوام فقط (3:30)
+    if (status.notClosed){
       outTxt = "—";
+      let lateMin = 0;
+      if (inM !== null) lateMin = Math.max(0, inM - shiftStartM);
+      return {inTxt, outTxt, workMin:HALF_SHIFT_MIN, lateMin};
     }
 
     let workMin = 0;
     if (inM !== null && outM !== null){
       workMin = Math.max(0, outM - inM);
-    }else if (inM !== null && outM === null){
-      workMin = Math.max(0, clampMaxM - inM);
     }
 
     let lateMin = 0;
@@ -1233,21 +1302,20 @@
   }
 
   function getGlobalPeriod(){
-    const keys = Array.from(importedDates).sort(); // asc
+    const keys = Array.from(importedDates).sort();
     if (!keys.length) return {fromTxt:"--", toTxt:"--"};
-    const from = keyToDate(keys[0]);                 // أقدم
-    const to = keyToDate(keys[keys.length-1]);       // أحدث
+    const from = keyToDate(keys[0]);
+    const to = keyToDate(keys[keys.length-1]);
     return {
       fromTxt: from ? formatHijriDate(from) : keys[0],
       toTxt: to ? formatHijriDate(to) : keys[keys.length-1]
     };
   }
-
+<!-- ===================== PART 7 / 7 ===================== -->
   /* =========================
      مؤشرات الانضباط
   ========================== */
   function calcDisciplineScore({totalDays, absCount, openCount, totalLateMin}){
-    // 100 - (غياب*12) - (لم يغلق*6) - (التأخر بالدقائق/5 حد أعلى 25)
     let s = 100;
     s -= absCount * 12;
     s -= openCount * 6;
@@ -1265,8 +1333,7 @@
   }
 
   /* =========================
-     WhatsApp: توليد/عرض/نسخ/فتح/طباعة
-     ✅ تربوي، مختصر، داعم، ويُحتسب لأيام الدوام فقط
+     WhatsApp
   ========================== */
   function buildWhatsAppMessage({teacher, totalDays, totalWorkMin, totalLateMin, absCount, openCount, attendanceRate, disciplineScore, level}){
     const m = monthCtx.month, y = monthCtx.year;
@@ -1391,7 +1458,7 @@
       <span class="chip">الجوال: ${escapeHtml(phone)}</span>
     </div>
     <div class="box">${escapeHtml(currentWaText || "")}</div>
-    <div class="foot">تحفظ في ملف المتابعة</div>
+    <div class="foot">وفق منصة حضوري الرسمية لتسهيل المتابعة</div>
   </div>
 </body></html>`;
 
@@ -1403,6 +1470,71 @@
     w.document.close();
 
     w.onload = () => setTimeout(() => { try{ w.focus(); w.print(); }catch(_){ } }, 200);
+  }
+
+  /* =========================
+     ✅ تنزيل PDF (كشف المعلم)
+  ========================== */
+  async function exportCurrentTeacherPDF(){
+    const id = teacherSelect.value;
+    if (!id || !teachers.has(id)){
+      alert("اختر معلماً أولاً.");
+      return;
+    }
+    // تأكد من التحديث قبل الالتقاط
+    renderSelectedTeacher();
+
+    const page = el("reportPage");
+    if (!page){
+      alert("تعذر العثور على صفحة التقرير.");
+      return;
+    }
+
+    try{
+      setState("جارٍ تجهيز PDF...");
+      const canvas = await html2canvas(page, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        windowWidth: document.documentElement.clientWidth
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const { jsPDF } = window.jspdf;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+
+      // حساب أبعاد الصورة داخل PDF
+      const imgW = pageW;
+      const imgH = (canvas.height * imgW) / canvas.width;
+
+      let y = 0;
+      let remaining = imgH;
+
+      pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
+
+      remaining -= pageH;
+
+      while (remaining > 2){
+        pdf.addPage();
+        y = -(imgH - remaining);
+        pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
+        remaining -= pageH;
+      }
+
+      const teacher = teachers.get(id);
+      const hijriShort = getHijriShort(new Date());
+      pdf.save(`كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.pdf`);
+
+      setState("جاهز");
+      toast("تم تنزيل PDF.");
+    }catch(err){
+      console.error(err);
+      setState("جاهز");
+      alert("تعذر إنشاء PDF. جرّب مرة أخرى.");
+    }
   }
 
   /* =========================
@@ -1524,11 +1656,10 @@
   }
 
   /* =========================
-     أدوات استبعاد الأيام (الجمعة/السبت + الإجازات)
+     أدوات استبعاد الأيام
   ========================== */
   function statusLooksHoliday(statusRaw){
     const s = normName(statusRaw || "");
-    // أي صياغة شائعة في أنظمة الحضور
     return s.includes("اجازه") || s.includes("عطله") || s.includes("holiday");
   }
 
@@ -1542,7 +1673,6 @@
   function isExcludedDayKey(dateKey, statusRaw){
     if (!dateKey) return {excluded:false, reason:""};
 
-    // استبعاد إذا كانت "إجازة" مذكورة في الحالة (حتى لو لم تُضف للنطاقات)
     if (SKIP_HOLIDAYS && statusLooksHoliday(statusRaw)) return {excluded:true, reason:"إجازة"};
 
     const d = keyToDate(dateKey);
@@ -1730,8 +1860,10 @@
 
   function setTodayHeader(){
     const now = new Date();
-    el("todayDow").textContent = weekdayAr(now);
-    el("todayHijri").textContent = formatHijriDate(now);
+    const dow = el("todayDow");
+    const hij = el("todayHijri");
+    if (dow) dow.textContent = weekdayAr(now);
+    if (hij) hij.textContent = formatHijriDate(now);
   }
 
   function normName(s){
@@ -1763,10 +1895,7 @@
   }
 
   function toWesternDigits(s){
-    const map = {
-      "٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9",
-      "۰":"0","۱":"1","۲":"2","۳":"3","۴":"4","۵":"5","۶":"6","۷":"7","۸":"8","۹":"9"
-    };
+    const map = {"٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9","۰":"0","۱":"1","۲":"2","۳":"3","۴":"4","۵":"5","۶":"6","۷":"7","۸":"8","۹":"9"};
     return String(s||"").replace(/[٠-٩۰-۹]/g, ch => map[ch] || ch);
   }
 
@@ -1815,7 +1944,7 @@
         }
       }
 
-if (!phone) issues.push(`بيان جوال غير مكتمل: ${name} (${id})`);
+      if (!phone) issues.push(`بيان جوال غير مكتمل: ${name} (${id})`);
       if (!spec || spec === "—") issues.push(`بيان تخصص غير مكتمل: ${name} (${id})`);
       if (!rank || rank === "—") issues.push(`بيان مرتبة/وظيفة غير مكتمل: ${name} (${id})`);
 
@@ -1830,20 +1959,18 @@ if (!phone) issues.push(`بيان جوال غير مكتمل: ${name} (${id})`);
     for (const [id, rec] of registryMap.entries()){
       const k = nameKey(rec?.name || "");
       if (!k) continue;
-      if (!m.has(k)) m.set(k, id); // نعتمد أول مطابق
+      if (!m.has(k)) m.set(k, id);
     }
     return m;
   }
 
   function nameKey(name){
-    // مفتاح موحّد للاسم (يدعم المطابقة حتى لو اختلفت المسافات/التشكيل)
     return normName(name).replace(/\s+/g, "");
   }
 
   function cleanId(v){
     const s = toWesternDigits(String(v ?? "")).replace(/\D+/g, "");
     if (!s) return "";
-    // غالبًا 10 أرقام (هوية/إقامة/رقم وظيفي). نتركه مرنًا لكن نتأكد أنه رقم فعلاً.
     return s;
   }
 
@@ -1851,30 +1978,18 @@ if (!phone) issues.push(`بيان جوال غير مكتمل: ${name} (${id})`);
     let s = String(v ?? "").trim();
     if (!s) return "";
     s = toWesternDigits(s);
-
-    // إزالة .00 الشائعة عند قدوم الرقم من Excel كقيمة رقمية
     s = s.replace(/\.0+$/g, "");
-
-    // استخراج الأرقام فقط
     let digits = s.replace(/\D+/g, "");
     if (!digits) return "";
-
-    // إزالة بادئة 00 إن وجدت
     if (digits.startsWith("00")) digits = digits.slice(2);
-
-    // تحويل الأشكال إلى صيغة واتساب: 9665XXXXXXXX (بدون +)
     if (digits.startsWith("966")){
-      // إذا بعد 966 جاء 0 أحياناً، نحذفه
       digits = "966" + digits.slice(3).replace(/^0+/, "");
     } else if (digits.length === 10 && digits.startsWith("05")){
       digits = "966" + digits.slice(1);
     } else if (digits.length === 9 && digits.startsWith("5")){
       digits = "966" + digits;
     }
-
-    // تحقق نهائي: 12 رقم ويبدأ بـ 9665
     if (digits.length === 12 && digits.startsWith("9665")) return digits;
-
     return "";
   }
 
