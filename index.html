@@ -1125,13 +1125,15 @@ async function ensureAllImagesEmbedded(root){
   for(const im of imgs){ if(!im.src.startsWith('data:')) await embedImageToDataURL(im); }
 }
 
-/* طباعة/حفظ PDF */
-document.getElementById('btnPrintSave').addEventListener('click', async function(){
+/* طباعة/حفظ PDF — ✅ إصلاح: ربط الزر + منع return خارج دالة */
+document.getElementById('btnPrintSave').addEventListener('click', async (e)=>{
   if(!requireDateGuard('الطباعة/الحفظ')) return;
 
-  const i=+selTeacher.value; if(!Number.isInteger(i)) { alert('اختر معلماً أولاً'); return; }
-  const t=TEACHERS[i];
+  const i = +selTeacher.value;
+  if(!Number.isInteger(i)) { alert('اختر معلماً أولاً'); return; }
+  const t = TEACHERS[i];
 
+  // حفظ في الأرشيف قبل إنشاء الـ PDF
   ARCH.push({
     ts: Date.now(),
     civil: t.civil,
@@ -1146,12 +1148,62 @@ document.getElementById('btnPrintSave').addEventListener('click', async function
       ? (document.getElementById('noteReasonText')?.textContent || '')
       : ''
   });
-/* فتح صفحة حصائيات الحضور والانصراف (شهري) */
-document.getElementById('btnMonthlyStats').addEventListener('click', ()=>{
-  const url='https://fhz545-hub.github.io/teacher-eval-1447/2';
-  const w=window.open(url,'_blank','noopener,noreferrer');
-  if(w) w.opener=null;
+  saveARCH();
+
+  const { jsPDF } = window.jspdf;
+
+  const btn = e.currentTarget;
+  const old = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'جارٍ إنشاء PDF...';
+
+  try{
+    const sheet = document.getElementById('sheet');
+    await ensureAllImagesEmbedded(sheet);
+
+    const canvas = await html2canvas(sheet, {
+      scale: 2,
+      background: '#fff',
+      useCORS: true,
+      allowTaint: false,
+      imageTimeout: 0,
+      logging: false
+    });
+
+    const pdf = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
+    const w = 210;
+    const h = canvas.height * 210 / canvas.width;
+
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
+    pdf.save(`إجراء - ${t.name}.pdf`);
+
+    if(confirm('تم حفظ ملف PDF. هل تريد الطباعة الآن؟')) {
+      setTimeout(()=>window.print(), 200);
+    }
+
+  }catch(err){
+    alert('تعذّر إنشاء PDF: ' + (err?.message || err));
+  }finally{
+    btn.disabled = false;
+    btn.textContent = old;
+  }
 });
+
+/* فتح صفحة حصائيات الحضور والانصراف (شهري) */
+const btnMonthlyStats = document.getElementById('btnMonthlyStats');
+if(btnMonthlyStats){
+  btnMonthlyStats.addEventListener('click', (e)=>{
+    e.preventDefault();
+    const url = 'https://fhz545-hub.github.io/teacher-eval-1447/2';
+
+    // محاولة فتح تبويب جديد
+    const w = window.open(url, '_blank');
+
+    // إذا المتصفح منع الـ popup افتحها في نفس الصفحة كخطة بديلة
+    if(!w) window.location.href = url;
+  });
+}
+
   saveARCH();
 
   const { jsPDF }=window.jspdf;
