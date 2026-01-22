@@ -1,0 +1,1909 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#0b7e88" />
+  <title>كشف حضوري (شهري)</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <style>
+    :root{
+      --moe:#0b7e88;
+      --ink:#0b2f2b;
+      --muted:#5f7c80;
+      --bg:#f5fafb;
+      --card:#ffffff;
+      --line:#e5eff1;
+      --shadow:0 12px 30px rgba(7, 38, 43, .08);
+      --ok:#e9fff4;
+      --warn:#fff6ec;
+      --bad:#ffefef;
+      --r:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    button,input,select,textarea{font-family:inherit}
+    a{color:inherit}
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      background:rgba(245,250,251,.86);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+      padding:10px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+    .title{font-weight:1000; letter-spacing:.2px; font-size:18px}
+    .btns{display:flex; gap:8px; flex-wrap:wrap}
+    .btn{
+      border:1px solid var(--line);
+      background:#eef7f8;
+      padding:9px 12px;
+      border-radius:999px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 6px 16px rgba(7, 38, 43, .05);
+      user-select:none;
+      display:inline-flex; align-items:center; gap:8px;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background:linear-gradient(180deg, #e8fbfb, #eaf6f6); border-color:#d9f0f0}
+    .btn.wa{background:linear-gradient(180deg,#eafff5,#e9fff4); border-color:#c9f2dd}
+    .btn.danger{background:linear-gradient(180deg,#fff0f0,#ffefef); border-color:#f4d3d3}
+
+    input[type="file"]{display:none}
+
+    .wrap{max-width:1200px;margin:14px auto 22px; padding:0 14px}
+    .notice{
+      background:#eef8f9;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px 14px;
+      font-weight:900;
+      color:#0b5660;
+      text-align:center;
+    }
+    .row{
+      margin-top:12px;
+      display:flex; gap:12px; align-items:center; flex-wrap:wrap; justify-content:space-between;
+    }
+    .chips{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .chip{
+      background:#eef7f8;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:1000;
+      color:#0b5660;
+      display:inline-flex; align-items:center; gap:8px;
+      white-space:nowrap;
+    }
+    .chip b{color:var(--ink)}
+    .chip.warn{background:var(--warn);border-color:#f2dfc4;color:#7a4a00; cursor:pointer}
+    .controls{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-inline-start:auto}
+    .field{
+      display:flex; align-items:center; gap:8px;
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:6px 10px;
+      box-shadow:0 8px 18px rgba(7, 38, 43, .05);
+      min-width:320px;
+    }
+    .field label{font-weight:900;color:var(--muted);font-size:12px}
+    select,input[type="text"]{
+      border:0; outline:0; background:transparent;
+      padding:8px 8px; width:100%;
+      font-weight:1000; color:var(--ink);
+    }
+    .field.small{min-width:260px}
+
+    .paper{margin:14px auto 0; max-width:1020px; padding:0 14px}
+    .page{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:22px 22px 18px;
+    }
+    .pageHeader{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:16px;
+      margin-bottom:10px;
+    }
+    .pageHeader .meta{display:flex; flex-direction:column; gap:6px; font-weight:1000}
+    .pageHeader .meta .dow{font-size:16px}
+    .pageHeader .meta .hijri{font-size:14px; color:var(--muted)}
+    .pageHeader .headline{
+      flex:1; text-align:center; font-weight:1100; font-size:22px; letter-spacing:.2px;
+      color:#0b5660; margin-top:4px; line-height:1.25;
+    }
+
+    table{width:100%; border-collapse:collapse}
+    th,td{border:1px solid #2a5f64; padding:10px 10px; text-align:center; vertical-align:middle}
+    th{background:#0b5f66; color:#fff; font-weight:1000; font-size:13px}
+    td{background:#fff; font-weight:900; color:#20383b}
+    .tight td{padding:9px 10px}
+    .sectionTitle{margin:18px 0 10px; font-weight:1100; color:#0b5660; font-size:16px; text-align:right}
+    .note{margin-top:10px; color:#5e7377; font-weight:900; font-size:12px}
+    .footerNote{margin-top:12px; color:#2f4f53; font-weight:1000; text-align:right}
+    .hint{color:#0b5660; font-weight:1000; text-align:center; padding:10px 10px 0}
+
+    .metrics{
+      margin-top:10px;
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-start;
+    }
+    .badge{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px; border-radius:999px; font-weight:1000; border:1px solid var(--line);
+      background:#f3fbfb; color:#0b5660;
+      white-space:nowrap;
+    }
+    .badge.ok{background:var(--ok); border-color:#c8efd8; color:#0a5f3b}
+    .badge.warn{background:var(--warn); border-color:#f2dfc4; color:#7a4a00}
+    .badge.bad{background:var(--bad); border-color:#f0caca; color:#8a1d1d}
+
+    /* ===== WhatsApp Modal ===== */
+    .overlay{
+      position:fixed; inset:0; z-index:80;
+      background:rgba(0,0,0,.35);
+      display:none;
+    }
+    .overlay.show{display:block}
+    .modal{
+      position:fixed; inset:0; z-index:90;
+      display:none;
+      align-items:center; justify-content:center;
+      padding:16px;
+    }
+    .modal.show{display:flex}
+    .modalCard{
+      width:min(820px, 100%);
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--line);
+      border-radius:22px;
+      box-shadow:0 22px 60px rgba(0,0,0,.18);
+      overflow:hidden;
+    }
+    .modalHead{
+      padding:14px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg,#f2fbfb,#ffffff);
+    }
+    .modalHead .h{
+      font-weight:1100; color:#0b5660; font-size:16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .modalBody{padding:14px 16px}
+    .msgBox{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      padding:14px;
+      font-weight:1000;
+      color:#20383b;
+      line-height:2;
+      white-space:pre-wrap;
+      user-select:text;
+    }
+    .modalActions{
+      padding:12px 16px 16px;
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-start;
+    }
+    .small{font-size:12px;color:var(--muted);font-weight:900;margin-top:10px}
+
+    /* ===== Registry Issues Modal ===== */
+    .list{
+      margin:10px 0 0;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      overflow:hidden;
+    }
+    .list .it{
+      padding:10px 12px;
+      border-bottom:1px solid var(--line);
+      font-weight:900;
+      color:#20383b;
+    }
+    .list .it:last-child{border-bottom:0}
+    .muted{color:var(--muted);font-weight:900}
+
+    @media print{
+      .topbar,.wrap,.overlay,.modal{display:none !important}
+      body{background:#fff}
+      .paper{max-width:none;padding:0}
+      .page{border:0; box-shadow:none; border-radius:0; padding:18px}
+      @page{size:A4 portrait; margin:10mm}
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="btns">
+      <button class="btn primary" id="btnExport">تنزيل Excel</button>
+      <button class="btn primary" id="btnPrint">طباعة</button>
+      <button class="btn wa" id="btnWA">رسالة واتساب</button>
+
+      <button class="btn" id="btnClose">إغلاق</button>
+
+      <label class="btn" for="fileInput">استيراد Excel</label>
+      <input id="fileInput" type="file" multiple accept=".xlsx,.xls,.csv" />
+
+      <label class="btn" for="folderInput">استيراد مجلد</label>
+      <input id="folderInput" type="file" webkitdirectory multiple />
+    </div>
+    <div class="title">كشف حضوري (شهري)</div>
+  </header>
+
+  <div class="wrap">
+    <div class="notice" id="notice">لم يتم استيراد ملفات بعد — اختر مجلد الشهر (مثل: ١١) ثم اختر معلماً لعرض كشفه الشهري.</div>
+
+    <div class="row">
+      <div class="chips">
+        <span class="chip">الشهر: <b id="monthChip">—</b></span>
+        <span class="chip">أيام مستوردة: <b id="daysImported">0</b></span>
+        <span class="chip">ملفات Excel مقروءة: <b id="excelRead">0</b></span>
+        <span class="chip">حالة: <b id="state">بانتظار الاستيراد</b></span>
+        <span class="chip warn" id="regWarn" style="display:none" title="اضغط لعرض التفاصيل">تنبيه السجل: <b id="regWarnCount">0</b></span>
+      </div>
+
+      <div class="controls">
+        <div class="field small" title="بحث سريع بالهوية/الرقم الوظيفي ثم Enter">
+          <label>الهوية</label>
+          <input id="idInput" type="text" inputmode="numeric" placeholder="اكتب رقم الهوية/الرقم الوظيفي ثم Enter للتحديد" />
+        </div>
+
+        <div class="field" title="اختيار المعلم (فريد حسب رقم الهوية/الرقم الوظيفي)">
+          <label>المعلم</label>
+          <select id="teacherSelect">
+            <option value="">— اختر —</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="paper">
+    <section class="page" id="reportPage">
+      <div class="pageHeader">
+        <div class="meta">
+          <div class="dow" id="todayDow">—</div>
+          <div class="hijri" id="todayHijri">—</div>
+        </div>
+
+        <div class="headline" id="reportHeadline">احصائيات الحضور والانصراف</div>
+      </div>
+
+      <table class="tight" aria-label="بيانات المعلم">
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>رقم الهوية (الرقم الوظيفي)</th>
+            <th>الجوال</th>
+            <th>التخصص</th>
+            <th>المرتبة</th>
+            <th>بداية الدوام: <span id="shiftStartTxt">07:00</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="tName">—</td>
+            <td id="tId">—</td>
+            <td id="tPhone">—</td>
+            <td id="tSpec">—</td>
+            <td id="tRank">—</td>
+            <td id="tShift">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="sectionTitle">ملخص الشهر</div>
+      <table class="tight" aria-label="ملخص الشهر">
+        <thead>
+          <tr>
+            <th>إجمالي ساعات الدوام</th>
+            <th>إجمالي التأخر</th>
+            <th>إجمالي الغياب</th>
+            <th>أيام لم يُغلق الدوام</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td id="sumWork">—</td>
+            <td id="sumLate">—</td>
+            <td id="sumAbs">—</td>
+            <td id="sumOpen">—</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="metrics" aria-label="مؤشرات إضافية">
+        <span class="badge" id="mAttendance">نسبة الحضور: —</span>
+        <span class="badge" id="mDiscipline">مؤشر الانضباط: —</span>
+        <span class="badge" id="mLevel">المستوى: —</span>
+      </div>
+
+      <div class="note">
+        • تُستبعد تلقائيًا أيام <b>الجمعة والسبت</b> و<b>الإجازات الرسمية</b> من العرض والحسابات، وتُحتسب الساعات ضمن نطاق (<b id="clampMin">06:30</b> → <b id="clampMax">14:25</b>) لضبط الإحصاءات بصورة عادلة.
+      </div>
+
+      <div class="sectionTitle">تفصيل أيام الشهر (من الأحدث إلى الأقدم)</div>
+      <table class="tight" aria-label="تفصيل أيام الشهر">
+        <thead>
+          <tr>
+            <th>اليوم</th>
+            <th>الحضور</th>
+            <th>الانصراف</th>
+            <th>ساعات الدوام</th>
+            <th>التأخر</th>
+            <th>الحالة</th>
+          </tr>
+        </thead>
+        <tbody id="daysBody">
+          <tr><td colspan="6" class="hint">اختر معلماً بعد الاستيراد لعرض تفاصيل الأيام.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="footerNote">تحفظ في ملف المتابعة</div>
+    </section>
+  </main>
+
+  <!-- WhatsApp Modal -->
+  <div class="overlay" id="waOverlay"></div>
+  <div class="modal" id="waModal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-label="رسالة واتساب">
+      <div class="modalHead">
+        <div class="h">
+          <span class="badge ok">واتساب</span>
+          <span>رسالة جاهزة (قابلة للنسخ/الإرسال/الطباعة)</span>
+        </div>
+        <button class="btn danger" id="btnWAClose">إغلاق</button>
+      </div>
+      <div class="modalBody">
+        <div class="msgBox" id="waText">—</div>
+        <div class="small" id="waHint">سيتم توجيه الرسالة لرقم الجوال المسجل للمعلم.</div>
+      </div>
+      <div class="modalActions">
+        <button class="btn primary" id="btnWACopy">نسخ الرسالة</button>
+        <button class="btn wa" id="btnWASend">فتح واتساب للإرسال</button>
+        <button class="btn" id="btnWAPrint">طباعة الرسالة</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Registry Issues Modal -->
+  <div class="overlay" id="regOverlay"></div>
+  <div class="modal" id="regModal" aria-hidden="true">
+    <div class="modalCard" role="dialog" aria-modal="true" aria-label="تنبيه السجل">
+      <div class="modalHead">
+        <div class="h">
+          <span class="badge warn">تنبيه</span>
+          <span>مشكلات في السجل المزروع (تكرار هوية/بيانات غير مكتملة)</span>
+        </div>
+        <button class="btn danger" id="btnRegClose">إغلاق</button>
+      </div>
+      <div class="modalBody">
+        <div class="muted">تم اعتماد أول سجل لكل رقم هوية لضمان عدم تكرار القائمة المنسدلة. يُستحسن تصحيح السجل المزروع عند الحاجة.</div>
+        <div class="list" id="regList"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ===== حماية من توقف صامت =====
+  window.addEventListener("error", (e) => {
+    const n = document.getElementById("notice");
+    const s = document.getElementById("state");
+    if (s) s.textContent = "خطأ برمجي";
+    if (n) n.textContent = "تعذر تشغيل الصفحة بسبب خطأ برمجي. انسخ الكود كما هو بالكامل ثم أعد التحميل.";
+    console.error(e?.error || e);
+  });
+
+  /* =========================
+     إعدادات الدوام
+  ========================== */
+  const SHIFT_START = "07:00";
+  const CLAMP_MIN  = "06:30";
+  const CLAMP_MAX  = "14:25";
+
+  /* =========================
+     إعدادات العام الدراسي (ميلادي)
+     ✅ حل مشكلة السنة تلقائياً:
+     - أشهر (8–12): سنة بداية العام الدراسي
+     - أشهر (1–7): سنة بداية العام + 1
+     ملاحظة: إن وُجدت سنة صريحة في اسم المجلد (مثل 2025-11) تُعتمد مباشرة.
+  ========================== */
+  const ACADEMIC_START_GREG_YEAR = 2025;   // 2025/2026
+  const DEFAULT_GREG_YEAR = ACADEMIC_START_GREG_YEAR;
+
+  function inferYearFromMonth(month){
+    if (!month) return DEFAULT_GREG_YEAR;
+    return (month >= 8) ? ACADEMIC_START_GREG_YEAR : (ACADEMIC_START_GREG_YEAR + 1);
+  }
+
+  /* =========================
+     استبعاد الجمعة/السبت + الإجازات الرسمية
+     ✅ بناءً على المرفقات (الفصلين) ويمكن تعديلها بسهولة عند الحاجة
+  ========================== */
+  const SKIP_WEEKEND = true;         // الجمعة + السبت
+  const SKIP_HOLIDAYS = true;        // الإجازات الرسمية/الإضافية
+
+  // نطاقات إجازات (YYYY-MM-DD) شاملة للطرفين
+  const HOLIDAY_RANGES = [
+    { start:"2025-09-23", end:"2025-09-23", label:"إجازة اليوم الوطني" },
+    { start:"2025-10-12", end:"2025-10-12", label:"إجازة إضافية" },
+    { start:"2025-11-20", end:"2025-11-29", label:"إجازة الخريف" },
+    { start:"2025-12-11", end:"2025-12-11", label:"إجازة إضافية" },
+    { start:"2025-12-14", end:"2025-12-14", label:"إجازة إضافية" },
+    { start:"2026-02-22", end:"2026-02-22", label:"إجازة يوم التأسيس" },
+    { start:"2026-03-05", end:"2026-03-28", label:"إجازة عيد الفطر" },
+    // يمكن تعديل نطاق عيد الأضحى وفق التعميم المعتمد (المرفق يُظهر أيامًا داخله)
+    { start:"2026-05-21", end:"2026-06-01", label:"إجازة عيد الأضحى" }
+  ];
+
+  const shiftStartM = hhmmToMinutes(SHIFT_START);
+  const clampMinM   = hhmmToMinutes(CLAMP_MIN);
+  const clampMaxM   = hhmmToMinutes(CLAMP_MAX);
+
+  const el = (id) => document.getElementById(id);
+
+  const fileInput = el("fileInput");
+  const folderInput = el("folderInput");
+  const teacherSelect = el("teacherSelect");
+  const idInput = el("idInput");
+  const notice = el("notice");
+  const daysImportedEl = el("daysImported");
+  const excelReadEl = el("excelRead");
+  const stateEl = el("state");
+  const monthChipEl = el("monthChip");
+  const reportHeadlineEl = el("reportHeadline");
+
+  // مؤشرات
+  const mAttendance = el("mAttendance");
+  const mDiscipline = el("mDiscipline");
+  const mLevel = el("mLevel");
+
+  // WhatsApp UI
+  const waOverlay = el("waOverlay");
+  const waModal = el("waModal");
+  const waTextEl = el("waText");
+  const waHintEl = el("waHint");
+
+  // Registry warn UI
+  const regWarn = el("regWarn");
+  const regWarnCount = el("regWarnCount");
+  const regOverlay = el("regOverlay");
+  const regModal = el("regModal");
+  const regList = el("regList");
+
+  // حقول التقرير
+  const tName = el("tName");
+  const tId   = el("tId");
+  const tPhone= el("tPhone");
+  const tSpec = el("tSpec");
+  const tRank = el("tRank");
+  const tShift= el("tShift");
+
+  const sumWork = el("sumWork");
+  const sumLate = el("sumLate");
+  const sumAbs  = el("sumAbs");
+  const sumOpen = el("sumOpen");
+  const daysBody= el("daysBody");
+
+  el("shiftStartTxt").textContent = SHIFT_START;
+  el("clampMin").textContent = CLAMP_MIN;
+  el("clampMax").textContent = CLAMP_MAX;
+
+  setTodayHeader();
+
+  /* =========================
+     بيانات المعلمين (مزروعة)
+     ✅ المفتاح الفريد: رقم الهوية (هو الرقم الوظيفي)
+     الاسم | الهوية | الجوال | التخصص | المرتبة
+  ========================== */
+  const TEACHERS_TSV = `
+موسى صلبان عبده عسيري\t1093013116\t966507058931\tفيزيا\tمعلم ممارس
+مبارك عوضه سفر آل ثابت\t1056464405\t966597233399\tكيميا\tمعلم ممارس
+فرج عبدالعلي يوسف ال سيف\t1000397735\t966504113707\tاحياء\tمعلم ممارس
+منذر عامر حمود زميع\t1065913053\t966541188974\tانجليزي\tمعلم ممارس
+عماد محمد جمعان الزهراني\t1048667289\t966542203039\tمكتبات\tمعلم ممارس
+ابراهيم حبيب عبدالغني الميمني\t1072815481\t966530163027\tرياضيات\tمعلم ممارس
+بندر عبدالعزيز محمد الغامدي\t1046853881\t966546135135\tحاسب\tمعلم ممارس
+حسين بن محمد بن فهد القحطاني\t1014268567\t966504988086\tاحياء\tمعلم ممارس
+ناصر علي ناصر الراشد\t1008303370\t966542933888\tحاسب\tمعلم ممارس
+حسين بن محمد بن حسين الأحمد\t1060369202\t966563740777\tاللغة العربية\tمعلم ممارس
+علي سعد سعيد الاصلعي الاحمري\t1023999780\t966590986464\tاحياء\tمعلم ممارس
+محمد حمد عبدالرحمن التويجري\t1064745944\t966541381105\tاللغة العربية\tمعلم ممارس
+عبدالله فيصل بن فطيس الهذلي\t1094733290\t966591585407\tرياضيات\tمعلم ممارس
+احمد عبدالرحيم عبدالحميد ابوعصيده\t1033584234\t966546623431\tانجليزي\tمعلم ممارس
+عبدالله بن عبدالعزيز بن سيف السهلي\t1063175010\t966546221133\tعلم اجتماع\tمعلم ممارس
+بشير بن أحمد بن عبدالله آل سليم\t1019783917\t966500126925\tمكتبات\tمعلم ممارس
+ابراهيم بن محمد بن ابراهيم الربيع\t1004182687\t966548638056\tانجليزي\tمعلم ممارس
+عبدالمجيد عبدالله سالم آل حبشان\t1004581359\t966500223640\tاجتماعيات\tمعلم ممارس
+فيصل فهد علي الزهراني\t1086115373\t966508448455\tرياضيات\tمعلم ممارس
+زياد عواض ابن عيضه العمري\t1092156742\t966557530102\tعلم إدارة\tمعلم ممارس
+عبدالرحمن عبدالجبار حمود العتيبي\t1089635724\t966555741488\tفيزيا\tمعلم ممارس
+عبد الله حسن عمر الادريسي\t1081556910\t966533025505\tرياضيات\tمعلم ممارس
+تقي عبد الهادي تقي العلي\t1026472363\t966543219321\tكيميا\tمعلم ممارس
+صالح بن محمد بن صالح السميحي\t1003535422\t966506921115\tدين\tمعلم ممارس
+عادل بن علي بن ناصر البارقي\t1007370701\t966530667666\tرياضه\tمعلم ممارس
+ابراهيم بن أحمد بن ابراهيم العجلان\t1001082179\t966559999808\tدين\tمعلم ممارس
+خالد أحمد محمد الشهري\t1034318301\t966560687900\tكيميا\tمعلم ممارس
+خالد سعد راشد المرضي\t1025640010\t966505877238\tاجتماعيات\tمعلم ممارس
+عبدالله بن خلوفة بن عبدالله ال مرعي\t1029490875\t966533225515\tدين\tمعلم ممارس
+يحيى بن محمد بن سعيد القحطاني\t1048978892\t966555751385\tاجتماعيات\tمعلم ممارس
+حسين بن سعيد سلمان المدن\t1022616799\t966556336875\tمكتبات\tمعلم ممارس
+يوسف عيسى عيسى العيد\t1012646822\t966592038351\tاللغة العربية\tمعلم ممارس
+نبيل بن محسن محمد القلاف\t1025472604\t966562962766\tرياضه\tمعلم ممارس
+عبدالمجيد عبدالرحمن عبدالله السالمي\t1073861831\t966558151033\tانجليزي\tمعلم ممارس
+حسن علي حسن الشهري\t1037273594\t966500677015\tاللغة العربية\tمعلم ممارس
+جميل عبدالمجيد جواد العلي\t1029281589\t966566712113\tفيزيا\tمعلم ممارس
+حسن يوسف حسين الخليفة\t1056994203\t966506907431\tكيميا\tمعلم ممارس
+حسن عبدالله علي العبدالله\t1005472780\t966543705512\tاحياء\tمعلم ممارس
+عادل بن علي بن سليمان السبعان\t1005472780\t966504836200\tموجه طلابي\tمعلم ممارس
+ياسر عبدالله محمد النمر\t1001443397\t966543705512\tمدخل بيانات\tمساعد معلم
+علي بن حسن بن علي آل قمبر\t1004780860\t966502085389.00\tسكرتاريه\tمساعد معلم
+حسن بن عامربن احمد الشهري\t1013124175\t966598893731\tمحضر مختبر\tمساعد معلم
+عدنان علي حسين الزريق\t1015776766\t966505808451.00\tوكيل\tمعلم ممارس
+فهد حامد علي الزهراني\t1024193532\t966504532489.00\tمدير المدرسة\tمعلم ممارس
+`.trim();
+
+  // ✅ بناء السجل + رصد المشكلات
+  const registryBuild = buildRegistryById(TEACHERS_TSV); // {map, issues}
+  const registryById = registryBuild.map;                // id -> reg
+  const registryIssues = registryBuild.issues;           // list
+  const idByNameKey  = buildNameToIdIndex(registryById); // nameKey -> id
+
+  updateRegistryWarnUI();
+
+  /* =========================
+     سياق الشهر (من اسم المجلد)
+  ========================== */
+  const monthCtx = {
+    month: null,
+    year: DEFAULT_GREG_YEAR,
+    folderLabel: ""
+  };
+
+  /* =========================
+     مخزن البيانات
+  ========================== */
+  const teachers = new Map();      // key = teacherId (الهوية) -> teacher obj
+  const importedDates = new Set(); // dayKey YYYY-MM-DD
+
+  let importedExcelCount = 0;
+  let lastSourceLabel = "";
+  let currentWaText = "";
+
+  resetDataToRegistry();
+
+  /* =========================
+     أحداث
+  ========================== */
+  el("btnPrint").addEventListener("click", () => window.print());
+  el("btnClose").addEventListener("click", () => {
+    if (history.length > 1) history.back();
+    else document.documentElement.style.display = "none";
+  });
+  el("btnExport").addEventListener("click", exportCurrentTeacherExcel);
+  teacherSelect.addEventListener("change", renderSelectedTeacher);
+
+  // بحث بالهوية ثم Enter
+  idInput.addEventListener("keydown", (ev) => {
+    if (ev.key !== "Enter") return;
+    const id = cleanId(idInput.value);
+    if (id && teachers.has(id)){
+      teacherSelect.value = id;
+      renderSelectedTeacher();
+      toast("تم تحديد المعلم بالهوية.");
+    }else{
+      toast("لم يتم العثور على هذه الهوية في السجل.");
+    }
+  });
+
+  // WhatsApp
+  el("btnWA").addEventListener("click", () => openWAModal());
+  el("btnWAClose").addEventListener("click", closeWAModal);
+  waOverlay.addEventListener("click", closeWAModal);
+  el("btnWACopy").addEventListener("click", copyWAMessage);
+  el("btnWASend").addEventListener("click", openWhatsAppChat);
+  el("btnWAPrint").addEventListener("click", printWAMessage);
+
+  // Registry modal
+  regWarn.addEventListener("click", () => openRegModal());
+  el("btnRegClose").addEventListener("click", closeRegModal);
+  regOverlay.addEventListener("click", closeRegModal);
+
+  fileInput.addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    if (!monthCtx.month){
+      const guessFolder = guessFolderNameFromFiles(files);
+      if (guessFolder) applyMonthFromFolder(guessFolder);
+    }
+    if (!monthCtx.month){
+      const mNow = (new Date()).getMonth()+1;
+      monthCtx.month = mNow;
+      monthCtx.year = inferYearFromMonth(mNow);
+      updateMonthUI();
+    }
+
+    await handleImport(files, { source: "files" });
+    fileInput.value = "";
+  });
+
+  folderInput.addEventListener("change", async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+
+    let folderName = "";
+    const first = files[0];
+    if (first && first.webkitRelativePath){
+      folderName = first.webkitRelativePath.split("/")[0] || "";
+    }
+
+    applyMonthFromFolder(folderName);
+    await handleImport(files, { source: "folder", folderName });
+    folderInput.value = "";
+  });
+
+  async function handleImport(files, meta){
+    setState("جارٍ الاستيراد...");
+
+    // ✅ استيراد شهري نظيف
+    resetDataToRegistry();
+    importedDates.clear();
+    importedExcelCount = 0;
+    daysImportedEl.textContent = "0";
+    excelReadEl.textContent = "0";
+
+    try{
+      const onlyExcel = files.filter(isExcelFile);
+      const skipped = files.length - onlyExcel.length;
+
+      lastSourceLabel = (meta.source === "folder" && meta.folderName)
+        ? `المجلد: ${meta.folderName}`
+        : (meta.source === "folder" ? "مجلد (غير مُسمّى)" : "ملفات محددة");
+
+      if (!onlyExcel.length){
+        setState("لا توجد ملفات Excel");
+        notice.textContent = `لم يتم العثور على ملفات Excel داخل ${lastSourceLabel}.`;
+        return;
+      }
+
+      await importFiles(onlyExcel);
+
+      // ✅ إن لم يظهر المعلم في بيانات اليوم => غياب (على أيام الدوام فقط بعد الاستبعاد)
+      ensureAbsencesForAllTeachers();
+
+      setState("جاهز");
+      updateTeacherSelect();
+      updateNotice(skipped);
+      renderSelectedTeacher();
+    }catch(err){
+      console.error(err);
+      setState("تعذر الاستيراد");
+      notice.textContent = "تعذر قراءة بعض الملفات. تأكد أن الملفات بصيغة Excel صحيحة ثم أعد المحاولة.";
+    }
+  }
+
+  function isExcelFile(f){
+    const name = (f && f.name) ? f.name.toLowerCase() : "";
+    return name.endsWith(".xlsx") || name.endsWith(".xls") || name.endsWith(".csv");
+  }
+
+  /* =========================
+     الاستيراد (بالهوية كمفتاح فريد)
+  ========================== */
+  async function importFiles(files){
+    for (const f of files){
+      const ctx = buildFileContext(f);
+
+      const buf = await readAsArrayBuffer(f);
+      const wb = XLSX.read(buf, { type:"array", cellDates:true, raw:true });
+
+      let anySheetRead = false;
+
+      for (const sheetName of wb.SheetNames){
+        const ws = wb.Sheets[sheetName];
+        if (!ws) continue;
+
+        const matrix = XLSX.utils.sheet_to_json(ws, { header:1, defval:"", raw:true });
+        if (!matrix || !matrix.length) continue;
+
+        const parsed = parseAttendanceMatrix(matrix, ctx);
+        if (!parsed || !parsed.rows.length) continue;
+
+        anySheetRead = true;
+
+        for (const r of parsed.rows){
+          // ✅ تحديد الهوية: من العمود أو من الاسم عبر السجل المزروع
+          const id = resolveTeacherId(r.id, r.name);
+          if (!id) continue; // لا نضيف خارج السجل
+
+          const teacher = teachers.get(id);
+          if (!teacher) continue;
+
+          // ✅ تحديد اليوم (الأولوية لتاريخ الصف، ثم سياق الملف)
+          const dateKey = r.dateKey || ctx.dayKey || "";
+          if (!dateKey) continue;
+
+          // ✅ استبعاد الجمعة/السبت + الإجازات (حسب التقويم/أو حالة السجل)
+          const ex = isExcludedDayKey(dateKey, r.status);
+          if (ex.excluded) continue;
+
+          // ✅ تسجيل اليوم ضمن الأيام المستوردة
+          importedDates.add(dateKey);
+
+          // ✅ تحديث بيانات قد تأتي من الملف (مع الحفاظ على بيانات السجل الأوثق)
+          if (r.phone) {
+            const p = normalizeKsaMobile(r.phone);
+            if (p && (!teacher.phone || teacher.phone === "—")) teacher.phone = p;
+          }
+          if (r.spec && teacher.spec === "—") teacher.spec = String(r.spec).trim();
+          if (r.rank && teacher.rank === "—") teacher.rank = String(r.rank).trim();
+
+          const day = teacher.days.get(dateKey) || { inM:null, outM:null, statusRaw:"", hasIn:false, hasOut:false };
+
+          const inM = parseTimeToMinutes(r.inTime);
+          const outM = parseTimeToMinutes(r.outTime);
+
+          if (inM !== null){
+            day.inM = (day.inM === null) ? inM : Math.min(day.inM, inM);
+            day.hasIn = true;
+          }
+          if (outM !== null){
+            day.outM = (day.outM === null) ? outM : Math.max(day.outM, outM);
+            day.hasOut = true;
+          }
+
+          const s = (r.status || "").toString().trim();
+          if (s) day.statusRaw = day.statusRaw ? (day.statusRaw + " | " + s) : s;
+
+          teacher.days.set(dateKey, day);
+        }
+      }
+
+      if (anySheetRead) importedExcelCount++;
+    }
+
+    daysImportedEl.textContent = String(importedDates.size);
+    excelReadEl.textContent = String(importedExcelCount);
+  }
+
+  function parseAttendanceMatrix(matrix, ctx){
+    const keys = {
+      name:  ["الاسم","الاسم الكامل","اسم الموظف","اسم المعلم","المعلم","Name","Employee Name","Employee"],
+      id:    ["رقم الهوية","الهوية","الرقم الوظيفي","رقم الموظف","National ID","Employee ID","ID"],
+      phone: ["الجوال","رقم الجوال","الهاتف","Mobile","Phone","Cell"],
+      date:  ["التاريخ","اليوم","تاريخ الحركة","Date","Day","التاريخ الميلادي","تاريخ"],
+      inTime:["الحضور","وقت الحضور","وقت الدخول","بصمة الدخول","دخول","Check in","Check-in","In","وقت الدوام"],
+      outTime:["الانصراف","وقت الانصراف","وقت الخروج","بصمة الخروج","خروج","Check out","Check-out","Out"],
+      status:["الحالة","البيان","الوضع","Status","حالة"],
+      spec:  ["التخصص","القسم","Specialty","Department"],
+      rank:  ["المرتبة","الدرجة","Rank","Grade"]
+    };
+
+    let headerRowIndex = -1;
+    let colMap = null;
+
+    for (let i=0;i<matrix.length;i++){
+      const row = matrix[i].map(v => (v ?? "").toString().trim());
+      if (!row.join("").trim()) continue;
+
+      const map = buildColMap(row, keys);
+      const okTimeOrStatus = (map.inTime !== null) || (map.outTime !== null) || (map.status !== null);
+      const okIdentity = (map.id !== null) || (map.name !== null);
+
+      if (okIdentity && okTimeOrStatus){
+        headerRowIndex = i;
+        colMap = map;
+        break;
+      }
+    }
+    if (headerRowIndex < 0 || !colMap) return null;
+
+    const rows = [];
+    for (let r=headerRowIndex+1; r<matrix.length; r++){
+      const row = matrix[r];
+      if (!row || !row.length) continue;
+
+      const name = colMap.name !== null ? getCell(row, colMap.name) : "";
+      const id   = colMap.id   !== null ? getCell(row, colMap.id)   : "";
+      const phone= colMap.phone!== null ? getCell(row, colMap.phone): "";
+
+      if (!String(name||"").trim() && !String(id||"").trim()) continue;
+
+      const dateVal = (colMap.date !== null) ? getCell(row, colMap.date) : "";
+
+      const rec = {
+        name, id, phone,
+        date: dateVal,
+        inTime: colMap.inTime !== null ? getCell(row, colMap.inTime) : "",
+        outTime: colMap.outTime !== null ? getCell(row, colMap.outTime) : "",
+        status: colMap.status !== null ? getCell(row, colMap.status) : "",
+        spec: colMap.spec !== null ? getCell(row, colMap.spec) : "",
+        rank: colMap.rank !== null ? getCell(row, colMap.rank) : ""
+      };
+
+      const dObj = normalizeDateWithContext(rec.date, ctx);
+      rec.dateKey = dObj ? dateToKey(dObj) : (ctx.dayKey || "");
+
+      rows.push(rec);
+    }
+
+    return {rows};
+  }
+
+  function buildColMap(row, keys){
+    const idx = (arr) => {
+      for (let j=0;j<row.length;j++){
+        const cell = (row[j]||"").toString().trim();
+        if (!cell) continue;
+        const norm = normHeader(cell);
+        for (const k of arr){
+          const nk = normHeader(k);
+          if (nk && norm.includes(nk)) return j;
+        }
+      }
+      return null;
+    };
+    return {
+      name: idx(keys.name),
+      id: idx(keys.id),
+      phone: idx(keys.phone),
+      date: idx(keys.date),
+      inTime: idx(keys.inTime),
+      outTime: idx(keys.outTime),
+      status: idx(keys.status),
+      spec: idx(keys.spec),
+      rank: idx(keys.rank)
+    };
+  }
+
+  function normHeader(s){
+    return (s||"")
+      .toString()
+      .toLowerCase()
+      .replace(/\s+/g," ")
+      .replace(/[^\p{L}\p{N} ]/gu,"")
+      .trim();
+  }
+
+  function getCell(row, i){
+    if (i === null || i === undefined) return "";
+    return (row[i] ?? "");
+  }
+
+  async function readAsArrayBuffer(file){
+    return new Promise((resolve,reject)=>{
+      const fr = new FileReader();
+      fr.onload = () => resolve(fr.result);
+      fr.onerror = () => reject(fr.error || new Error("FileReader error"));
+      fr.readAsArrayBuffer(file);
+    });
+  }
+
+  /* =========================
+     الشهر من اسم المجلد
+  ========================== */
+  function applyMonthFromFolder(folderName){
+    const parsed = parseMonthYear(folderName);
+    if (parsed.month){
+      monthCtx.month = parsed.month;
+      monthCtx.year = parsed.year || inferYearFromMonth(parsed.month);
+      monthCtx.folderLabel = folderName || "";
+    }else{
+      monthCtx.month = null;
+      monthCtx.year = DEFAULT_GREG_YEAR;
+      monthCtx.folderLabel = folderName || "";
+    }
+    updateMonthUI();
+  }
+
+  function updateMonthUI(){
+    const m = monthCtx.month;
+    const y = monthCtx.year;
+
+    const monthTxt = (m ? toArNumber(m) : "—");
+    const yearTxt  = (y ? toArNumber(y) : "—");
+
+    monthChipEl.textContent = (m ? `${monthTxt} / ${yearTxt}` : "—");
+
+    const headline = (m && y)
+      ? `احصائيات الحضور والانصراف لشهر ${monthTxt} من عام ${yearTxt}`
+      : `احصائيات الحضور والانصراف`;
+
+    reportHeadlineEl.textContent = headline;
+    document.title = (m && y) ? `كشف حضوري (شهري) — شهر ${monthTxt} عام ${yearTxt}` : "كشف حضوري (شهري)";
+  }
+
+  function guessFolderNameFromFiles(files){
+    for (const f of files){
+      const p = f.webkitRelativePath || "";
+      if (p.includes("/")) return p.split("/")[0] || "";
+    }
+    return "";
+  }
+
+  function parseMonthYear(folderName){
+    const s0 = String(folderName||"").trim();
+    if (!s0) return {month:null, year:DEFAULT_GREG_YEAR};
+
+    const s = toWesternDigits(s0);
+    const nums = (s.match(/\d+/g) || []).map(n => parseInt(n,10)).filter(n => Number.isFinite(n));
+
+    const yearExplicit = nums.find(n => n>=2000 && n<=2100) || null;
+    const month = nums.find(n => n>=1 && n<=12) || null;
+
+    const year = yearExplicit || (month ? inferYearFromMonth(month) : DEFAULT_GREG_YEAR);
+    return {month, year};
+  }
+
+  function toArNumber(n){
+    try{
+      return new Intl.NumberFormat("ar-SA").format(n).replace(/[٬,]/g,"");
+    }catch(_){
+      return String(n);
+    }
+  }
+
+  /* =========================
+     سياق اليوم من اسم الملف
+     أمثلة:
+     - 1 و 1.2 => يوم 1
+     - 2025-11-01 => يوم 01
+  ========================== */
+  function buildFileContext(file){
+    const year = monthCtx.year || DEFAULT_GREG_YEAR;
+    const month = monthCtx.month;
+
+    const dayNum = parseDayFromFileName(file?.name || "");
+    const dayKey = (month && dayNum) ? makeDayKey(year, month, dayNum) : "";
+
+    return { year, month, dayNum, dayKey, fileName:file?.name || "" };
+  }
+
+  function parseDayFromFileName(name){
+    const base = String(name||"").trim().replace(/\.[^.]+$/,""); // remove extension
+    const w = toWesternDigits(base);
+
+    // 1.2 / 01.3 => اليوم = الرقم قبل النقطة
+    const dot = w.match(/^(\d{1,2})\s*\.\s*\d+/);
+    if (dot){
+      const d = parseInt(dot[1],10);
+      if (Number.isFinite(d) && d>=1 && d<=31) return d;
+    }
+
+    // 2025-11-01 => خذ آخر جزء
+    const parts = w.split(/[^\d]+/).filter(Boolean);
+    const cand = parts.filter(p => p.length<=2).map(p => parseInt(p,10)).filter(n => Number.isFinite(n) && n>=1 && n<=31);
+    if (cand.length) return cand[cand.length-1];
+
+    // fallback: أول رقم 1-2
+    const m = w.match(/(\d{1,2})/);
+    if (!m) return null;
+    const d = parseInt(m[1],10);
+    if (!Number.isFinite(d) || d < 1 || d > 31) return null;
+    return d;
+  }
+
+  function makeDayKey(year, month, day){
+    const m = String(month).padStart(2,"0");
+    const d = String(day).padStart(2,"0");
+    return `${year}-${m}-${d}`;
+  }
+
+  /* =========================
+     ✅ الغياب عند عدم وجود الاسم بالملف
+     (على أيام الدوام فقط بعد الاستبعاد)
+  ========================== */
+  function ensureAbsencesForAllTeachers(){
+    const allDays = Array.from(importedDates).sort(); // asc
+    if (!allDays.length) return;
+
+    for (const t of teachers.values()){
+      for (const dk of allDays){
+        if (!t.days.has(dk)){
+          t.days.set(dk, { inM:null, outM:null, statusRaw:"غياب", hasIn:false, hasOut:false });
+        }
+      }
+    }
+  }
+
+  /* =========================
+     قائمة المعلمين (فريدة بالهوية)
+  ========================== */
+  function updateTeacherSelect(){
+    const current = teacherSelect.value;
+    teacherSelect.innerHTML = `<option value="">— اختر —</option>`;
+
+    const list = Array.from(teachers.values())
+      .sort((a,b)=> a.name.localeCompare(b.name, "ar"));
+
+    for (const t of list){
+      const opt = document.createElement("option");
+      opt.value = t.id;
+      opt.textContent = `${t.name} — ${t.id}`;
+      teacherSelect.appendChild(opt);
+    }
+
+    if (current && teachers.has(current)) teacherSelect.value = current;
+  }
+
+  function updateNotice(skippedCount){
+    const period = getGlobalPeriod();
+    const skipTxt = skippedCount ? ` — تم تجاهل ${skippedCount} ملف غير Excel` : "";
+
+    const m = monthCtx.month, y = monthCtx.year;
+    const monthLine = (m && y) ? ` — شهر ${toArNumber(m)} من عام ${toArNumber(y)}` : "";
+
+    notice.textContent =
+      `تم استيراد ${importedExcelCount} ملف Excel من ${lastSourceLabel}${skipTxt}${monthLine} — الأيام من ${period.toTxt} حتى ${period.fromTxt} — (يُستبعد الجمعة والسبت والإجازات الرسمية تلقائياً) — اختر معلماً لعرض كشفه الشهري.`;
+  }
+
+  /* =========================
+     العرض والحسابات
+  ========================== */
+  function renderSelectedTeacher(){
+    const id = teacherSelect.value;
+    if (!id || !teachers.has(id)){
+      clearReport();
+      return;
+    }
+    const teacher = teachers.get(id);
+
+    // ✅ ترتيب من الجديد إلى الأقدم (البيانات هنا أصلاً بعد الاستبعاد)
+    const days = Array.from(teacher.days.entries()).sort((a,b)=> b[0].localeCompare(a[0]));
+
+    tName.textContent = teacher.name || "—";
+    tId.textContent   = teacher.id || "—";
+    tPhone.textContent= normalizeKsaMobile(teacher.phone || "") || "—";
+    tSpec.textContent = teacher.spec || "—";
+    tRank.textContent = teacher.rank || "—";
+    tShift.textContent= SHIFT_START;
+
+    let totalWork = 0;
+    let totalLate = 0;
+    let absCount  = 0;
+    let openCount = 0;
+
+    const bodyRows = [];
+
+    for (const [dateKey, day] of days){
+      // طبقة أمان: إن ظهر يوم مستبعد لأي سبب لا يُعرض ولا يُحسب
+      const ex = isExcludedDayKey(dateKey, day.statusRaw);
+      if (ex.excluded) continue;
+
+      const dObj = keyToDate(dateKey);
+      const dayLabel = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dateKey;
+
+      const status = computeStatus(day);
+      if (status.isAbsent) absCount++;
+      if (status.notClosed) openCount++;
+
+      const calc = computeTimes(day);
+      totalWork += calc.workMin;
+      totalLate += calc.lateMin;
+
+      bodyRows.push({
+        dayLabel,
+        inTxt: calc.inTxt,
+        outTxt: calc.outTxt,
+        workTxt: minsToHM(calc.workMin),
+        lateTxt: minsToHM(calc.lateMin),
+        statusTxt: status.label,
+        tone: status.isAbsent ? "bad" : (status.notClosed || calc.lateMin>0 ? "warn" : "ok")
+      });
+    }
+
+    sumWork.textContent = minsToHM(totalWork);
+    sumLate.textContent = minsToHM(totalLate);
+    sumAbs.textContent  = String(absCount);
+    sumOpen.textContent = String(openCount);
+
+    const totalDays = bodyRows.length || 0;
+    const attendanceDays = Math.max(0, totalDays - absCount);
+    const attendanceRate = totalDays ? Math.round((attendanceDays / totalDays) * 100) : 0;
+
+    const disciplineScore = calcDisciplineScore({totalDays, absCount, openCount, totalLateMin: totalLate});
+    const level = scoreToLevel(disciplineScore);
+
+    setMetricBadges({attendanceRate, disciplineScore, level});
+
+    if (!bodyRows.length){
+      daysBody.innerHTML = `<tr><td colspan="6" class="hint">لا توجد بيانات (بعد استبعاد الجمعة/السبت والإجازات) ضمن الملفات المستوردة.</td></tr>`;
+      currentWaText = "";
+      return;
+    }
+
+    daysBody.innerHTML = bodyRows.map(r => `
+      <tr>
+        <td>${escapeHtml(r.dayLabel)}</td>
+        <td>${escapeHtml(r.inTxt)}</td>
+        <td>${escapeHtml(r.outTxt)}</td>
+        <td>${escapeHtml(r.workTxt)}</td>
+        <td>${escapeHtml(r.lateTxt)}</td>
+        <td>${escapeHtml(r.statusTxt)}</td>
+      </tr>
+    `).join("");
+
+    currentWaText = buildWhatsAppMessage({
+      teacher,
+      totalDays,
+      totalWorkMin: totalWork,
+      totalLateMin: totalLate,
+      absCount,
+      openCount,
+      attendanceRate,
+      disciplineScore,
+      level
+    });
+  }
+
+  function setMetricBadges({attendanceRate, disciplineScore, level}){
+    mAttendance.textContent = `نسبة الحضور: ${toArNumber(attendanceRate)}%`;
+    mDiscipline.textContent = `مؤشر الانضباط: ${toArNumber(disciplineScore)}/100`;
+    mLevel.textContent = `المستوى: ${level.text}`;
+
+    mAttendance.className = "badge " + level.tone;
+    mDiscipline.className = "badge " + level.tone;
+    mLevel.className = "badge " + level.tone;
+  }
+
+  function clearReport(){
+    tName.textContent  = "—";
+    tId.textContent    = "—";
+    tPhone.textContent = "—";
+    tSpec.textContent  = "—";
+    tRank.textContent  = "—";
+    tShift.textContent = "—";
+
+    sumWork.textContent = "—";
+    sumLate.textContent = "—";
+    sumAbs.textContent  = "—";
+    sumOpen.textContent = "—";
+
+    mAttendance.textContent = "نسبة الحضور: —";
+    mDiscipline.textContent = "مؤشر الانضباط: —";
+    mLevel.textContent = "المستوى: —";
+    mAttendance.className = "badge";
+    mDiscipline.className = "badge";
+    mLevel.className = "badge";
+
+    daysBody.innerHTML = `<tr><td colspan="6" class="hint">اختر معلماً بعد الاستيراد لعرض تفاصيل الأيام.</td></tr>`;
+    currentWaText = "";
+  }
+
+  function computeStatus(day){
+    const raw = (day.statusRaw || "").toString();
+    const rawN = normName(raw);
+
+    const isAbsent = rawN.includes("غائب") || rawN.includes("غياب");
+    const notClosed = !isAbsent && day.hasIn && !day.hasOut;
+
+    let label = "—";
+    if (isAbsent) label = "غياب";
+    else if (notClosed) label = "لم يُغلق الدوام";
+    else if (raw.trim()) label = raw.trim();
+    else label = (day.hasIn ? "حضور" : "—");
+
+    return {isAbsent, notClosed, label};
+  }
+
+  function computeTimes(day){
+    const status = computeStatus(day);
+    if (status.isAbsent){
+      return {inTxt:"—", outTxt:"—", workMin:0, lateMin:0};
+    }
+
+    let inM = (day.inM !== null) ? clamp(day.inM, clampMinM, clampMaxM) : null;
+    let outM = (day.outM !== null) ? clamp(day.outM, clampMinM, clampMaxM) : null;
+
+    let inTxt = (inM !== null) ? minutesToHHMM(inM) : "—";
+    let outTxt = (outM !== null) ? minutesToHHMM(outM) : "—";
+
+    if (day.hasIn && !day.hasOut){
+      outM = clampMaxM;
+      outTxt = "—";
+    }
+
+    let workMin = 0;
+    if (inM !== null && outM !== null){
+      workMin = Math.max(0, outM - inM);
+    }else if (inM !== null && outM === null){
+      workMin = Math.max(0, clampMaxM - inM);
+    }
+
+    let lateMin = 0;
+    if (inM !== null){
+      lateMin = Math.max(0, inM - shiftStartM);
+    }
+
+    return {inTxt, outTxt, workMin, lateMin};
+  }
+
+  function getGlobalPeriod(){
+    const keys = Array.from(importedDates).sort(); // asc
+    if (!keys.length) return {fromTxt:"--", toTxt:"--"};
+    const from = keyToDate(keys[0]);                 // أقدم
+    const to = keyToDate(keys[keys.length-1]);       // أحدث
+    return {
+      fromTxt: from ? formatHijriDate(from) : keys[0],
+      toTxt: to ? formatHijriDate(to) : keys[keys.length-1]
+    };
+  }
+
+  /* =========================
+     مؤشرات الانضباط
+  ========================== */
+  function calcDisciplineScore({totalDays, absCount, openCount, totalLateMin}){
+    // 100 - (غياب*12) - (لم يغلق*6) - (التأخر بالدقائق/5 حد أعلى 25)
+    let s = 100;
+    s -= absCount * 12;
+    s -= openCount * 6;
+    s -= Math.min(25, Math.round((totalLateMin || 0) / 5));
+    if (totalDays === 0) s = 0;
+    return clamp(Math.round(s), 0, 100);
+  }
+
+  function scoreToLevel(score){
+    if (score >= 95) return {tone:"ok", text:"ممتاز"};
+    if (score >= 88) return {tone:"ok", text:"جيد جداً"};
+    if (score >= 80) return {tone:"warn", text:"جيد"};
+    if (score >= 70) return {tone:"warn", text:"يحتاج متابعة"};
+    return {tone:"bad", text:"يحتاج تحسين"};
+  }
+
+  /* =========================
+     WhatsApp: توليد/عرض/نسخ/فتح/طباعة
+     ✅ تربوي، مختصر، داعم، ويُحتسب لأيام الدوام فقط
+  ========================== */
+  function buildWhatsAppMessage({teacher, totalDays, totalWorkMin, totalLateMin, absCount, openCount, attendanceRate, disciplineScore, level}){
+    const m = monthCtx.month, y = monthCtx.year;
+    const monthTxt = m ? toArNumber(m) : "—";
+    const yearTxt  = y ? toArNumber(y) : "—";
+
+    const workTxt = minsToHM(totalWorkMin);
+    const lateTxt = minsToHM(totalLateMin);
+
+    const greet = `السلام عليكم ورحمة الله وبركاته`;
+    const head  = `أ. ${teacher.name}`;
+    const sub   = `ملخص الحضور والانصراف لشهر ${monthTxt} لعام ${yearTxt} (أيام الدوام فقط).`;
+
+    const l1 = `• أيام الدوام: ${toArNumber(totalDays)} | نسبة الحضور: ${toArNumber(attendanceRate)}%`;
+    const l2 = `• ساعات الدوام: ${workTxt} | التأخر: ${lateTxt}`;
+    const l3 = `• الغياب: ${toArNumber(absCount)} | عدم إغلاق الدوام: ${toArNumber(openCount)}`;
+    const l4 = `• مؤشر الانضباط: ${toArNumber(disciplineScore)}/100 (${level.text}).`;
+
+    const tip = `للدقة التنظيمية: عند وجود ملاحظة على البيانات، يُرجى الإفادة لتصحيحها وفق الإجراءات.`;
+    return [greet,"",head,sub,l1,l2,l3,l4,"",tip].join("\n");
+  }
+
+  function openWAModal(){
+    const id = teacherSelect.value;
+    if (!id || !teachers.has(id)){
+      alert("اختر معلماً أولاً.");
+      return;
+    }
+    if (!currentWaText) renderSelectedTeacher();
+
+    const teacher = teachers.get(id);
+    const phone = normalizeKsaMobile(teacher.phone || "");
+
+    waTextEl.textContent = currentWaText || "—";
+    waHintEl.textContent = phone
+      ? `سيتم توجيه الرسالة لرقم: ${phone}`
+      : `لا يوجد رقم جوال صالح للمعلم — حدّث رقم الجوال في السجل المزروع.`;
+
+    waOverlay.classList.add("show");
+    waModal.classList.add("show");
+    waModal.setAttribute("aria-hidden","false");
+  }
+
+  function closeWAModal(){
+    waOverlay.classList.remove("show");
+    waModal.classList.remove("show");
+    waModal.setAttribute("aria-hidden","true");
+  }
+
+  async function copyWAMessage(){
+    const text = currentWaText || waTextEl.textContent || "";
+    if (!text.trim()){
+      alert("لا توجد رسالة للنسخ.");
+      return;
+    }
+    try{
+      await navigator.clipboard.writeText(text);
+      toast("تم نسخ الرسالة.");
+    }catch(_){
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position="fixed";
+      ta.style.opacity="0";
+      document.body.appendChild(ta);
+      ta.select();
+      try{ document.execCommand("copy"); toast("تم نسخ الرسالة."); }
+      catch(err){ alert("تعذر النسخ. انسخها يدوياً من مربع الرسالة."); }
+      finally{ ta.remove(); }
+    }
+  }
+
+  function openWhatsAppChat(){
+    const id = teacherSelect.value;
+    if (!id || !teachers.has(id)){
+      alert("اختر معلماً أولاً.");
+      return;
+    }
+    const teacher = teachers.get(id);
+    const phone = normalizeKsaMobile(teacher.phone || "");
+    if (!phone){
+      alert("لا يوجد رقم جوال صالح للمعلم لإرسال واتساب.");
+      return;
+    }
+    const text = encodeURIComponent(currentWaText || "");
+    const url = `https://wa.me/${phone}?text=${text}`;
+    window.open(url, "_blank", "noopener");
+  }
+
+  function printWAMessage(){
+    const id = teacherSelect.value;
+    if (!id || !teachers.has(id)){
+      alert("اختر معلماً أولاً.");
+      return;
+    }
+    const teacher = teachers.get(id);
+
+    const m = monthCtx.month, y = monthCtx.year;
+    const monthTxt = m ? toArNumber(m) : "—";
+    const yearTxt  = y ? toArNumber(y) : "—";
+    const phone = normalizeKsaMobile(teacher.phone||"") || "—";
+
+    const html = `<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>طباعة رسالة واتساب</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;font-family:Tajawal,system-ui;background:#fff;color:#0b2f2b}
+  .page{padding:18mm}
+  .h{font-weight:1000;color:#0b5660;font-size:18px;margin:0 0 10px}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+  .chip{border:1px solid #e5eff1;border-radius:999px;padding:7px 10px;font-weight:900;color:#0b5660;background:#f3fbfb}
+  .box{border:1px solid #e5eff1;border-radius:16px;padding:14px;font-weight:900;line-height:2;white-space:pre-wrap}
+  .foot{margin-top:12px;font-weight:900;color:#2f4f53}
+  @page{size:A4 portrait;margin:10mm}
+</style></head><body>
+  <div class="page">
+    <h1 class="h">رسالة واتساب — ملخص الحضور والانصراف لشهر ${monthTxt} لعام ${yearTxt}</h1>
+    <div class="meta">
+      <span class="chip">المعلم: ${escapeHtml(teacher.name)}</span>
+      <span class="chip">الهوية: ${escapeHtml(teacher.id)}</span>
+      <span class="chip">الجوال: ${escapeHtml(phone)}</span>
+    </div>
+    <div class="box">${escapeHtml(currentWaText || "")}</div>
+    <div class="foot">تحفظ في ملف المتابعة</div>
+  </div>
+</body></html>`;
+
+    const w = window.open("", "_blank", "noopener,noreferrer");
+    if (!w){ alert("تعذر فتح نافذة الطباعة."); return; }
+
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+
+    w.onload = () => setTimeout(() => { try{ w.focus(); w.print(); }catch(_){ } }, 200);
+  }
+
+  /* =========================
+     Registry warn modal
+  ========================== */
+  function updateRegistryWarnUI(){
+    const n = registryIssues.length;
+    if (n > 0){
+      regWarn.style.display = "";
+      regWarnCount.textContent = String(n);
+      regList.innerHTML = registryIssues.map(x => `<div class="it">${escapeHtml(x)}</div>`).join("");
+    }else{
+      regWarn.style.display = "none";
+      regWarnCount.textContent = "0";
+      regList.innerHTML = "";
+    }
+  }
+
+  function openRegModal(){
+    if (!registryIssues.length) return;
+    regOverlay.classList.add("show");
+    regModal.classList.add("show");
+    regModal.setAttribute("aria-hidden","false");
+  }
+  function closeRegModal(){
+    regOverlay.classList.remove("show");
+    regModal.classList.remove("show");
+    regModal.setAttribute("aria-hidden","true");
+  }
+
+  /* =========================
+     التصدير إلى Excel
+  ========================== */
+  function exportCurrentTeacherExcel(){
+    const id = teacherSelect.value;
+    if (!id || !teachers.has(id)){
+      alert("اختر معلماً أولاً.");
+      return;
+    }
+    const teacher = teachers.get(id);
+
+    const all = Array.from(teacher.days.entries()).sort((a,b)=> b[0].localeCompare(a[0]));
+    const days = all.filter(([dk, day]) => !isExcludedDayKey(dk, day.statusRaw).excluded);
+
+    const detail = days.map(([dk, day]) => {
+      const dObj = keyToDate(dk);
+      const label = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dk;
+      const st = computeStatus(day);
+      const c = computeTimes(day);
+      return {
+        "اليوم": label,
+        "الحضور": c.inTxt,
+        "الانصراف": c.outTxt,
+        "ساعات الدوام": minsToHM(c.workMin),
+        "التأخر": minsToHM(c.lateMin),
+        "الحالة": st.label
+      };
+    });
+
+    let totalWork=0,totalLate=0,abs=0,open=0;
+    for (const [_, day] of days){
+      const st = computeStatus(day);
+      const c = computeTimes(day);
+      totalWork += c.workMin;
+      totalLate += c.lateMin;
+      if (st.isAbsent) abs++;
+      if (st.notClosed) open++;
+    }
+
+    const totalDays = days.length || 0;
+    const attendanceDays = Math.max(0, totalDays - abs);
+    const attendanceRate = totalDays ? Math.round((attendanceDays / totalDays) * 100) : 0;
+    const disciplineScore = calcDisciplineScore({totalDays, absCount:abs, openCount:open, totalLateMin: totalLate});
+    const level = scoreToLevel(disciplineScore);
+
+    const m = monthCtx.month, y = monthCtx.year;
+    const monthTxt = (m ? toArNumber(m) : "—");
+    const yearTxt  = (y ? toArNumber(y) : "—");
+
+    const summary = [
+      {"البند":"الشهر", "القيمة": (m && y) ? `شهر ${monthTxt} من عام ${yearTxt}` : "—"},
+      {"البند":"الاسم", "القيمة": teacher.name},
+      {"البند":"رقم الهوية (الرقم الوظيفي)", "القيمة": teacher.id || "—"},
+      {"البند":"الجوال", "القيمة": normalizeKsaMobile(teacher.phone||"") || "—"},
+      {"البند":"التخصص", "القيمة": teacher.spec},
+      {"البند":"المرتبة", "القيمة": teacher.rank},
+      {"البند":"ملاحظة", "القيمة": "أيام الدوام فقط (مستبعد الجمعة/السبت والإجازات الرسمية)."},
+      {"البند":"نسبة الحضور", "القيمة": `${toArNumber(attendanceRate)}%`},
+      {"البند":"مؤشر الانضباط", "القيمة": `${toArNumber(disciplineScore)}/100 (${level.text})`},
+      {"البند":"إجمالي ساعات الدوام", "القيمة": minsToHM(totalWork)},
+      {"البند":"إجمالي التأخر", "القيمة": minsToHM(totalLate)},
+      {"البند":"إجمالي الغياب", "القيمة": String(abs)},
+      {"البند":"أيام لم يُغلق الدوام", "القيمة": String(open)}
+    ];
+
+    const wb = XLSX.utils.book_new();
+    const ws1 = XLSX.utils.json_to_sheet(summary, {skipHeader:false});
+    const ws2 = XLSX.utils.json_to_sheet(detail, {skipHeader:false});
+
+    ws1["!cols"] = [{wch:32},{wch:54}];
+    ws2["!cols"] = [{wch:30},{wch:10},{wch:10},{wch:14},{wch:10},{wch:18}];
+
+    XLSX.utils.book_append_sheet(wb, ws1, "ملخص");
+    XLSX.utils.book_append_sheet(wb, ws2, "تفصيل");
+
+    const out = XLSX.write(wb, {bookType:"xlsx", type:"array"});
+    const blob = new Blob([out], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+
+    const hijriShort = getHijriShort(new Date());
+    a.download = `كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.xlsx`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      URL.revokeObjectURL(a.href);
+      a.remove();
+    }, 250);
+  }
+
+  /* =========================
+     أدوات استبعاد الأيام (الجمعة/السبت + الإجازات)
+  ========================== */
+  function statusLooksHoliday(statusRaw){
+    const s = normName(statusRaw || "");
+    // أي صياغة شائعة في أنظمة الحضور
+    return s.includes("اجازه") || s.includes("عطله") || s.includes("holiday");
+  }
+
+  function inHolidayRanges(dateKey){
+    for (const r of HOLIDAY_RANGES){
+      if (dateKey >= r.start && dateKey <= r.end) return (r.label || "إجازة رسمية");
+    }
+    return "";
+  }
+
+  function isExcludedDayKey(dateKey, statusRaw){
+    if (!dateKey) return {excluded:false, reason:""};
+
+    // استبعاد إذا كانت "إجازة" مذكورة في الحالة (حتى لو لم تُضف للنطاقات)
+    if (SKIP_HOLIDAYS && statusLooksHoliday(statusRaw)) return {excluded:true, reason:"إجازة"};
+
+    const d = keyToDate(dateKey);
+    if (SKIP_WEEKEND && d){
+      const wd = d.getDay(); // 0=Sun ... 5=Fri 6=Sat
+      if (wd === 5 || wd === 6) return {excluded:true, reason:"نهاية الأسبوع"};
+    }
+
+    if (SKIP_HOLIDAYS){
+      const lbl = inHolidayRanges(dateKey);
+      if (lbl) return {excluded:true, reason:lbl};
+    }
+
+    return {excluded:false, reason:""};
+  }
+
+  /* =========================
+     أدوات مساعدة
+  ========================== */
+  function setState(txt){ stateEl.textContent = txt; }
+
+  function hhmmToMinutes(hhmm){
+    const m = String(hhmm||"").trim().match(/^(\d{1,2}):(\d{2})/);
+    if (!m) return 0;
+    return (parseInt(m[1],10)*60) + parseInt(m[2],10);
+  }
+
+  function minutesToHHMM(mins){
+    mins = Math.max(0, Math.round(mins));
+    const h = Math.floor(mins/60);
+    const m = mins%60;
+    return String(h).padStart(2,"0") + ":" + String(m).padStart(2,"0");
+  }
+
+  function minsToHM(mins){ return minutesToHHMM(mins || 0); }
+  function clamp(v, a, b){ return Math.min(b, Math.max(a, v)); }
+
+  function parseTimeToMinutes(v){
+    if (v === null || v === undefined) return null;
+
+    if (typeof v === "number" && isFinite(v)){
+      if (v > 1){
+        try{
+          const d = XLSX.SSF.parse_date_code(v);
+          if (d && typeof d.H === "number" && typeof d.M === "number"){
+            return d.H*60 + d.M;
+          }
+        }catch(_){}
+        return null;
+      }
+      const mins = Math.round(v * 24 * 60);
+      if (mins < 0 || mins > 24*60) return null;
+      return mins;
+    }
+
+    const s = String(v).trim();
+    if (!s) return null;
+
+    let ss = s.replace(/[^\d:صمAPMapm ]+/g," ").trim();
+    const isPM = /م/i.test(ss) || /\bPM\b/i.test(ss);
+    const isAM = /ص/i.test(ss) || /\bAM\b/i.test(ss);
+
+    const m = ss.match(/(\d{1,2})\s*:\s*(\d{2})/);
+    if (!m) return null;
+
+    let hh = parseInt(m[1],10);
+    const mm = parseInt(m[2],10);
+
+    if (mm < 0 || mm > 59) return null;
+    if (isPM && hh < 12) hh += 12;
+    if (isAM && hh === 12) hh = 0;
+    if (hh < 0 || hh > 23) return null;
+
+    return hh*60 + mm;
+  }
+
+  function normalizeDateWithContext(v, ctx){
+    const full = normalizeDate(v);
+    if (full) return full;
+
+    const month = ctx?.month, year = ctx?.year;
+    if (!month || !year) return null;
+
+    if (typeof v === "number" && isFinite(v)){
+      const d = Math.floor(v);
+      if (d>=1 && d<=31) return new Date(year, month-1, d);
+    }
+    const s = String(v ?? "").trim();
+    if (s){
+      const w = toWesternDigits(s);
+      const m = w.match(/^(\d{1,2})$/);
+      if (m){
+        const d = parseInt(m[1],10);
+        if (d>=1 && d<=31) return new Date(year, month-1, d);
+      }
+    }
+    return null;
+  }
+
+  function normalizeDate(v){
+    if (v === null || v === undefined) return null;
+
+    if (v instanceof Date && !isNaN(v.getTime())) return new Date(v.getFullYear(), v.getMonth(), v.getDate());
+
+    if (typeof v === "number" && isFinite(v)){
+      try{
+        const d = XLSX.SSF.parse_date_code(v);
+        if (d && d.y && d.m && d.d){
+          return new Date(d.y, d.m-1, d.d);
+        }
+      }catch(_){}
+      return null;
+    }
+
+    const s = String(v).trim();
+    if (!s) return null;
+
+    const m = s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
+    if (m){
+      const y = parseInt(m[1],10), mo = parseInt(m[2],10)-1, d = parseInt(m[3],10);
+      const dt = new Date(y, mo, d);
+      if (!isNaN(dt.getTime())) return dt;
+    }
+
+    const m2 = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if (m2){
+      const d = parseInt(m2[1],10), mo = parseInt(m2[2],10)-1, y = parseInt(m2[3],10);
+      const dt = new Date(y, mo, d);
+      if (!isNaN(dt.getTime())) return dt;
+    }
+
+    return null;
+  }
+
+  function dateToKey(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const da = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${da}`;
+  }
+
+  function keyToDate(key){
+    const m = String(key||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (!m) return null;
+    const y = parseInt(m[1],10), mo = parseInt(m[2],10)-1, d = parseInt(m[3],10);
+    const dt = new Date(y, mo, d);
+    return isNaN(dt.getTime()) ? null : dt;
+  }
+
+  function weekdayAr(d){
+    try{
+      return new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {weekday:"long"}).format(d);
+    }catch(_){
+      return d.toLocaleDateString("ar-SA", {weekday:"long"});
+    }
+  }
+
+  function formatHijriDate(d){
+    try{
+      const parts = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+        year:"numeric", month:"2-digit", day:"2-digit"
+      }).formatToParts(d);
+
+      const get = (t) => (parts.find(p=>p.type===t)?.value || "");
+      const y = get("year"), mo = get("month"), da = get("day");
+      return `${y}/${mo}/${da} هـ`;
+    }catch(_){
+      return d.toLocaleDateString("ar-SA");
+    }
+  }
+
+  function getHijriShort(d){
+    try{
+      const parts = new Intl.DateTimeFormat("ar-SA-u-ca-islamic-umalqura", {
+        year:"numeric", month:"2-digit", day:"2-digit"
+      }).formatToParts(d);
+      const get = (t) => (parts.find(p=>p.type===t)?.value || "");
+      const y = get("year"), mo = get("month"), da = get("day");
+      return `${y}${mo}${da}`;
+    }catch(_){
+      const key = dateToKey(new Date(d.getFullYear(), d.getMonth(), d.getDate()));
+      return key.replaceAll("-","");
+    }
+  }
+
+  function setTodayHeader(){
+    const now = new Date();
+    el("todayDow").textContent = weekdayAr(now);
+    el("todayHijri").textContent = formatHijriDate(now);
+  }
+
+  function normName(s){
+    return (s||"")
+      .toString()
+      .trim()
+      .toLowerCase()
+      .replace(/[\u064B-\u065F\u0670]/g,"")
+      .replace(/[إأآٱ]/g,"ا")
+      .replace(/[ىي]/g,"ي")
+      .replace(/ة/g,"ه")
+      .replace(/[^\p{L}\p{N} ]/gu," ")
+      .replace(/\s+/g," ")
+      .trim();
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "").replace(/[&<>"']/g, s => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[s]));
+  }
+
+  function safeFileName(name){
+    return String(name||"")
+      .replace(/[\\\/:*?"<>|]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 80) || "بدون-اسم";
+  }
+
+  function toWesternDigits(s){
+    const map = {
+      "٠":"0","١":"1","٢":"2","٣":"3","٤":"4","٥":"5","٦":"6","٧":"7","٨":"8","٩":"9",
+      "۰":"0","۱":"1","۲":"2","۳":"3","۴":"4","۵":"5","۶":"6","۷":"7","۸":"8","۹":"9"
+    };
+    return String(s||"").replace(/[٠-٩۰-۹]/g, ch => map[ch] || ch);
+  }
+
+  function toast(msg){
+    const t = document.createElement("div");
+    t.textContent = msg;
+    t.style.position="fixed";
+    t.style.bottom="16px";
+    t.style.left="16px";
+    t.style.zIndex="200";
+    t.style.background="rgba(255,255,255,.92)";
+    t.style.border="1px solid #e5eff1";
+    t.style.borderRadius="999px";
+    t.style.padding="10px 12px";
+    t.style.fontWeight="1000";
+    t.style.boxShadow="0 12px 30px rgba(0,0,0,.12)";
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(), 1400);
+  }
+
+  /* =========================
+     السجل المزروع (بالهوية)
+  ========================== */
+  function buildRegistryById(tsv){
+    const map = new Map();
+    const issues = [];
+    const lines = String(tsv||"").split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+
+    for (const line of lines){
+      const parts = line.split("\t").map(p => (p||"").trim());
+      if (parts.length < 2) continue;
+
+      const name = parts[0];
+      const id   = cleanId(parts[1]);
+      const phone= normalizeKsaMobile(parts[2] || "");
+      const spec = parts[3] || "—";
+      const rank = parts[4] || "—";
+
+      if (!name || !id) continue;
+
+      if (map.has(id)){
+        const prev = map.get(id);
+        if (prev && prev.name !== name){
+          issues.push(`تكرار هوية (${id}): ${prev.name} / ${name} — تم اعتماد أول سجل.`);
+          continue;
+        }
+      }
+
+if (!phone) issues.push(`بيان جوال غير مكتمل: ${name} (${id})`);
+      if (!spec || spec === "—") issues.push(`بيان تخصص غير مكتمل: ${name} (${id})`);
+      if (!rank || rank === "—") issues.push(`بيان مرتبة/وظيفة غير مكتمل: ${name} (${id})`);
+
+      map.set(id, { name, id, phone: phone || "—", spec, rank });
+    }
+
+    return { map, issues };
+  }
+
+  function buildNameToIdIndex(registryMap){
+    const m = new Map();
+    for (const [id, rec] of registryMap.entries()){
+      const k = nameKey(rec?.name || "");
+      if (!k) continue;
+      if (!m.has(k)) m.set(k, id); // نعتمد أول مطابق
+    }
+    return m;
+  }
+
+  function nameKey(name){
+    // مفتاح موحّد للاسم (يدعم المطابقة حتى لو اختلفت المسافات/التشكيل)
+    return normName(name).replace(/\s+/g, "");
+  }
+
+  function cleanId(v){
+    const s = toWesternDigits(String(v ?? "")).replace(/\D+/g, "");
+    if (!s) return "";
+    // غالبًا 10 أرقام (هوية/إقامة/رقم وظيفي). نتركه مرنًا لكن نتأكد أنه رقم فعلاً.
+    return s;
+  }
+
+  function normalizeKsaMobile(v){
+    let s = String(v ?? "").trim();
+    if (!s) return "";
+    s = toWesternDigits(s);
+
+    // إزالة .00 الشائعة عند قدوم الرقم من Excel كقيمة رقمية
+    s = s.replace(/\.0+$/g, "");
+
+    // استخراج الأرقام فقط
+    let digits = s.replace(/\D+/g, "");
+    if (!digits) return "";
+
+    // إزالة بادئة 00 إن وجدت
+    if (digits.startsWith("00")) digits = digits.slice(2);
+
+    // تحويل الأشكال إلى صيغة واتساب: 9665XXXXXXXX (بدون +)
+    if (digits.startsWith("966")){
+      // إذا بعد 966 جاء 0 أحياناً، نحذفه
+      digits = "966" + digits.slice(3).replace(/^0+/, "");
+    } else if (digits.length === 10 && digits.startsWith("05")){
+      digits = "966" + digits.slice(1);
+    } else if (digits.length === 9 && digits.startsWith("5")){
+      digits = "966" + digits;
+    }
+
+    // تحقق نهائي: 12 رقم ويبدأ بـ 9665
+    if (digits.length === 12 && digits.startsWith("9665")) return digits;
+
+    return "";
+  }
+
+  function resolveTeacherId(idRaw, nameRaw){
+    const id = cleanId(idRaw);
+    if (id && teachers.has(id)) return id;
+    if (id && registryById.has(id)) return id;
+
+    const k = nameKey(nameRaw || "");
+    if (k && idByNameKey.has(k)) return idByNameKey.get(k);
+
+    return "";
+  }
+
+  function resetDataToRegistry(){
+    teachers.clear();
+    for (const [id, r] of registryById.entries()){
+      teachers.set(id, {
+        id,
+        name: r.name || "—",
+        phone: normalizeKsaMobile(r.phone || "") || "—",
+        spec: (r.spec || "—"),
+        rank: (r.rank || "—"),
+        days: new Map()
+      });
+    }
+  }
+
+})();
+</script>
+</body>
+</html>
