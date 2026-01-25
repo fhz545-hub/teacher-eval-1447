@@ -1445,7 +1445,19 @@ function findIdxByAny(headers, patterns){
   }
   return -1;
 }
-function bestHeaderRow(rows){
+const ID_PATS = [
+  /السجل المدني/,
+  /رقم السجل المدني/,
+  /الهوية الوطنية/,
+  /رقم الهوية/,
+  /هوية/,
+  /رقم الموظف/,
+  /الرقم الوظيفي/,
+  /رقم المعلم/,
+  /\bid\b/,
+  /national id/,
+  /civil/
+];function bestHeaderRow(rows){
   let best={i:-1,score:-1,headers:[]};
   const max=Math.min(25, rows.length);
   for(let i=0;i<max;i++){
