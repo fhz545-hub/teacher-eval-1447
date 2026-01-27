@@ -142,15 +142,37 @@
     .headline{
   text-align:center;
   font-weight:900;
-  font-size:22px;
+  font-size:20px;
   letter-spacing:0;
   color:#0b5660;
   margin:10px 0 6px;
   line-height:1.25;
 }
+/* ✅ تصغير عنوان "احصائيات الحضور والانصراف لشهر..." فقط */
+#reportHeadline{
+  font-size:18px;      /* حجم العرض + PDF (html2canvas) */
+  line-height:1.25;
+}
 
+/* ✅ تصغير إضافي للطباعة فقط */
+@media print{
+  #reportHeadline{
+    font-size:16px;
+    line-height:1.2;
+  }
+}
     table{width:100%; border-collapse:collapse}
     th,td{border:1px solid #2a5f64; padding:10px 10px; text-align:center; vertical-align:middle}
+/* ✅ تصغير خط جدول بيانات المعلم (الاسم/الهوية/الجوال/التخصص/المرتبة) فقط */
+table[aria-label="بيانات المعلم"] th{
+  font-size:12px;
+  padding:8px 8px;
+}
+table[aria-label="بيانات المعلم"] td{
+  font-size:12px;
+  padding:8px 8px;
+  line-height:1.6;
+}
     th{background:#0b5f66; color:#fff; font-weight:1000; font-size:13px}
     td{background:#fff; font-weight:900; color:#20383b}
     .tight td{padding:9px 10px}
@@ -192,7 +214,7 @@
 .permPill.mid{background:#fffbeb;border-color:#fde68a;color:#854d0e}
 .permPill.none{background:#f6fafb;border-color:var(--line);color:var(--muted)}
 .sectionTitle{margin:18px 0 10px; font-weight:1100; color:#0b5660; font-size:16px; text-align:right}
-
+.sectionTitle.center{ text-align:center; }
     .note{margin-top:10px; color:#5e7377; font-weight:900; font-size:12px}
     .footerNote{margin-top:12px; color:#2f4f53; font-weight:1000; text-align:right}
     .hint{color:#0b5660; font-weight:1000; text-align:center; padding:10px 10px 0}
@@ -355,7 +377,7 @@
       <!-- ✅ عنوان الكشف كما هو -->
       <div class="headline" id="reportHeadline">احصائيات الحضور والانصراف</div>
 
-      <table class="tight" aria-label="بيانات المعلم">
+<table class="tight teacherTable" aria-label="بيانات المعلم">
         <thead>
           <tr>
             <th>الاسم</th>
@@ -411,12 +433,9 @@
 
      
 
-      <div class="note">
-  • يُستخلص هذا الكشف من تقارير الحضور والانصراف في «حضوري» عبر لوحة تحكم المدير، مع إمكانية تصدير التقرير بصيغتي (Excel / PDF).<br>
-  • يُعدّ ملخص المتابعة وفق إجراء «متابعة حضور الموظفين»، ويشمل حصر ساعات التأخر والغياب وأسبابه، وحالات الانصراف قبل انتهاء الدوام الرسمي، واتخاذ الإجراء اللازم وفق التنظيم.
-</div>
+      
 
-      <div class="sectionTitle">تفصيل أيام الشهر (من الأحدث إلى الأقدم)</div>
+<div class="sectionTitle center" id="daysSectionTitle">سجل المتابعة اليومي للحضور والانصراف (أحدث الأيام أولاً)</div>
 <table class="tight" aria-label="تفصيل أيام الشهر">
   <thead>
     <tr>
@@ -702,7 +721,7 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
   let currentWaText = "";
 let importedPermCount = 0; // ✅ NEW
   resetDataToRegistry();
-
+updateTeacherSelect(); // ✅ إظهار الأسماء فور فتح الصفحة
   /* =========================
      أحداث
   ========================== */
@@ -1234,7 +1253,7 @@ function buildPermText(perm){
     updateMonthUI();
   }
 
-  function updateMonthUI(){
+    function updateMonthUI(){
     const m = monthCtx.month;
     const y = monthCtx.year;
 
@@ -1249,6 +1268,23 @@ function buildPermText(perm){
 
     reportHeadlineEl.textContent = headline;
     document.title = (m && y) ? `كشف حضوري (شهري) — شهر ${monthTxt} عام ${yearTxt}` : "كشف حضوري (شهري)";
+
+    updateDaysSectionTitle();
+  }
+
+  // ✅ أضفها هنا مباشرة (مرة واحدة فقط)
+  function updateDaysSectionTitle(){
+    const t = document.getElementById("daysSectionTitle");
+    if (!t) return;
+
+    const m = monthCtx.month;
+    const y = monthCtx.year;
+
+    if (m && y){
+      t.textContent = `سجل المتابعة اليومي للحضور والانصراف لشهر ${toArNumber(m)} من عام ${toArNumber(y)} (أحدث الأيام أولاً)`;
+    } else {
+      t.textContent = "سجل المتابعة اليومي للحضور والانصراف (أحدث الأيام أولاً)";
+    }
   }
 
   function guessFolderNameFromFiles(files){
@@ -1465,8 +1501,9 @@ function renderSelectedTeacher(){
   const attendanceRate = totalDays ? Math.round((attendanceDays / totalDays) * 100) : 0;
 
   const disciplineScore = calcDisciplineScore({totalDays, absCount, openCount, totalLateMin: totalLate});
-  const level = scoreToLevel(disciplineScore);
-  function setMetricBadges({attendanceRate, disciplineScore, level}){
+const level = scoreToLevel(disciplineScore);
+
+function setMetricBadges({attendanceRate, disciplineScore, level}){
   // نسبة الحضور
   if (mAttendance){
     mAttendance.textContent = `نسبة الحضور: ${toArNumber(attendanceRate)}%`;
@@ -1485,6 +1522,10 @@ function renderSelectedTeacher(){
     mLevel.className = "badge " + (level?.tone || "warn");
   }
 }
+
+// ✅ هذا السطر كان ناقصًا
+setMetricBadges({attendanceRate, disciplineScore, level});
+
 
   if (!bodyRows.length){
     daysBody.innerHTML = `<tr><td colspan="7" class="hint">لا توجد بيانات (بعد استبعاد الجمعة/السبت والإجازات) ضمن الملفات المستوردة.</td></tr>`;
