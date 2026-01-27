@@ -158,8 +158,41 @@
     /* ✅ تلوين صفوف تفصيل الأيام */
     #daysBody tr.absent td{background:var(--rowAbs) !important}
     #daysBody tr.open td{background:var(--rowOpen) !important}
+/* ✅ مظهر الاستئذان داخل الخلية */
+.permCell{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  align-items:center;
+  justify-content:center;
+}
+.permCell b{
+  font-weight:1100;
+  color:#0b5660;
+}
+.permPills{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.permPill{
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:3px 8px;
+  font-weight:1000;
+  font-size:11px;
+  line-height:1.6;
+  white-space:nowrap;
+  background:#f3fbfb;
+  color:#0b5660;
+}
+.permPill.start{background:#eef7ff;border-color:#cfe0ff;color:#1b4d86}
+.permPill.end{background:#fff1f2;border-color:#fecdd3;color:#9f1239}
+.permPill.mid{background:#fffbeb;border-color:#fde68a;color:#854d0e}
+.permPill.none{background:#f6fafb;border-color:var(--line);color:var(--muted)}
+.sectionTitle{margin:18px 0 10px; font-weight:1100; color:#0b5660; font-size:16px; text-align:right}
 
-    .sectionTitle{margin:18px 0 10px; font-weight:1100; color:#0b5660; font-size:16px; text-align:right}
     .note{margin-top:10px; color:#5e7377; font-weight:900; font-size:12px}
     .footerNote{margin-top:12px; color:#2f4f53; font-weight:1000; text-align:right}
     .hint{color:#0b5660; font-weight:1000; text-align:center; padding:10px 10px 0}
@@ -345,31 +378,38 @@
         </tbody>
       </table>
 
-      <div class="sectionTitle">ملخص الشهر</div>
-      <table class="tight" aria-label="ملخص الشهر">
-        <thead>
-          <tr>
-            <th>إجمالي ساعات الدوام</th>
-            <th>إجمالي التأخر</th>
-            <th>إجمالي الغياب</th>
-            <th>أيام لم يُغلق الدوام</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td id="sumWork">—</td>
-            <td id="sumLate">—</td>
-            <td id="sumAbs">—</td>
-            <td id="sumOpen">—</td>
-          </tr>
-        </tbody>
-      </table>
+     <div class="sectionTitle">ملخص الشهر</div>
+<table class="tight" aria-label="ملخص الشهر">
+  <thead>
+    <tr>
+      <th>إجمالي ساعات الدوام</th>
+      <th>إجمالي التأخر</th>
+      <th>إجمالي الاستئذان</th>
+      <th>إجمالي الغياب</th>
+      <th>أيام لم يُغلق الدوام</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id="sumWork">—</td>
+      <td id="sumLate">—</td>
+      <td id="sumExcuse">—</td>
+      <td id="sumAbs">—</td>
+      <td id="sumOpen">—</td>
+    </tr>
+  </tbody>
+</table>
 
-      <div class="metrics" aria-label="مؤشرات إضافية">
-        <span class="badge" id="mAttendance">نسبة الحضور: —</span>
-        <span class="badge" id="mDiscipline">مؤشر الانضباط: —</span>
-        <span class="badge" id="mLevel">المستوى: —</span>
-      </div>
+<div class="metrics" aria-label="مؤشرات إضافية">
+  <span class="badge" id="mAttendance">نسبة الحضور: —</span>
+  <span class="badge" id="mDiscipline">مؤشر الانضباط: —</span>
+  <span class="badge" id="mLevel">المستوى: —</span>
+</div>
+
+
+
+
+     
 
       <div class="note">
   • يُستخلص هذا الكشف من تقارير الحضور والانصراف في «حضوري» عبر لوحة تحكم المدير، مع إمكانية تصدير التقرير بصيغتي (Excel / PDF).<br>
@@ -377,21 +417,23 @@
 </div>
 
       <div class="sectionTitle">تفصيل أيام الشهر (من الأحدث إلى الأقدم)</div>
-      <table class="tight" aria-label="تفصيل أيام الشهر">
-        <thead>
-          <tr>
-            <th>اليوم</th>
-            <th>الحضور</th>
-            <th>الانصراف</th>
-            <th>ساعات الدوام</th>
-            <th>التأخر</th>
-            <th>الحالة</th>
-          </tr>
-        </thead>
-        <tbody id="daysBody">
-          <tr><td colspan="6" class="hint">اختر معلماً بعد الاستيراد لعرض تفاصيل الأيام.</td></tr>
-        </tbody>
-      </table>
+<table class="tight" aria-label="تفصيل أيام الشهر">
+  <thead>
+    <tr>
+      <th>اليوم</th>
+      <th>الحضور</th>
+      <th>الانصراف</th>
+      <th>ساعات الدوام</th>
+      <th>التأخر</th>
+      <th>الاستئذان</th>
+      <th>الحالة</th>
+    </tr>
+  </thead>
+  <tbody id="daysBody">
+    <tr><td colspan="7" class="hint">اختر معلماً بعد الاستيراد لعرض تفاصيل الأيام.</td></tr>
+  </tbody>
+</table>
+
 
       <div class="footerNote">وفق منصة حضوري الرسمية لتسهيل المتابعة</div>
     </section>
@@ -568,10 +610,12 @@
   const tShift= el("tShift");
 
   const sumWork = el("sumWork");
-  const sumLate = el("sumLate");
-  const sumAbs  = el("sumAbs");
-  const sumOpen = el("sumOpen");
-  const daysBody= el("daysBody");
+const sumLate = el("sumLate");
+const sumExcuse = el("sumExcuse"); // ✅ NEW
+const sumAbs  = el("sumAbs");
+const sumOpen = el("sumOpen");
+const daysBody= el("daysBody");
+
 
   el("shiftStartTxt").textContent = SHIFT_START;
   const clampMinEl = el("clampMin");
@@ -629,7 +673,7 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
 عدنان علي حسين الزريق\t1015776766\t966505808451.00\tوكيل\tمعلم ممارس
 فهد حامد علي الزهراني\t1024193532\t966504532489.00\tمدير المدرسة\tمعلم ممارس
 `.trim();
-<!-- ===================== PART 4 / 7 ===================== -->
+// ===================== PART 4 / 7 =====================
   // ✅ بناء السجل + رصد المشكلات
   const registryBuild = buildRegistryById(TEACHERS_TSV); // {map, issues}
   const registryById = registryBuild.map;                // id -> reg
@@ -656,7 +700,7 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
   let importedExcelCount = 0;
   let lastSourceLabel = "";
   let currentWaText = "";
-
+let importedPermCount = 0; // ✅ NEW
   resetDataToRegistry();
 
   /* =========================
@@ -795,7 +839,31 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
 
         const matrix = XLSX.utils.sheet_to_json(ws, { header:1, defval:"", raw:true });
         if (!matrix || !matrix.length) continue;
+// ✅ محاولة قراءة الاستئذانات
+const parsedPerm = parsePermissionMatrix(matrix, ctx);
+if (parsedPerm && parsedPerm.rows.length){
+  anySheetRead = true;
+  importedPermCount += parsedPerm.rows.length;
 
+  for (const p of parsedPerm.rows){
+    const id = resolveTeacherId(p.id, p.name);
+    if (!id) continue;
+
+    const teacher = teachers.get(id);
+    if (!teacher) continue;
+
+    const dateKey = p.dateKey || "";
+    if (!dateKey) continue;
+
+    // استبعاد الجمعة/السبت + الإجازات مثل الحضور
+    if (isExcludedDayKey(dateKey, "").excluded) continue;
+
+    addPermissionToTeacher(teacher, dateKey, p);
+  }
+
+  // لا نكمل كحضور لهذا الشيت
+  continue;
+}
         const parsed = parseAttendanceMatrix(matrix, ctx);
         if (!parsed || !parsed.rows.length) continue;
 
@@ -921,30 +989,27 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
   }
 
   function buildColMap(row, keys){
-    const idx = (arr) => {
-      for (let j=0;j<row.length;j++){
-        const cell = (row[j]||"").toString().trim();
-        if (!cell) continue;
-        const norm = normHeader(cell);
-        for (const k of arr){
-          const nk = normHeader(k);
-          if (nk && norm.includes(nk)) return j;
-        }
+  const idx = (arr) => {
+    if (!arr || !arr.length) return null; // ✅ مهم
+    for (let j=0;j<row.length;j++){
+      const cell = (row[j]||"").toString().trim();
+      if (!cell) continue;
+      const norm = normHeader(cell);
+      for (const k of arr){
+        const nk = normHeader(k);
+        if (nk && norm.includes(nk)) return j;
       }
-      return null;
-    };
-    return {
-      name: idx(keys.name),
-      id: idx(keys.id),
-      phone: idx(keys.phone),
-      date: idx(keys.date),
-      inTime: idx(keys.inTime),
-      outTime: idx(keys.outTime),
-      status: idx(keys.status),
-      spec: idx(keys.spec),
-      rank: idx(keys.rank)
-    };
+    }
+    return null;
+  };
+
+  const out = {};
+  for (const k in keys){
+    out[k] = idx(keys[k]);
   }
+  return out;
+}
+
 
   function normHeader(s){
     return (s||"")
@@ -968,6 +1033,189 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
       fr.readAsArrayBuffer(file);
     });
   }
+/* =========================
+   ✅ قراءة الاستئذانات (شهري)
+========================== */
+function parsePermissionMatrix(matrix, ctx){
+  const keys = {
+    id:       ["السجل المدني","رقم الهوية","الهوية","National ID","ID"],
+    name:     ["الموظف","الاسم","اسم الموظف","Employee","Employee Name"],
+    fromTime: ["من وقت","من الوقت","From Time","Start Time"],
+    toTime:   ["إلى وقت","الى وقت","To Time","End Time"],
+    fromDate: ["من تاريخ","From Date","التاريخ","Date"],
+    toDate:   ["إلى تاريخ","الى تاريخ","To Date"],
+    duration: ["مدة الاستئذان","المدة","Duration"],
+    status:   ["حالة الطلب","الحالة","Status"],
+    type:     ["نوع الاستئذان","النوع","Type"]
+  };
+
+  let headerRowIndex = -1;
+  let colMap = null;
+
+  for (let i=0;i<matrix.length;i++){
+    const row = matrix[i].map(v => (v ?? "").toString().trim());
+    if (!row.join("").trim()) continue;
+
+    const map = buildColMap(row, keys);
+    const okIdentity = (map.id !== null) || (map.name !== null);
+    const okDates = (map.fromDate !== null);
+    const okTimes = (map.fromTime !== null) || (map.toTime !== null) || (map.duration !== null);
+
+    if (okIdentity && okDates && okTimes){
+      headerRowIndex = i;
+      colMap = map;
+      break;
+    }
+  }
+  if (headerRowIndex < 0 || !colMap) return null;
+
+  const rows = [];
+
+  for (let r=headerRowIndex+1; r<matrix.length; r++){
+    const row = matrix[r];
+    if (!row || !row.length) continue;
+
+    const name = colMap.name !== null ? getCell(row, colMap.name) : "";
+    const id   = colMap.id   !== null ? getCell(row, colMap.id)   : "";
+    if (!String(name||"").trim() && !String(id||"").trim()) continue;
+
+    const fromDateVal = colMap.fromDate !== null ? getCell(row, colMap.fromDate) : "";
+    const toDateVal   = colMap.toDate   !== null ? getCell(row, colMap.toDate)   : "";
+    const fromTimeVal = colMap.fromTime !== null ? getCell(row, colMap.fromTime) : "";
+    const toTimeVal   = colMap.toTime   !== null ? getCell(row, colMap.toTime)   : "";
+    const durationVal = colMap.duration !== null ? getCell(row, colMap.duration) : "";
+    const statusVal   = colMap.status   !== null ? getCell(row, colMap.status)   : "";
+    const typeVal     = colMap.type     !== null ? getCell(row, colMap.type)     : "";
+
+    const stN = normName(statusVal || "");
+    if (stN && !(stN.includes("مقبول") || stN.includes("معتمد") || stN.includes("approved"))){
+      continue;
+    }
+
+    const dFrom = normalizeDate(fromDateVal);
+    const dTo   = normalizeDate(toDateVal) || dFrom;
+    if (!dFrom) continue;
+
+    const dateKey = dateToKey(dFrom);
+
+    const durMin = parseDurationToMinutes(durationVal);
+    const fromM = parseTimeToMinutes(fromTimeVal);
+    const toM   = parseTimeToMinutes(toTimeVal);
+
+    let min = (durMin !== null) ? durMin : computeDiffMinutes(fromM, toM);
+    if (!min || min < 0) min = 0;
+
+    const kind = classifyPermissionKind(fromM, toM);
+
+    rows.push({
+      id, name,
+      dateKey,
+      min,
+      kind,
+      fromM, toM,
+      type: String(typeVal||"").trim(),
+      status: String(statusVal||"").trim()
+    });
+  }
+
+  return { rows };
+}
+
+function parseDurationToMinutes(v){
+  if (v === null || v === undefined || v === "") return null;
+
+  if (typeof v === "number" && isFinite(v)){
+    if (v > 0 && v < 1) return Math.round(v * 24 * 60);
+    if (v >= 1 && v <= 24*60) return Math.round(v);
+  }
+
+  const s0 = String(v).trim();
+  if (!s0) return null;
+  const s = toWesternDigits(s0);
+
+  const m = s.match(/(\d{1,2})\s*:\s*(\d{2})/);
+  if (m){
+    const hh = parseInt(m[1],10);
+    const mm = parseInt(m[2],10);
+    if (Number.isFinite(hh) && Number.isFinite(mm)) return hh*60 + mm;
+  }
+
+  const digits = s.replace(/\D+/g,"");
+  if (digits){
+    const n = parseInt(digits,10);
+    if (Number.isFinite(n)) return n;
+  }
+
+  return null;
+}
+
+function computeDiffMinutes(fromM, toM){
+  if (fromM === null || toM === null) return 0;
+  let diff = toM - fromM;
+  if (diff < 0) diff += 24*60;
+  return Math.max(0, diff);
+}
+
+function classifyPermissionKind(fromM, toM){
+  const START_WINDOW = 60;
+  const END_WINDOW   = 60;
+
+  if (fromM !== null && fromM <= (shiftStartM + START_WINDOW)) return "start";
+  if (toM !== null && toM >= (clampMaxM - END_WINDOW)) return "end";
+  return "mid";
+}
+
+function addPermissionToTeacher(teacher, dateKey, p){
+  const cur = teacher.perms.get(dateKey) || { totalMin:0, startMin:0, midMin:0, endMin:0, items:[] };
+
+  cur.totalMin += (p.min || 0);
+  if (p.kind === "start") cur.startMin += (p.min || 0);
+  else if (p.kind === "end") cur.endMin += (p.min || 0);
+  else cur.midMin += (p.min || 0);
+
+  const fromTxt = (p.fromM !== null) ? minutesToHHMM(p.fromM) : "—";
+  const toTxt   = (p.toM !== null) ? minutesToHHMM(p.toM) : "—";
+
+  cur.items.push({
+    kind: p.kind,
+    min: p.min || 0,
+    fromTxt, toTxt,
+    type: p.type || "",
+    status: p.status || ""
+  });
+
+  teacher.perms.set(dateKey, cur);
+}
+
+function buildPermHtml(perm){
+  if (!perm || !perm.totalMin){
+    return `<div class="permCell"><span class="permPill none">—</span></div>`;
+  }
+
+  const total = minsToHM(perm.totalMin);
+  const pills = [];
+
+  if (perm.startMin) pills.push(`<span class="permPill start">بداية ${escapeHtml(minsToHM(perm.startMin))}</span>`);
+  if (perm.midMin)   pills.push(`<span class="permPill mid">وسط ${escapeHtml(minsToHM(perm.midMin))}</span>`);
+  if (perm.endMin)   pills.push(`<span class="permPill end">نهاية ${escapeHtml(minsToHM(perm.endMin))}</span>`);
+
+  return `
+    <div class="permCell">
+      <b>${escapeHtml(total)}</b>
+      <div class="permPills">${pills.join("")}</div>
+    </div>
+  `.trim();
+}
+
+function buildPermText(perm){
+  if (!perm || !perm.totalMin) return "—";
+  const parts = [];
+  if (perm.startMin) parts.push(`بداية ${minsToHM(perm.startMin)}`);
+  if (perm.midMin)   parts.push(`وسط ${minsToHM(perm.midMin)}`);
+  if (perm.endMin)   parts.push(`نهاية ${minsToHM(perm.endMin)}`);
+  return `${minsToHM(perm.totalMin)}${parts.length ? " (" + parts.join(" + ") + ")" : ""}`;
+}
+
 <!-- ===================== PART 6 / 7 ===================== -->
   /* =========================
      الشهر من اسم المجلد
@@ -1123,111 +1371,163 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
   /* =========================
      العرض والحسابات
   ========================== */
-  function renderSelectedTeacher(){
-    const id = teacherSelect.value;
-    if (!id || !teachers.has(id)){
-      clearReport();
-      return;
+function renderSelectedTeacher(){
+  const id = teacherSelect.value;
+  if (!id || !teachers.has(id)){
+    clearReport();
+    return;
+  }
+  const teacher = teachers.get(id);
+
+  const days = Array.from(teacher.days.entries()).sort((a,b)=> b[0].localeCompare(a[0]));
+
+  tName.textContent = teacher.name || "—";
+  tId.textContent   = teacher.id || "—";
+  tPhone.textContent= normalizeKsaMobile(teacher.phone || "") || "—";
+  tSpec.textContent = teacher.spec || "—";
+  tRank.textContent = teacher.rank || "—";
+  tShift.textContent= SHIFT_START;
+
+  let totalWork = 0;
+  let totalLate = 0;
+  let absCount  = 0;
+  let openCount = 0;
+
+  let totalExcuse = 0;
+  let permDays = 0;
+  let permStart = 0, permMid = 0, permEnd = 0;
+
+  const lateItems = [];
+  const absDaysList = [];
+  const openDaysList = [];
+  const permItems = [];
+
+  const bodyRows = [];
+
+  for (const [dateKey, day] of days){
+    const ex = isExcludedDayKey(dateKey, day.statusRaw);
+    if (ex.excluded) continue;
+
+    const dObj = keyToDate(dateKey);
+    const dayLabel = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dateKey;
+
+    const status = computeStatus(day);
+    const calc = computeTimes(day);
+
+    totalWork += calc.workMin;
+    totalLate += calc.lateMin;
+
+    if (status.isAbsent){
+      absCount++;
+      absDaysList.push(dayLabel);
     }
-    const teacher = teachers.get(id);
-
-    const days = Array.from(teacher.days.entries()).sort((a,b)=> b[0].localeCompare(a[0]));
-
-    tName.textContent = teacher.name || "—";
-    tId.textContent   = teacher.id || "—";
-    tPhone.textContent= normalizeKsaMobile(teacher.phone || "") || "—";
-    tSpec.textContent = teacher.spec || "—";
-    tRank.textContent = teacher.rank || "—";
-    tShift.textContent= SHIFT_START;
-
-    let totalWork = 0;
-    let totalLate = 0;
-    let absCount  = 0;
-    let openCount = 0;
-
-    const bodyRows = [];
-
-    for (const [dateKey, day] of days){
-      const ex = isExcludedDayKey(dateKey, day.statusRaw);
-      if (ex.excluded) continue;
-
-      const dObj = keyToDate(dateKey);
-      const dayLabel = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dateKey;
-
-      const status = computeStatus(day);
-      if (status.isAbsent) absCount++;
-      if (status.notClosed) openCount++;
-
-      const calc = computeTimes(day);
-      totalWork += calc.workMin;
-      totalLate += calc.lateMin;
-
-      const rowClass = status.isAbsent ? "absent" : (status.notClosed ? "open" : "");
-
-      bodyRows.push({
-        dayLabel,
-        inTxt: calc.inTxt,
-        outTxt: calc.outTxt,
-        workTxt: minsToHM(calc.workMin),
-        lateTxt: minsToHM(calc.lateMin),
-        statusTxt: status.label,
-        rowClass
-      });
+    if (status.notClosed){
+      openCount++;
+      openDaysList.push(dayLabel);
     }
-
-    sumWork.textContent = minsToHM(totalWork);
-    sumLate.textContent = minsToHM(totalLate);
-    sumAbs.textContent  = String(absCount);
-    sumOpen.textContent = String(openCount);
-
-    const totalDays = bodyRows.length || 0;
-    const attendanceDays = Math.max(0, totalDays - absCount);
-    const attendanceRate = totalDays ? Math.round((attendanceDays / totalDays) * 100) : 0;
-
-    const disciplineScore = calcDisciplineScore({totalDays, absCount, openCount, totalLateMin: totalLate});
-    const level = scoreToLevel(disciplineScore);
-
-    setMetricBadges({attendanceRate, disciplineScore, level});
-
-    if (!bodyRows.length){
-      daysBody.innerHTML = `<tr><td colspan="6" class="hint">لا توجد بيانات (بعد استبعاد الجمعة/السبت والإجازات) ضمن الملفات المستوردة.</td></tr>`;
-      currentWaText = "";
-      return;
+    if (calc.lateMin > 0){
+      lateItems.push({ dateKey, dayLabel, lateMin: calc.lateMin });
     }
 
-    daysBody.innerHTML = bodyRows.map(r => `
-      <tr class="${r.rowClass}">
-        <td>${escapeHtml(r.dayLabel)}</td>
-        <td>${escapeHtml(r.inTxt)}</td>
-        <td>${escapeHtml(r.outTxt)}</td>
-        <td>${escapeHtml(r.workTxt)}</td>
-        <td>${escapeHtml(r.lateTxt)}</td>
-        <td>${escapeHtml(r.statusTxt)}</td>
-      </tr>
-    `).join("");
+    const perm = teacher.perms.get(dateKey) || null;
+    if (perm && perm.totalMin){
+      totalExcuse += perm.totalMin;
+      permDays++;
+      permStart += (perm.startMin || 0);
+      permMid   += (perm.midMin || 0);
+      permEnd   += (perm.endMin || 0);
+      permItems.push({ dateKey, dayLabel, perm });
+    }
 
-    currentWaText = buildWhatsAppMessage({
-      teacher,
-      totalDays,
-      totalWorkMin: totalWork,
-      totalLateMin: totalLate,
-      absCount,
-      openCount,
-      attendanceRate,
-      disciplineScore,
-      level
+    const rowClass = status.isAbsent ? "absent" : (status.notClosed ? "open" : "");
+    const permHtml = buildPermHtml(perm);
+
+    bodyRows.push({
+      dayLabel,
+      inTxt: calc.inTxt,
+      outTxt: calc.outTxt,
+      workTxt: minsToHM(calc.workMin),
+      lateTxt: minsToHM(calc.lateMin),
+      permHtml,
+      statusTxt: status.label,
+      rowClass
     });
   }
 
-  function setMetricBadges({attendanceRate, disciplineScore, level}){
-    mAttendance.textContent = `نسبة الحضور: ${toArNumber(attendanceRate)}%`;
-    mDiscipline.textContent = `مؤشر الانضباط: ${toArNumber(disciplineScore)}/100`;
-    mLevel.textContent = `المستوى: ${level.text}`;
+  sumWork.textContent = minsToHM(totalWork);
+  sumLate.textContent = minsToHM(totalLate);
+  if (sumExcuse) sumExcuse.textContent = minsToHM(totalExcuse);
+  sumAbs.textContent  = String(absCount);
+  sumOpen.textContent = String(openCount);
 
-    mAttendance.className = "badge " + level.tone;
-    mDiscipline.className = "badge " + level.tone;
-    mLevel.className = "badge " + level.tone;
+  const totalDays = bodyRows.length || 0;
+  const attendanceDays = Math.max(0, totalDays - absCount);
+  const attendanceRate = totalDays ? Math.round((attendanceDays / totalDays) * 100) : 0;
+
+  const disciplineScore = calcDisciplineScore({totalDays, absCount, openCount, totalLateMin: totalLate});
+  const level = scoreToLevel(disciplineScore);
+  function setMetricBadges({attendanceRate, disciplineScore, level}){
+  // نسبة الحضور
+  if (mAttendance){
+    mAttendance.textContent = `نسبة الحضور: ${toArNumber(attendanceRate)}%`;
+    mAttendance.className = "badge " + (attendanceRate >= 95 ? "ok" : (attendanceRate >= 85 ? "warn" : "bad"));
   }
+
+  // مؤشر الانضباط
+  if (mDiscipline){
+    mDiscipline.textContent = `مؤشر الانضباط: ${toArNumber(disciplineScore)}/100`;
+    mDiscipline.className = "badge " + (level?.tone || "warn");
+  }
+
+  // المستوى
+  if (mLevel){
+    mLevel.textContent = `المستوى: ${level?.text || "—"}`;
+    mLevel.className = "badge " + (level?.tone || "warn");
+  }
+}
+
+  if (!bodyRows.length){
+    daysBody.innerHTML = `<tr><td colspan="7" class="hint">لا توجد بيانات (بعد استبعاد الجمعة/السبت والإجازات) ضمن الملفات المستوردة.</td></tr>`;
+    currentWaText = "";
+    return;
+  }
+
+  daysBody.innerHTML = bodyRows.map(r => `
+    <tr class="${r.rowClass}">
+      <td>${escapeHtml(r.dayLabel)}</td>
+      <td>${escapeHtml(r.inTxt)}</td>
+      <td>${escapeHtml(r.outTxt)}</td>
+      <td>${escapeHtml(r.workTxt)}</td>
+      <td>${escapeHtml(r.lateTxt)}</td>
+      <td>${r.permHtml}</td>
+      <td>${escapeHtml(r.statusTxt)}</td>
+    </tr>
+  `).join("");
+
+  currentWaText = buildWhatsAppMessage({
+    teacher,
+    totalDays,
+    totalWorkMin: totalWork,
+    totalLateMin: totalLate,
+    totalExcuseMin: totalExcuse,
+    absCount,
+    openCount,
+    attendanceRate,
+    disciplineScore,
+    level,
+
+    permDays,
+    permStartMin: permStart,
+    permMidMin: permMid,
+    permEndMin: permEnd,
+
+    lateItems,
+    absDaysList,
+    openDaysList,
+    permItems
+  });
+}
+
 
   function clearReport(){
     tName.textContent  = "—";
@@ -1239,6 +1539,7 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
 
     sumWork.textContent = "—";
     sumLate.textContent = "—";
+if (sumExcuse) sumExcuse.textContent = "—";
     sumAbs.textContent  = "—";
     sumOpen.textContent = "—";
 
@@ -1249,7 +1550,7 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
     mDiscipline.className = "badge";
     mLevel.className = "badge";
 
-    daysBody.innerHTML = `<tr><td colspan="6" class="hint">اختر معلماً بعد الاستيراد لعرض تفاصيل الأيام.</td></tr>`;
+    daysBody.innerHTML = `<tr><td colspan="7" class="hint">اختر معلماً بعد الاستيراد لعرض تفاصيل الأيام.</td></tr>`;
     currentWaText = "";
   }
 
@@ -1336,26 +1637,85 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
   /* =========================
      WhatsApp
   ========================== */
-  function buildWhatsAppMessage({teacher, totalDays, totalWorkMin, totalLateMin, absCount, openCount, attendanceRate, disciplineScore, level}){
-    const m = monthCtx.month, y = monthCtx.year;
-    const monthTxt = m ? toArNumber(m) : "—";
-    const yearTxt  = y ? toArNumber(y) : "—";
+ function buildWhatsAppMessage({
+  teacher,
+  totalDays,
+  totalWorkMin,
+  totalLateMin,
+  totalExcuseMin = 0,
+  absCount,
+  openCount,
+  attendanceRate,
+  disciplineScore,
+  level,
 
-    const workTxt = minsToHM(totalWorkMin);
-    const lateTxt = minsToHM(totalLateMin);
+  permDays = 0,
+  permStartMin = 0,
+  permMidMin = 0,
+  permEndMin = 0,
 
-    const greet = `السلام عليكم ورحمة الله وبركاته`;
-    const head  = `أ. ${teacher.name}`;
-    const sub   = `ملخص الحضور والانصراف لشهر ${monthTxt} لعام ${yearTxt} (أيام الدوام فقط).`;
+  lateItems = [],
+  absDaysList = [],
+  openDaysList = [],
+  permItems = []
+}){
+  const m = monthCtx.month, y = monthCtx.year;
+  const monthTxt = m ? toArNumber(m) : "—";
+  const yearTxt  = y ? toArNumber(y) : "—";
 
-    const l1 = `• أيام الدوام: ${toArNumber(totalDays)} | نسبة الحضور: ${toArNumber(attendanceRate)}%`;
-    const l2 = `• ساعات الدوام: ${workTxt} | التأخر: ${lateTxt}`;
-    const l3 = `• الغياب: ${toArNumber(absCount)} | عدم إغلاق الدوام: ${toArNumber(openCount)}`;
-    const l4 = `• مؤشر الانضباط: ${toArNumber(disciplineScore)}/100 (${level.text}).`;
+  const workTxt   = minsToHM(totalWorkMin);
+  const lateTxt   = minsToHM(totalLateMin);
+  const excuseTxt = minsToHM(totalExcuseMin);
 
-    const tip = `للدقة التنظيمية: عند وجود ملاحظة على البيانات، يُرجى الإفادة لتصحيحها وفق الإجراءات.`;
-    return [greet,"",head,sub,l1,l2,l3,l4,"",tip].join("\n");
+  const greet = `السلام عليكم ورحمة الله وبركاته`;
+  const head  = `أ. ${teacher.name}`;
+  const sub   = `ملخص الحضور والانصراف لشهر ${monthTxt} لعام ${yearTxt} (أيام الدوام فقط).`;
+
+  const l1 = `• أيام الدوام: ${toArNumber(totalDays)} | نسبة الحضور: ${toArNumber(attendanceRate)}%`;
+  const l2 = `• ساعات الدوام: ${workTxt} | التأخر: ${lateTxt} | الاستئذان: ${excuseTxt}`;
+  const l3 = `• الغياب: ${toArNumber(absCount)} | عدم إغلاق الدوام: ${toArNumber(openCount)}`;
+  const l4 = `• مؤشر الانضباط: ${toArNumber(disciplineScore)}/100 (${level.text}).`;
+
+  const l5 = permDays
+    ? `• تفصيل الاستئذان: أيام ${toArNumber(permDays)} | بداية ${minsToHM(permStartMin)} | وسط ${minsToHM(permMidMin)} | نهاية ${minsToHM(permEndMin)}`
+    : "";
+
+  const details = [];
+
+  if (lateItems.length){
+    details.push("تفصيل التأخر (الأيام ذات التأخر فقط):");
+    details.push(...lateItems.map(x => `• ${x.dayLabel}: ${minsToHM(x.lateMin)}`));
   }
+
+  if (permItems.length){
+    details.push("تفصيل الاستئذان (الأيام ذات الاستئذان فقط):");
+    details.push(...permItems.map(x => `• ${x.dayLabel}: ${buildPermText(x.perm)}`));
+  }
+
+  if (absDaysList.length){
+    details.push("أيام الغياب:");
+    details.push(...absDaysList.map(d => `• ${d}`));
+  }
+
+  if (openDaysList.length){
+    details.push("أيام لم يُغلق الدوام:");
+    details.push(...openDaysList.map(d => `• ${d}`));
+  }
+
+  const tip = `للدقة التنظيمية: عند وجود ملاحظة على البيانات، يُرجى الإفادة لتصحيحها وفق الإجراءات المعتمدة.`;
+
+  return [
+    greet, "",
+    head,
+    sub,
+    l1, l2, l3, l4,
+    l5 ? l5 : "",
+    details.length ? "" : "",
+    ...details,
+    "",
+    tip
+  ].filter(Boolean).join("\n");
+}
 
   function openWAModal(){
     const id = teacherSelect.value;
@@ -1662,91 +2022,102 @@ async function exportCurrentTeacherPDF(){
      التصدير إلى Excel
   ========================== */
   function exportCurrentTeacherExcel(){
-    const id = teacherSelect.value;
-    if (!id || !teachers.has(id)){
-      alert("اختر معلماً أولاً.");
-      return;
-    }
-    const teacher = teachers.get(id);
-
-    const all = Array.from(teacher.days.entries()).sort((a,b)=> b[0].localeCompare(a[0]));
-    const days = all.filter(([dk, day]) => !isExcludedDayKey(dk, day.statusRaw).excluded);
-
-    const detail = days.map(([dk, day]) => {
-      const dObj = keyToDate(dk);
-      const label = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dk;
-      const st = computeStatus(day);
-      const c = computeTimes(day);
-      return {
-        "اليوم": label,
-        "الحضور": c.inTxt,
-        "الانصراف": c.outTxt,
-        "ساعات الدوام": minsToHM(c.workMin),
-        "التأخر": minsToHM(c.lateMin),
-        "الحالة": st.label
-      };
-    });
-
-    let totalWork=0,totalLate=0,abs=0,open=0;
-    for (const [_, day] of days){
-      const st = computeStatus(day);
-      const c = computeTimes(day);
-      totalWork += c.workMin;
-      totalLate += c.lateMin;
-      if (st.isAbsent) abs++;
-      if (st.notClosed) open++;
-    }
-
-    const totalDays = days.length || 0;
-    const attendanceDays = Math.max(0, totalDays - abs);
-    const attendanceRate = totalDays ? Math.round((attendanceDays / totalDays) * 100) : 0;
-    const disciplineScore = calcDisciplineScore({totalDays, absCount:abs, openCount:open, totalLateMin: totalLate});
-    const level = scoreToLevel(disciplineScore);
-
-    const m = monthCtx.month, y = monthCtx.year;
-    const monthTxt = (m ? toArNumber(m) : "—");
-    const yearTxt  = (y ? toArNumber(y) : "—");
-
-    const summary = [
-      {"البند":"الشهر", "القيمة": (m && y) ? `شهر ${monthTxt} من عام ${yearTxt}` : "—"},
-      {"البند":"الاسم", "القيمة": teacher.name},
-      {"البند":"رقم الهوية (الرقم الوظيفي)", "القيمة": teacher.id || "—"},
-      {"البند":"الجوال", "القيمة": normalizeKsaMobile(teacher.phone||"") || "—"},
-      {"البند":"التخصص", "القيمة": teacher.spec},
-      {"البند":"المرتبة", "القيمة": teacher.rank},
-      {"البند":"ملاحظة", "القيمة": "أيام الدوام فقط (مستبعد الجمعة/السبت والإجازات الرسمية)."},
-      {"البند":"نسبة الحضور", "القيمة": `${toArNumber(attendanceRate)}%`},
-      {"البند":"مؤشر الانضباط", "القيمة": `${toArNumber(disciplineScore)}/100 (${level.text})`},
-      {"البند":"إجمالي ساعات الدوام", "القيمة": minsToHM(totalWork)},
-      {"البند":"إجمالي التأخر", "القيمة": minsToHM(totalLate)},
-      {"البند":"إجمالي الغياب", "القيمة": String(abs)},
-      {"البند":"أيام لم يُغلق الدوام", "القيمة": String(open)}
-    ];
-
-    const wb = XLSX.utils.book_new();
-    const ws1 = XLSX.utils.json_to_sheet(summary, {skipHeader:false});
-    const ws2 = XLSX.utils.json_to_sheet(detail, {skipHeader:false});
-
-    ws1["!cols"] = [{wch:32},{wch:54}];
-    ws2["!cols"] = [{wch:30},{wch:10},{wch:10},{wch:14},{wch:10},{wch:18}];
-
-    XLSX.utils.book_append_sheet(wb, ws1, "ملخص");
-    XLSX.utils.book_append_sheet(wb, ws2, "تفصيل");
-
-    const out = XLSX.write(wb, {bookType:"xlsx", type:"array"});
-    const blob = new Blob([out], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-
-    const hijriShort = getHijriShort(new Date());
-    a.download = `كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      URL.revokeObjectURL(a.href);
-      a.remove();
-    }, 250);
+  const id = teacherSelect.value;
+  if (!id || !teachers.has(id)){
+    alert("اختر معلماً أولاً.");
+    return;
   }
+  const teacher = teachers.get(id);
+
+  const all = Array.from(teacher.days.entries()).sort((a,b)=> b[0].localeCompare(a[0]));
+  const days = all.filter(([dk, day]) => !isExcludedDayKey(dk, day.statusRaw).excluded);
+
+  // ✅ (تفصيل) — مع عمود الاستئذان
+  const detail = days.map(([dk, day]) => {
+    const dObj = keyToDate(dk);
+    const label = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dk;
+
+    const st = computeStatus(day);
+    const c  = computeTimes(day);
+    const perm = teacher.perms.get(dk) || null;
+
+    return {
+      "اليوم": label,
+      "الحضور": c.inTxt,
+      "الانصراف": c.outTxt,
+      "ساعات الدوام": minsToHM(c.workMin),
+      "التأخر": minsToHM(c.lateMin),
+      "الاستئذان": buildPermText(perm),
+      "الحالة": st.label
+    };
+  });
+
+  // ✅ (ملخص) — مع إجمالي الاستئذان
+  let totalWork=0, totalLate=0, totalExcuse=0, abs=0, open=0;
+
+  for (const [dk, day] of days){
+    const st = computeStatus(day);
+    const c  = computeTimes(day);
+    totalWork += c.workMin;
+    totalLate += c.lateMin;
+    if (st.isAbsent) abs++;
+    if (st.notClosed) open++;
+
+    const perm = teacher.perms.get(dk) || null;
+    if (perm && perm.totalMin) totalExcuse += perm.totalMin;
+  }
+
+  const totalDays = days.length || 0;
+  const attendanceDays = Math.max(0, totalDays - abs);
+  const attendanceRate = totalDays ? Math.round((attendanceDays / totalDays) * 100) : 0;
+  const disciplineScore = calcDisciplineScore({totalDays, absCount:abs, openCount:open, totalLateMin: totalLate});
+  const level = scoreToLevel(disciplineScore);
+
+  const m = monthCtx.month, y = monthCtx.year;
+  const monthTxt = (m ? toArNumber(m) : "—");
+  const yearTxt  = (y ? toArNumber(y) : "—");
+
+  const summary = [
+    {"البند":"الشهر", "القيمة": (m && y) ? `شهر ${monthTxt} من عام ${yearTxt}` : "—"},
+    {"البند":"الاسم", "القيمة": teacher.name},
+    {"البند":"رقم الهوية (الرقم الوظيفي)", "القيمة": teacher.id || "—"},
+    {"البند":"الجوال", "القيمة": normalizeKsaMobile(teacher.phone||"") || "—"},
+    {"البند":"التخصص", "القيمة": teacher.spec},
+    {"البند":"المرتبة", "القيمة": teacher.rank},
+    {"البند":"ملاحظة", "القيمة": "أيام الدوام فقط (مستبعد الجمعة/السبت والإجازات الرسمية)."},
+    {"البند":"نسبة الحضور", "القيمة": `${toArNumber(attendanceRate)}%`},
+    {"البند":"مؤشر الانضباط", "القيمة": `${toArNumber(disciplineScore)}/100 (${level.text})`},
+    {"البند":"إجمالي ساعات الدوام", "القيمة": minsToHM(totalWork)},
+    {"البند":"إجمالي التأخر", "القيمة": minsToHM(totalLate)},
+    {"البند":"إجمالي الاستئذان", "القيمة": minsToHM(totalExcuse)},
+    {"البند":"إجمالي الغياب", "القيمة": String(abs)},
+    {"البند":"أيام لم يُغلق الدوام", "القيمة": String(open)}
+  ];
+
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.json_to_sheet(summary, {skipHeader:false});
+  const ws2 = XLSX.utils.json_to_sheet(detail, {skipHeader:false});
+
+  ws1["!cols"] = [{wch:32},{wch:54}];
+  ws2["!cols"] = [{wch:30},{wch:10},{wch:10},{wch:14},{wch:10},{wch:18},{wch:18}];
+
+  XLSX.utils.book_append_sheet(wb, ws1, "ملخص");
+  XLSX.utils.book_append_sheet(wb, ws2, "تفصيل");
+
+  const out = XLSX.write(wb, {bookType:"xlsx", type:"array"});
+  const blob = new Blob([out], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+
+  const hijriShort = getHijriShort(new Date());
+  a.download = `كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(a.href);
+    a.remove();
+  }, 250);
+}
 
   /* =========================
      أدوات استبعاد الأيام
@@ -2106,7 +2477,8 @@ async function exportCurrentTeacherPDF(){
         phone: normalizeKsaMobile(r.phone || "") || "—",
         spec: (r.spec || "—"),
         rank: (r.rank || "—"),
-        days: new Map()
+days: new Map(),
+perms: new Map() // ✅ NEW: dateKey -> تجميع الاستئذان
       });
     }
   }
