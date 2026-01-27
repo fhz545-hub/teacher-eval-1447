@@ -372,9 +372,9 @@
       </div>
 
       <div class="note">
-        • تُستبعد تلقائيًا أيام <b>الجمعة والسبت</b> و<b>الإجازات الرسمية</b> من العرض والحسابات، وتُحتسب الساعات ضمن نطاق (<b id="clampMin">06:30</b> → <b id="clampMax">14:25</b>) لضبط الإحصاءات بصورة عادلة.<br>
-        • في حال <b>لم يُغلق الدوام</b> (عدم تسجيل الانصراف) يُحتسب <b>نصف دوام فقط</b> (3:30) وفق التنظيم.
-      </div>
+  • يُستخلص هذا الكشف من تقارير الحضور والانصراف في «حضوري» عبر لوحة تحكم المدير، مع إمكانية تصدير التقرير بصيغتي (Excel / PDF).<br>
+  • يُعدّ ملخص المتابعة وفق إجراء «متابعة حضور الموظفين»، ويشمل حصر ساعات التأخر والغياب وأسبابه، وحالات الانصراف قبل انتهاء الدوام الرسمي، واتخاذ الإجراء اللازم وفق التنظيم.
+</div>
 
       <div class="sectionTitle">تفصيل أيام الشهر (من الأحدث إلى الأقدم)</div>
       <table class="tight" aria-label="تفصيل أيام الشهر">
@@ -574,8 +574,11 @@
   const daysBody= el("daysBody");
 
   el("shiftStartTxt").textContent = SHIFT_START;
-  el("clampMin").textContent = CLAMP_MIN;
-  el("clampMax").textContent = CLAMP_MAX;
+  const clampMinEl = el("clampMin");
+if (clampMinEl) clampMinEl.textContent = CLAMP_MIN;
+
+const clampMaxEl = el("clampMax");
+if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
 
   setTodayHeader();
 
