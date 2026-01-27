@@ -348,7 +348,7 @@
         </div>
 
         <div class="bannerWrap" aria-label="بنر وزارة التعليم">
-          <img id="bannerImg" src="shree.png" alt="" />
+          <img id="bannerImg" src="shree.png" alt="" crossorigin="anonymous" />
         </div>
       </div>
 
@@ -1909,17 +1909,49 @@ async function exportCurrentTeacherPDF(){
     return { wrap, clone };
   };
 
+  // ✅ يحاول تحويل البنر إلى DataURL لضمان دخوله في الـ PDF بدون مشاكل CORS
+  async function inlineBannerIfPossible(clone){
+    const b = clone.querySelector("#bannerImg");
+    if (!b) return;
+
+    // اجعلها anonymous إن وُجدت
+    try{ b.crossOrigin = "anonymous"; }catch(_){}
+
+    // انتظر تحميلها إن أمكن
+    await new Promise((resolve) => {
+      if (b.complete && b.naturalWidth) return resolve();
+      b.addEventListener("load", resolve, { once:true });
+      b.addEventListener("error", resolve, { once:true });
+      setTimeout(resolve, 1500);
+    });
+
+    if (!(b.complete && b.naturalWidth)) return;
+
+    try{
+      const c = document.createElement("canvas");
+      c.width = b.naturalWidth;
+      c.height = b.naturalHeight;
+      const ctx = c.getContext("2d");
+      ctx.drawImage(b, 0, 0);
+      const dataUrl = c.toDataURL("image/png");
+      if (dataUrl && dataUrl.startsWith("data:image/")) b.src = dataUrl;
+    }catch(_){
+      // إذا فشل التحويل، نتركه كما هو (قد ينجح الالتقاط على نفس النطاق)
+    }
+  }
+
   try{
     setState("جارٍ تجهيز PDF...");
 
     const { wrap, clone } = makeOffscreenClone();
 
-    await (document.fonts?.ready || Promise.resolve());
-    await waitForImages(clone, 8000);
+    try{
+      await (document.fonts?.ready || Promise.resolve());
+      await waitForImages(clone, 12000);
+      await inlineBannerIfPossible(clone);
 
-    const scale = Math.min(3, Math.max(2.2, (window.devicePixelRatio || 1) * 2));
+      const scale = 3; // ✅ وضوح أعلى (إن رغبت أخف حجمًا: اجعلها 2.2)
 
-    const capture = async () => {
       const canvas = await html2canvas(clone, {
         scale,
         useCORS: true,
@@ -1932,58 +1964,69 @@ async function exportCurrentTeacherPDF(){
         windowWidth: clone.scrollWidth,
         windowHeight: clone.scrollHeight
       });
-      canvas.toDataURL("image/png");
-      return canvas;
-    };
 
-    let canvas;
-    try{
-      canvas = await capture();
-    }catch(err1){
-      const b = clone.querySelector("#bannerImg");
-      const prev = b ? b.style.display : "";
-      if (b) b.style.display = "none";
-      try{
-        canvas = await capture();
-      }finally{
-        if (b) b.style.display = prev;
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF("p", "mm", "a4");
+
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+
+      const margin = 6;
+      const availW = pageW - margin*2;
+      const availH = pageH - margin*2;
+
+      // قياس الصورة لو طُبعت بعرض الصفحة
+      const fullImgW = availW;
+      const fullImgH = (canvas.height * fullImgW) / canvas.width;
+
+      // ✅ إذا تجاوزت صفحة واحدة بمقدار بسيط: صغّر لتصبح صفحة واحدة (يمنع صفحة ثانية شبه فارغة)
+      const OVERFLOW_TOL_MM = 12; // سماحية 12mm
+      if (fullImgH <= (availH + OVERFLOW_TOL_MM)){
+        const imgData = canvas.toDataURL("image/png");
+        const fitH = availH;
+        const fitW = (canvas.width * fitH) / canvas.height;
+        const x = margin + (availW - fitW)/2;
+        pdf.addImage(imgData, "PNG", x, margin, fitW, fitH);
+      } else {
+        // ✅ تقسيم فعلي للكانفس إلى صفحات (قصّ شرائح)
+        const pxPerMm = canvas.width / fullImgW;
+        const pagePxH = Math.floor(availH * pxPerMm);
+
+        let yPx = 0;
+        let pageIndex = 0;
+
+        while (yPx < canvas.height){
+          const sliceH = Math.min(pagePxH, canvas.height - yPx);
+
+          const sliceCanvas = document.createElement("canvas");
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = sliceH;
+
+          const sctx = sliceCanvas.getContext("2d");
+          sctx.drawImage(canvas, 0, yPx, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+
+          const sliceImg = sliceCanvas.toDataURL("image/png");
+          const sliceMmH = sliceH / pxPerMm;
+
+          if (pageIndex > 0) pdf.addPage();
+          pdf.addImage(sliceImg, "PNG", margin, margin, fullImgW, sliceMmH);
+
+          yPx += sliceH;
+          pageIndex++;
+        }
       }
-    }finally{
+
+      const teacher = teachers.get(id);
+      const hijriShort = getHijriShort(new Date());
+      pdf.save(`كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.pdf`);
+
+      setState("جاهز");
+      toast("تم تنزيل PDF.");
+    } finally {
       wrap.remove();
     }
 
-    const imgData = canvas.toDataURL("image/png");
-
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-
-    const margin = 6;
-    const availW = pageW - margin*2;
-    const availH = pageH - margin*2;
-
-    const imgW = availW;
-    const imgH = (canvas.height * imgW) / canvas.width;
-
-    pdf.addImage(imgData, "PNG", margin, margin, imgW, imgH);
-
-    let remaining = imgH - availH;
-    while (remaining > 1){
-      pdf.addPage();
-      const y = margin - (imgH - remaining);
-      pdf.addImage(imgData, "PNG", margin, y, imgW, imgH);
-      remaining -= availH;
-    }
-
-    const teacher = teachers.get(id);
-    const hijriShort = getHijriShort(new Date());
-    pdf.save(`كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.pdf`);
-
-    setState("جاهز");
-    toast("تم تنزيل PDF.");
-  }catch(err){
+  } catch(err){
     console.error("PDF export error:", err);
     setState("جاهز");
     alert("تعذر إنشاء PDF. افتح Console وستجد السبب تحت: PDF export error");
