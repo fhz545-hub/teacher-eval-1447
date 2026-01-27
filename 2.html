@@ -163,6 +163,79 @@
 }
     table{width:100%; border-collapse:collapse}
     th,td{border:1px solid #2a5f64; padding:10px 10px; text-align:center; vertical-align:middle}
+/* =========================================================
+   ✅ تصغير خطوط التقرير (بدون التأثير على باقي الجداول)
+   ضع هذا بعد قاعدة: th,td{...}
+========================================================= */
+
+/* 1) ✅ جدول بيانات المعلم */
+table[aria-label="بيانات المعلم"] th{
+  font-size:12px !important;
+  padding:8px 8px !important;
+}
+table[aria-label="بيانات المعلم"] td{
+  font-size:12px !important;
+  padding:8px 8px !important;
+}
+
+/* 2) ✅ عنوان: احصائيات الحضور والانصراف لشهر ... */
+#reportHeadline{
+  font-size:18px !important; /* كان 22px */
+  line-height:1.25 !important;
+  margin:8px 0 6px !important;
+}
+
+/* 3) ✅ شارات المؤشرات: نسبة الحضور / مؤشر الانضباط / المستوى */
+.metrics .badge{
+  font-size:12px !important;
+  padding:6px 9px !important;
+}
+
+/* 4) ✅ جدول سجل المتابعة اليومي */
+table[aria-label="تفصيل أيام الشهر"] th{
+  font-size:12px !important;
+  padding:8px 8px !important;
+}
+table[aria-label="تفصيل أيام الشهر"] td{
+  font-size:12px !important;
+  padding:8px 8px !important;
+}
+
+/* ✅ للجوال فقط */
+@media (max-width:560px){
+  table[aria-label="بيانات المعلم"] th,
+  table[aria-label="بيانات المعلم"] td,
+  table[aria-label="تفصيل أيام الشهر"] th,
+  table[aria-label="تفصيل أيام الشهر"] td,
+  .metrics .badge{
+    font-size:11px !important;
+    padding:7px 6px !important;
+  }
+
+  #reportHeadline{
+    font-size:16px !important;
+  }
+}
+
+/* ✅ للطباعة / PDF فقط */
+@media print{
+  table[aria-label="بيانات المعلم"] th,
+  table[aria-label="بيانات المعلم"] td,
+  table[aria-label="تفصيل أيام الشهر"] th,
+  table[aria-label="تفصيل أيام الشهر"] td{
+    font-size:11px !important;
+    padding:7px 7px !important;
+  }
+
+  .metrics .badge{
+    font-size:11px !important;
+    padding:6px 8px !important;
+  }
+
+  #reportHeadline{
+    font-size:17px !important;
+  }
+}
 /* ✅ تصغير خط جدول بيانات المعلم (الاسم/الهوية/الجوال/التخصص/المرتبة) فقط */
 table[aria-label="بيانات المعلم"] th{
   font-size:12px;
@@ -232,7 +305,28 @@ table[aria-label="بيانات المعلم"] td{
     .badge.ok{background:var(--ok); border-color:#c8efd8; color:#0a5f3b}
     .badge.warn{background:var(--warn); border-color:#f2dfc4; color:#7a4a00}
     .badge.bad{background:var(--bad); border-color:#f0caca; color:#8a1d1d}
+/* ✅ (دقيق) تصغير مؤشرات: نسبة الحضور / مؤشر الانضباط / المستوى فقط */
+.metrics[aria-label="مؤشرات إضافية"] .badge{
+  font-size:12px;
+  padding:6px 10px;
+  line-height:1.6;
+}
 
+/* ✅ للجوال فقط */
+@media (max-width:560px){
+  .metrics[aria-label="مؤشرات إضافية"] .badge{
+    font-size:11px;
+    padding:5px 9px;
+  }
+}
+
+/* ✅ للطباعة/PDF فقط */
+@media print{
+  .metrics[aria-label="مؤشرات إضافية"] .badge{
+    font-size:11px;
+    padding:5px 9px;
+  }
+}
     /* ===== WhatsApp Modal ===== */
     .overlay{
       position:fixed; inset:0; z-index:80;
