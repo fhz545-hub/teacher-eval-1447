@@ -140,14 +140,14 @@
 
     /* عنوان الكشف يبقى كما هو */
     .headline{
-      text-align:center;
-      font-weight:1100;
-      font-size:22px;
-      letter-spacing:.2px;
-      color:#0b5660;
-      margin:10px 0 6px;
-      line-height:1.25;
-    }
+  text-align:center;
+  font-weight:900;
+  font-size:22px;
+  letter-spacing:0;
+  color:#0b5660;
+  margin:10px 0 6px;
+  line-height:1.25;
+}
 
     table{width:100%; border-collapse:collapse}
     th,td{border:1px solid #2a5f64; padding:10px 10px; text-align:center; vertical-align:middle}
@@ -1472,71 +1472,163 @@ if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
 
     w.onload = () => setTimeout(() => { try{ w.focus(); w.print(); }catch(_){ } }, 200);
   }
+function waitForImages(root, timeoutMs = 7000){
+  const imgs = Array.from(root.querySelectorAll("img"))
+    .filter(img => !img.complete || img.naturalWidth === 0);
 
+  if (!imgs.length) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    let done = false;
+    const t = setTimeout(() => { if(!done){ done = true; resolve(); } }, timeoutMs);
+
+    let left = imgs.length;
+    const finish = () => {
+      left--;
+      if (left <= 0 && !done){
+        done = true;
+        clearTimeout(t);
+        resolve();
+      }
+    };
+
+    imgs.forEach(img => {
+      img.addEventListener("load", finish, { once:true });
+      img.addEventListener("error", finish, { once:true });
+    });
+  });
+}
   /* =========================
      ✅ تنزيل PDF (كشف المعلم)
   ========================== */
-  async function exportCurrentTeacherPDF(){
-    const id = teacherSelect.value;
-    if (!id || !teachers.has(id)){
-      alert("اختر معلماً أولاً.");
-      return;
-    }
-    // تأكد من التحديث قبل الالتقاط
-    renderSelectedTeacher();
-
-    const page = el("reportPage");
-    if (!page){
-      alert("تعذر العثور على صفحة التقرير.");
-      return;
-    }
-
-    try{
-      setState("جارٍ تجهيز PDF...");
-      const canvas = await html2canvas(page, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        windowWidth: document.documentElement.clientWidth
-      });
-
-      const imgData = canvas.toDataURL("image/png");
-      const { jsPDF } = window.jspdf;
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-
-      // حساب أبعاد الصورة داخل PDF
-      const imgW = pageW;
-      const imgH = (canvas.height * imgW) / canvas.width;
-
-      let y = 0;
-      let remaining = imgH;
-
-      pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
-
-      remaining -= pageH;
-
-      while (remaining > 2){
-        pdf.addPage();
-        y = -(imgH - remaining);
-        pdf.addImage(imgData, "PNG", 0, y, imgW, imgH);
-        remaining -= pageH;
-      }
-
-      const teacher = teachers.get(id);
-      const hijriShort = getHijriShort(new Date());
-      pdf.save(`كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.pdf`);
-
-      setState("جاهز");
-      toast("تم تنزيل PDF.");
-    }catch(err){
-      console.error(err);
-      setState("جاهز");
-      alert("تعذر إنشاء PDF. جرّب مرة أخرى.");
-    }
+async function exportCurrentTeacherPDF(){
+  const id = teacherSelect.value;
+  if (!id || !teachers.has(id)){
+    alert("اختر معلماً أولاً.");
+    return;
   }
+
+  if (typeof html2canvas !== "function"){
+    alert("مكتبة html2canvas لم تُحمّل.");
+    return;
+  }
+  if (!window.jspdf || !window.jspdf.jsPDF){
+    alert("مكتبة jsPDF لم تُحمّل.");
+    return;
+  }
+
+  renderSelectedTeacher();
+
+  const src = el("reportPage");
+  if (!src){
+    alert("تعذر العثور على صفحة التقرير.");
+    return;
+  }
+
+  const makeOffscreenClone = () => {
+    const wrap = document.createElement("div");
+    wrap.style.position = "fixed";
+    wrap.style.left = "-100000px";
+    wrap.style.top = "0";
+    wrap.style.width = "210mm";
+    wrap.style.background = "#fff";
+    wrap.style.zIndex = "-1";
+
+    const clone = src.cloneNode(true);
+
+    clone.style.width = "210mm";
+    clone.style.maxWidth = "210mm";
+    clone.style.margin = "0";
+    clone.style.boxShadow = "none";
+    clone.style.borderRadius = "0";
+    clone.style.border = "0";
+    clone.style.direction = "rtl";
+
+    wrap.appendChild(clone);
+    document.body.appendChild(wrap);
+    return { wrap, clone };
+  };
+
+  try{
+    setState("جارٍ تجهيز PDF...");
+
+    const { wrap, clone } = makeOffscreenClone();
+
+    await (document.fonts?.ready || Promise.resolve());
+    await waitForImages(clone, 8000);
+
+    const scale = Math.min(3, Math.max(2.2, (window.devicePixelRatio || 1) * 2));
+
+    const capture = async () => {
+      const canvas = await html2canvas(clone, {
+        scale,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#ffffff",
+        scrollX: 0,
+        scrollY: 0,
+        width: clone.scrollWidth,
+        height: clone.scrollHeight,
+        windowWidth: clone.scrollWidth,
+        windowHeight: clone.scrollHeight
+      });
+      canvas.toDataURL("image/png");
+      return canvas;
+    };
+
+    let canvas;
+    try{
+      canvas = await capture();
+    }catch(err1){
+      const b = clone.querySelector("#bannerImg");
+      const prev = b ? b.style.display : "";
+      if (b) b.style.display = "none";
+      try{
+        canvas = await capture();
+      }finally{
+        if (b) b.style.display = prev;
+      }
+    }finally{
+      wrap.remove();
+    }
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+
+    const margin = 6;
+    const availW = pageW - margin*2;
+    const availH = pageH - margin*2;
+
+    const imgW = availW;
+    const imgH = (canvas.height * imgW) / canvas.width;
+
+    pdf.addImage(imgData, "PNG", margin, margin, imgW, imgH);
+
+    let remaining = imgH - availH;
+    while (remaining > 1){
+      pdf.addPage();
+      const y = margin - (imgH - remaining);
+      pdf.addImage(imgData, "PNG", margin, y, imgW, imgH);
+      remaining -= availH;
+    }
+
+    const teacher = teachers.get(id);
+    const hijriShort = getHijriShort(new Date());
+    pdf.save(`كشف حضوري شهري - ${safeFileName(teacher.name)} - ${hijriShort}.pdf`);
+
+    setState("جاهز");
+    toast("تم تنزيل PDF.");
+  }catch(err){
+    console.error("PDF export error:", err);
+    setState("جاهز");
+    alert("تعذر إنشاء PDF. افتح Console وستجد السبب تحت: PDF export error");
+  }
+}
 
   /* =========================
      Registry warn modal
