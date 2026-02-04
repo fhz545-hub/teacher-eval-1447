@@ -274,6 +274,39 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           <option>التقصير في إدخال الدرجات في (نور) ضمن الإطار الزمني المعتمد.</option>
           <option>عدم تسجيل الانصراف في منصة حضوري.</option>
         </select>
+<!-- ✅ تفاصيل الحصة (تظهر فقط عند: التأخر عن دخول الحصة / الخروج قبل انتهائها) -->
+<div class="f" id="lessonBox" style="display:none">
+  <label id="lessonTitle">تفاصيل الحصة</label>
+
+  <div class="row">
+    <select id="periodNo" class="sel" style="width:34%">
+      <option value="">— الحصة —</option>
+      <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+      <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+    </select>
+
+    <span class="pill" style="flex:1;justify-content:center">
+      <b id="lessonMins">0</b> دقيقة
+    </span>
+  </div>
+
+  <div class="row" style="margin-top:8px">
+    <div style="flex:1">
+      <div class="mini" id="lessonA_lbl">وقت بداية الحصة (حسب الجدول)</div>
+      <span id="lessonA" class="timebox empty" contenteditable="true" data-mask>--:--</span>
+    </div>
+
+    <div style="flex:1">
+      <div class="mini" id="lessonB_lbl">وقت دخول المعلم للحصة</div>
+      <span id="lessonB" class="timebox empty" contenteditable="true" data-mask>--:--</span>
+    </div>
+  </div>
+
+  <div class="mini" id="lessonHint" style="margin-top:6px">
+    أدخل الوقتين وسيتم احتساب الدقائق تلقائيًا.
+  </div>
+</div>
+
       </div>
 
       <div class="f">
@@ -540,7 +573,12 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
               الموافق <span id="noteHijri" style="font-weight:900;border-bottom:1px dotted #2f4f4c;padding:0 3mm">—</span></p>
             <p id="noteParagraph">
               إشارةً إلى التعليمات والأنظمة المعتمدة في المدرسة؛ لوحِظ
-              <span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>.
+<span id="noteReasonText" style="font-weight:900">المهمة المحددة</span>
+<span id="noteLessonExtra" style="display:none">
+  (الحصة رقم <span id="notePeriodNo" style="font-weight:900">—</span>
+  — <span id="noteLessonKind" style="font-weight:900">التأخر</span>:
+  <span id="noteLessonMin" style="font-weight:900">0</span> دقيقة)
+</span>.
               ونأمل منكم المبادرة بمعالجة ذلك، والالتزام التام بما يُوكل إليكم من مهام؛ دعمًا للانضباط المهني ورفعًا لجودة الأداء.
             </p>
             <p><strong>توقيع الموظف بالاطلاع:</strong> ............................... &nbsp;&nbsp; <strong>الاسم:</strong> ............................... &nbsp;&nbsp; <strong>التاريخ:</strong> ______ / ______ / 14</p>
@@ -722,7 +760,23 @@ const hD=document.getElementById('hD');
 const gY=document.getElementById('gY');
 const gM=document.getElementById('gM');
 const gD=document.getElementById('gD');
+/* ✅ تفاصيل الحصة داخل لفت النظر */
+const lessonBox = document.getElementById('lessonBox');
+const periodNo = document.getElementById('periodNo');
+const lessonTitle = document.getElementById('lessonTitle');
+const lessonA = document.getElementById('lessonA');
+const lessonB = document.getElementById('lessonB');
+const lessonA_lbl = document.getElementById('lessonA_lbl');
+const lessonB_lbl = document.getElementById('lessonB_lbl');
+const lessonMins = document.getElementById('lessonMins');
+const lessonHint = document.getElementById('lessonHint');
 
+const noteLessonExtra = document.getElementById('noteLessonExtra');
+const notePeriodNo = document.getElementById('notePeriodNo');
+const noteLessonKind = document.getElementById('noteLessonKind');
+const noteLessonMin = document.getElementById('noteLessonMin');
+
+let NOTE_LESSON_MODE = ''; // 'enter' أو 'exit'
 /* ================= بيانات المعلمين ================= */
 const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058931	فيزيا	معلم ممارس
 يوسف  عيسى العيد	1012646822	966592038351	اللغة العربية	معلم ممارس
@@ -927,9 +981,14 @@ function setPack(kind){
   const frWrap=document.getElementById('frGroup').parentElement;
   if(kind==='gaib'){ frWrap.classList.remove('disabled'); if(!STATE.faris) STATE.faris='not'; }
   else { frWrap.classList.add('disabled'); STATE.faris=''; }
+
   updUnifiedText();
+
   if(kind==='gaib') updatePrincipalAbs();
+
+  updateLessonUI();
 }
+
 document.getElementById('kindChips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
   [...e.currentTarget.children].forEach(x=>x.classList.remove('active')); b.classList.add('active');
@@ -1067,7 +1126,10 @@ function attachTimeMask(el){
   el.addEventListener('click',()=>openClock(el));
 }
 function placeCaretAtEnd(el){ const r=document.createRange(); r.selectNodeContents(el); r.collapse(false); const s=window.getSelection(); s.removeAllRanges(); s.addRange(r); }
-['tLateIn','tAbsFrom','tAbsTo'].forEach(id=>attachTimeMask(document.getElementById(id)));
+['tLateIn','tAbsFrom','tAbsTo','lessonA','lessonB'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) attachTimeMask(el);
+});
 
 /* ساعة اختيار */
 let CLOCK_TARGET=null;
@@ -1093,6 +1155,77 @@ document.getElementById('btnClockClose').onclick=hideClock;
 clockDlg.addEventListener('click',(e)=>{ if(e.target===clockDlg) hideClock(); });
 
 /* حسابات */
+function detectLessonMode(reason){
+  const r = String(reason||'').trim();
+  if(r.includes('التأخر عن دخول الحصة')) return 'enter';
+  if(r.includes('الخروج من الحصة قبل انتهائها')) return 'exit';
+  return '';
+}
+
+function resetLessonFields(){
+  if(periodNo) periodNo.value='';
+  if(lessonA){ lessonA.textContent='--:--'; lessonA.classList.add('empty'); }
+  if(lessonB){ lessonB.textContent='--:--'; lessonB.classList.add('empty'); }
+  if(lessonMins) lessonMins.textContent='0';
+  if(notePeriodNo) notePeriodNo.textContent='—';
+  if(noteLessonMin) noteLessonMin.textContent='0';
+}
+
+function recalcLesson(){
+  if(!NOTE_LESSON_MODE){
+    if(lessonMins) lessonMins.textContent='0';
+    if(noteLessonMin) noteLessonMin.textContent='0';
+    return;
+  }
+
+  const a = toMin(lessonA?.textContent.trim());
+  const b = toMin(lessonB?.textContent.trim());
+
+  let mins = 0;
+  if(a!=null && b!=null){
+    if(NOTE_LESSON_MODE==='enter'){
+      mins = Math.max(0, b - a);   // دخول - بداية الحصة
+    }else{
+      mins = Math.max(0, a - b);   // نهاية الحصة - خروج فعلي
+    }
+  }
+
+  lessonMins.textContent = en2ar(mins);
+  noteLessonMin.textContent = en2ar(mins);
+}
+
+function updateLessonUI(){
+  const reason = document.getElementById('noteReason')?.value || '';
+  NOTE_LESSON_MODE = (STATE.kind==='note') ? detectLessonMode(reason) : '';
+
+  const on = !!NOTE_LESSON_MODE;
+
+  if(lessonBox) lessonBox.style.display = on ? '' : 'none';
+  if(noteLessonExtra) noteLessonExtra.style.display = on ? 'inline' : 'none';
+
+  if(!on){
+    resetLessonFields();
+    return;
+  }
+
+  if(NOTE_LESSON_MODE==='enter'){
+    lessonTitle.textContent = 'تفاصيل التأخر عن دخول الحصة';
+    lessonA_lbl.textContent = 'وقت بداية الحصة (حسب الجدول)';
+    lessonB_lbl.textContent = 'وقت دخول المعلم للحصة';
+    noteLessonKind.textContent = 'التأخر';
+    lessonHint.textContent = 'أدخل وقت بداية الحصة ووقت الدخول — سيتم احتساب دقائق التأخر تلقائيًا.';
+  }else{
+    lessonTitle.textContent = 'تفاصيل الخروج قبل انتهاء الحصة';
+    lessonA_lbl.textContent = 'وقت نهاية الحصة (حسب الجدول)';
+    lessonB_lbl.textContent = 'وقت خروج المعلم من الحصة';
+    noteLessonKind.textContent = 'الخروج المبكر';
+    lessonHint.textContent = 'أدخل وقت نهاية الحصة ووقت الخروج — سيتم احتساب دقائق الخروج المبكر تلقائيًا.';
+  }
+
+  notePeriodNo.textContent = (periodNo.value ? en2ar(periodNo.value) : '—');
+
+  recalcLesson();
+}
 function recalc(){
   const wsM=toMin(WORK_RANGE[SEASON].start);
   const tLateM=toMin(document.getElementById('tLateIn').textContent.trim());
@@ -1104,6 +1237,7 @@ function recalc(){
     lateTotal.textContent='0 دقيقة';
     lateHH.textContent='00:00';
   }
+  recalcLesson();
 
   const aFM=toMin(document.getElementById('tAbsFrom').textContent.trim()), aTM=toMin(document.getElementById('tAbsTo').textContent.trim());
   if(aFM!=null&&aTM!=null&&aTM>aFM){
@@ -1118,8 +1252,13 @@ function recalc(){
 
 /* سبب لفت النظر */
 document.getElementById('noteReason').addEventListener('change', e=>{
-  document.getElementById('noteReasonText').textContent=e.target.value||'المهمة المحددة';
+  document.getElementById('noteReasonText').textContent = e.target.value || 'المهمة المحددة';
+  updateLessonUI();
 });
+
+if(periodNo){
+  periodNo.addEventListener('change', updateLessonUI);
+}
 
 /* اختيار معلم */
 selTeacher.addEventListener('change',e=>{
@@ -1169,9 +1308,15 @@ document.getElementById('btnPrintSave').addEventListener('click', async (e)=>{
     faris: (STATE.kind === 'gaib' ? (STATE.faris || 'not') : ''),
     hijri: metaHijri.textContent,
     day: metaDay.textContent,
-    noteReason: (STATE.kind === 'note')
+       noteReason: (STATE.kind === 'note')
       ? (document.getElementById('noteReasonText')?.textContent || '')
-      : ''
+      : '',
+
+    period: (STATE.kind==='note' ? (periodNo?.value || '') : ''),
+    lessonMode: (STATE.kind==='note' ? (NOTE_LESSON_MODE || '') : ''),
+    lessonMins: (STATE.kind==='note' ? ar2en(lessonMins?.textContent || '0') : ''),
+    lessonA: (STATE.kind==='note' ? (lessonA?.textContent.trim() || '') : ''),
+    lessonB: (STATE.kind==='note' ? (lessonB?.textContent.trim() || '') : '')
   });
   saveARCH();
 
@@ -1231,7 +1376,14 @@ function shortDetails(r){
   if(r.kind === 'late') return 'تنبيه تأخر';
   if(r.kind === 'absent') return 'تنبيه عدم تواجد';
   if(r.kind === 'gaib') return 'غياب';
-  if(r.kind === 'note') return `لفت نظر — ${r.noteReason || '—'}`;
+if(r.kind === 'note'){
+  let extra='';
+  if(r.lessonMode){
+    const lbl = (r.lessonMode==='enter') ? 'تأخر' : 'خروج مبكر';
+    extra = ` — الحصة: ${r.period?en2ar(r.period):'—'} — ${lbl}: ${en2ar(r.lessonMins||0)} د`;
+  }
+  return `لفت نظر — ${r.noteReason || '—'}${extra}`;
+}
   return '—';
 }
 
@@ -1735,8 +1887,13 @@ document.getElementById('btnWA').addEventListener('click', ()=>{
   } else if(kind==='gaib'){
     details=`تم تسجيل مساءلة غياب لليوم الموضّح.`;
   } else if(kind==='note'){
-    details=`لفت نظر بسبب: ${document.getElementById('noteReasonText').textContent.trim()}`;
+  let extra='';
+  if(NOTE_LESSON_MODE){
+    const lbl = (NOTE_LESSON_MODE==='enter') ? 'تأخر' : 'خروج مبكر';
+    extra = ` — الحصة: ${periodNo.value?en2ar(periodNo.value):'—'} — ${lbl}: ${lessonMins.textContent||'0'} دقيقة`;
   }
+  details=`لفت نظر بسبب: ${document.getElementById('noteReasonText').textContent.trim()}${extra}`;
+}
 
   const msg=`السلام عليكم
 ${kindLabel}
