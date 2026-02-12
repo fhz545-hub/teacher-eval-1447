@@ -913,6 +913,11 @@ document.getElementById('btnGuardReview').onclick=()=>{
 };
 
 document.getElementById('btnGuardConfirm').onclick=()=>{
+  const iso = document.getElementById('hadoryManualDate').value || '';
+  if(!iso){
+    alert('حدد تاريخ التقرير يدويًا أولاً ثم اضغط (تطبيق) قبل التأكيد.');
+    return;
+  }
   if(!chkAck.checked){
     alert('لا يمكن المتابعة قبل وضع علامة الإقرار بتطابق التاريخ.');
     return;
@@ -923,13 +928,23 @@ document.getElementById('btnGuardConfirm').onclick=()=>{
   showDateOk(true);
 };
 
+
 function requireDateGuard(actionName){
   if(!HADORY_USED) return true;
+
+  const iso = document.getElementById('hadoryManualDate').value || '';
+  if(!iso){
+    openDateGuard('يلزم اختيار تاريخ التقرير يدويًا ثم الضغط على (تطبيق) قبل: ' + actionName);
+    return false;
+  }
+
   if(!DATE_GUARD_ACTIVE) return true;
   if(DATE_GUARD_CONFIRMED) return true;
-  openDateGuard(DATE_GUARD_REASON || ('حماية التاريخ مفعّلة قبل: '+actionName));
+
+  openDateGuard(DATE_GUARD_REASON || ('حماية التاريخ مفعّلة قبل: ' + actionName));
   return false;
 }
+
 
 /* ============= أرشيف محلي ============= */
 const KEY_ARCH='followup_archive_v11';
@@ -1036,7 +1051,7 @@ function hijriToGregorian(y,m,d){
     if(v.y<y||(v.y===y&&v.m<m)||(v.y===y&&v.m===m&&v.d<d)) lo=new Date(mid.getFullYear(),mid.getMonth(),mid.getDate()+1);
     else hi=new Date(mid.getFullYear(),mid.getMonth(),mid.getDate()-1);
   }
-  return new Date();
+return null;
 }
 function buildHijriPicker(){
   hY.innerHTML=hM.innerHTML=hD.innerHTML='';
@@ -1054,9 +1069,11 @@ function buildHijriPicker(){
 }
 function syncFromHijri(){
   const y=+hY.value, m=+hM.value, d=+hD.value;
-  const g=hijriToGregorian(y,m,d);
-  const dayName=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{weekday:'long'}).format(g);
-  const hij=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).format(g);
+const g=hijriToGregorian(y,m,d);
+if(!g){
+  alert('اليوم المختار غير موجود في تقويم أم القرى لهذا الشهر. اختر يومًا آخر.');
+  return;
+}
 
   metaDay.textContent=dayName; metaHijri.textContent=hij;
   dynDay.textContent=dayName; dynHijri.textContent=hij;
@@ -1262,7 +1279,11 @@ if(periodNo){
 
 /* اختيار معلم */
 selTeacher.addEventListener('change',e=>{
-  const i=+e.target.value; const t=Number.isInteger(i)?TEACHERS[i]:null; if(!t) return;
+  if(e.target.value==='') return;         // ✅ يمنع اعتبار الفارغ = 0
+  const i = Number(e.target.value);
+  const t = Number.isInteger(i) ? TEACHERS[i] : null;
+  if(!t) return;
+
   t_name.textContent=t.name||'—'; t_spec.textContent=t.spec||'—'; t_level.textContent=t.level||'—';
   t_job.textContent=t.job||'—'; t_work.textContent=t.work||'—'; t_civil.textContent=t.civil||'—';
   teacherNameInline.textContent=t.name||'—'; noteTeacherName.textContent=t.name||'—'; document.getElementById('affTeacher').textContent=t.name||'—';
@@ -1293,9 +1314,11 @@ async function ensureAllImagesEmbedded(root){
 document.getElementById('btnPrintSave').addEventListener('click', async (e)=>{
   if(!requireDateGuard('الطباعة/الحفظ')) return;
 
-  const i = +selTeacher.value;
-  if(!Number.isInteger(i)) { alert('اختر معلماً أولاً'); return; }
-  const t = TEACHERS[i];
+  if(selTeacher.value===''){ alert('اختر معلماً أولاً'); return; } // ✅
+const i = Number(selTeacher.value);
+const t = TEACHERS[i];
+if(!t){ alert('تعذّر تحديد المعلم.'); return; }                 // ✅
+
 
   // حفظ في الأرشيف قبل إنشاء الـ PDF
   ARCH.push({
@@ -1332,19 +1355,29 @@ document.getElementById('btnPrintSave').addEventListener('click', async (e)=>{
     await ensureAllImagesEmbedded(sheet);
 
     const canvas = await html2canvas(sheet, {
-      scale: 2,
-      background: '#fff',
-      useCORS: true,
+  scale: 2,
+  backgroundColor: '#fff',   // ✅ الصحيح
+  useCORS: true,
+
       allowTaint: false,
       imageTimeout: 0,
       logging: false
     });
 
-    const pdf = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
-    const w = 210;
-    const h = canvas.height * 210 / canvas.width;
+  const pdf = new jsPDF({orientation:'p', unit:'mm', format:'a4'});
+const pageW = 210, pageH = 297;
 
-    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, w, h);
+let imgW = pageW;
+let imgH = canvas.height * pageW / canvas.width;
+
+if(imgH > pageH){
+  imgH = pageH;
+  imgW = canvas.width * pageH / canvas.height;
+}
+
+const x = (pageW - imgW) / 2;
+pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, 0, imgW, imgH);
+
     pdf.save(`إجراء - ${t.name}.pdf`);
 
     if(confirm('تم حفظ ملف PDF. هل تريد الطباعة الآن؟')) {
@@ -1518,35 +1551,60 @@ function showDateOk(on){
   }
 }
 
-function guessDateFromFileName(name){
-  const m = String(name||'').match(/(20\d{2})[^\d]?(\d{1,2})[^\d]?(\d{1,2})/);
-  if(!m) return '';
-  const y=m[1], mm=String(m[2]).padStart(2,'0'), dd=String(m[3]).padStart(2,'0');
-  return `${y}-${mm}-${dd}`;
-}
 function normalizeDate(raw){
   if(raw===undefined || raw===null) return '';
-  let s=String(raw).trim(); if(!s) return '';
-  if(!isNaN(Number(s)) && !s.includes('-') && !s.includes('/')){
-    const n=Number(s);
-    const base=new Date(1899,11,30);
-    const d=new Date(base.getTime()+n*24*60*60*1000);
-    const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${dd}`;
+
+  // إذا كانت خلية Excel تُقرأ كـ Date
+  if(raw instanceof Date){
+    const y = raw.getFullYear();
+    const m = String(raw.getMonth()+1).padStart(2,'0');
+    const d = String(raw.getDate()).padStart(2,'0');
+    return `${y}-${m}-${d}`;
   }
-  s=s.replace(/\./g,'/').replace(/\\/g,'/');
-  let m=s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
-  if(m){ return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`; }
-  m=s.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})\s+(\d{1,2}):(\d{2})/);
-  if(m){ return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`; }
+
+  let s = String(raw).trim();
+  if(!s) return '';
+
+  // Excel serial date number
+  if(!isNaN(Number(s)) && !s.includes(':') && !s.includes('/') && !s.includes('-')){
+    const n = Number(s);
+    if(n > 20000 && n < 70000){
+      const dt = new Date(Math.round((n - 25569) * 86400 * 1000));
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth()+1).padStart(2,'0');
+      const d = String(dt.getDate()).padStart(2,'0');
+      return `${y}-${m}-${d}`;
+    }
+  }
+
+  s = s.replace(/\./g,'/').replace(/\\/g,'/');
+  let m = s.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
+  if(m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+
+  m = s.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})\s+\d{1,2}:\d{2}/);
+  if(m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+
+  m = s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m) return `${m[1]}-${m[2]}-${m[3]}`;
+
   return '';
 }
+
 function normalizeTime(raw){
-  if(raw===undefined||raw===null) return '';
-  let s=String(raw).trim(); if(!s) return '';
-  const dt = s.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-  if(dt){ return `${String(parseInt(dt[1],10)).padStart(2,'0')}:${dt[2]}`; }
-  if(!isNaN(Number(s)) && !s.includes(':')){
+  if(raw===undefined || raw===null) return '';
+
+  // إذا كانت خلية Excel تُقرأ كـ Date (وقت)
+  if(raw instanceof Date){
+    const h=String(raw.getHours()).padStart(2,'0');
+    const m=String(raw.getMinutes()).padStart(2,'0');
+    return `${h}:${m}`;
+  }
+
+  let s=String(raw).trim();
+  if(!s) return '';
+
+  // Excel fraction of a day (0..1)
+  if(!isNaN(Number(s)) && !s.includes(':') && !s.includes('/') && !s.includes('-')){
     const v=Number(s);
     if(v>=0 && v<1){
       const total=Math.round(v*24*60);
@@ -1555,16 +1613,32 @@ function normalizeTime(raw){
       return `${h}:${m}`;
     }
   }
-  s=s.replace(/\s+/g,'').toUpperCase();
-  let m=s.match(/^(\d{1,2}):(\d{2})(AM|PM)?$/);
+
+  // "06:32 AM" / "1:36 PM" / "06:32" / "06:32:10"
+  let m=s.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
   if(m){
-    let h=parseInt(m[1],10), mm=m[2], ap=m[3];
+    let h=parseInt(m[1],10);
+    const mm=m[2];
+    const ap=(m[4]||'').toUpperCase();
     if(ap==='PM' && h<12) h+=12;
     if(ap==='AM' && h===12) h=0;
-    return `${String(h).padStart(2,'0')}:${mm}`;
+    if(h>=0 && h<=23) return `${String(h).padStart(2,'0')}:${mm}`;
   }
+
+  s=s.replace(/\s+/g,'').toUpperCase();
+  m=s.match(/^(\d{1,2}):(\d{2})(AM|PM)?$/);
+  if(m){
+    let h=parseInt(m[1],10);
+    const mm=m[2];
+    const ap=m[3];
+    if(ap==='PM' && h<12) h+=12;
+    if(ap==='AM' && h===12) h=0;
+    if(h>=0 && h<=23) return `${String(h).padStart(2,'0')}:${mm}`;
+  }
+
   return '';
 }
+
 function diffMin(start,end){
   const s=toMin(start), e=toMin(end);
   if(s==null||e==null) return 0;
@@ -1590,13 +1664,24 @@ function normH(s){
     .replace(/\s+/g,' ')
     .trim();
 }
+function normalizeName(v){
+  return String(v||'')
+    .replace(/\u200f|\u200e/g,'')
+    .replace(/[^\p{L}\p{N}\s]/gu,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
 function findIdxByAny(headers, patterns){
   for(let i=0;i<headers.length;i++){
-    const h=normH(headers[i]);
-    for(const p of patterns){ if(p.test(h)) return i; }
+    const h = normH(headers[i]);
+    for(const p of patterns){
+      if(p && p.test && p.test(h)) return i;
+    }
   }
   return -1;
 }
+
 const ID_PATS = [
   /السجل المدني/,
   /رقم السجل المدني/,
@@ -1615,16 +1700,41 @@ const ID_PATS = [
   for(let i=0;i<max;i++){
     const r=rows[i]||[];
     const headers=r.map(x=>String(x||''));
-    const idIdx=findIdxByAny(headers,[/هوية/,/رقم الموظف/,/الرقم الوظيفي/,/\bid\b/]);
-    const inIdx=findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
-    const outIdx=findIdxByAny(headers,[/الانصراف/,/وقت الانصراف/,/توقيت الانصراف/,/وقت الخروج/,/توقيت الخروج/]);
-    const nameIdx=findIdxByAny(headers,[/اسم الموظف/,/اسم المعلم/,/الاسم/]);
+   const idIdx  = findIdxByAny(headers, ID_PATS);
+const nameIdx = findIdxByAny(headers, [/اسم الموظف/,/اسم المعلم/,/الاسم/,/الإسم/,/[اإأآ]سم/]);
+const inIdx  = findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
+const outIdx = findIdxByAny(headers, [/[اإأآ]نصراف/,/وقت الانصراف/,/وقت الإنصراف/,/توقيت الانصراف/,/توقيت الإنصراف/,/وقت الخروج/,/توقيت الخروج/]);
+
     const score=(idIdx>-1?5:0)+(inIdx>-1?3:0)+(outIdx>-1?2:0)+(nameIdx>-1?2:0);
     if(score>best.score){ best={i,score,headers}; }
   }
   return best.i>-1?best.i:0;
 }
+function guessDateFromFileName(fileName){
+  const s = ar2en(String(fileName||''));
 
+  // 1) 2026-02-12 / 2026_2_12 / 2026.2.12
+  let m = s.match(/(20\d{2})[._\-\/](\d{1,2})[._\-\/](\d{1,2})/);
+  if(m){
+    const y=m[1], mo=String(+m[2]).padStart(2,'0'), d=String(+m[3]).padStart(2,'0');
+    return `${y}-${mo}-${d}`;
+  }
+
+  // 2) 12-02-2026
+  m = s.match(/(\d{1,2})[._\-\/](\d{1,2})[._\-\/](20\d{2})/);
+  if(m){
+    const y=m[3], mo=String(+m[2]).padStart(2,'0'), d=String(+m[1]).padStart(2,'0');
+    return `${y}-${mo}-${d}`;
+  }
+
+  // 3) 20260212
+  m = s.match(/(20\d{2})(\d{2})(\d{2})/);
+  if(m){
+    return `${m[1]}-${m[2]}-${m[3]}`;
+  }
+
+  return '';
+}
 hadoryFiles.addEventListener('change', async (e)=>{
   const files=[...e.target.files||[]];
   if(!files.length) return;
@@ -1658,12 +1768,13 @@ hadoryFiles.addEventListener('change', async (e)=>{
         const headerRowIndex = bestHeaderRow(rows);
         const headers=(rows[headerRowIndex]||[]).map(h=>String(h||'').trim());
 
-        const nameIdx=findIdxByAny(headers,[/اسم الموظف/,/اسم المعلم/,/الاسم/]);
-        const idIdx=findIdxByAny(headers,[/هوية/,/الرقم الوظيفي/,/رقم الموظف/,/رقم المعلم/,/\bid\b/]);
-        const dateIdx=findIdxByAny(headers,[/تاريخ/]);
+const nameIdx = findIdxByAny(headers, [/اسم الموظف/,/اسم المعلم/,/الاسم/,/الإسم/,/[اإأآ]سم/]);
+const idIdx   = findIdxByAny(headers, ID_PATS);
 
-        const inIdx=findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
-        const outIdx=findIdxByAny(headers,[/الانصراف/,/وقت الانصراف/,/توقيت الانصراف/,/وقت الخروج/,/توقيت الخروج/]);
+const dateIdx = findIdxByAny(headers,[/تاريخ/]);
+
+const inIdx   = findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
+const outIdx  = findIdxByAny(headers, [/[اإأآ]نصراف/,/وقت الانصراف/,/وقت الإنصراف/,/توقيت الانصراف/,/توقيت الإنصراف/,/وقت الخروج/,/توقيت الخروج/]);
 
         const outTypeIdx=findIdxByAny(headers,[/نوع الانصراف/,/طريقة الانصراف/,/حالة الانصراف/,/ملاحظة/,/ملاحظات/,/note/]);
 
@@ -1673,32 +1784,40 @@ hadoryFiles.addEventListener('change', async (e)=>{
           const row=rows[r];
           if(!row || row.every(c=>String(c).trim()==='')) continue;
 
-          const civil = String(row[idIdx]||'').replace(/[^\d]/g,'');
-          if(!civil) continue;
+// ===== قراءة الهوية/الاسم من الصف (إصلاح أخطاء name + return) =====
+const idRaw = ar2en(String(row[idIdx]||'')).replace(/\D/g,'').trim();
+const civil = (idRaw.length===10) ? idRaw : '';
+const empNo = (!civil && idRaw) ? idRaw : '';
 
-          let dateStr='';
-          if(dateIdx>=0) dateStr=normalizeDate(row[dateIdx]);
-          if(dateStr) datesFromCells.add(dateStr);
+const fileName = (nameIdx>=0) ? normalizeName(row[nameIdx]) : '';
+if(!fileName && !empNo && !civil) continue;
 
-          let attend= (inIdx>=0) ? normalizeTime(row[inIdx]) : '';
-          let leave = (outIdx>=0) ? normalizeTime(row[outIdx]) : '';
+let dateStr = '';
+if(dateIdx>=0) dateStr = normalizeDate(row[dateIdx]);
+if(dateStr) datesFromCells.add(dateStr);
 
-          let workMinutes=0;
-          if(attend && leave) workMinutes = diffMin(attend,leave);
+const attend = (inIdx>=0) ? normalizeTime(row[inIdx]) : '';
+const leave  = (outIdx>=0) ? normalizeTime(row[outIdx]) : '';
 
-          const outTypeRaw = (outTypeIdx>=0)? String(row[outTypeIdx]||'').trim() : '';
-          const autoOut = isAutoOutText(outTypeRaw);
+let workMinutes = 0;
+if(attend && leave) workMinutes = diffMin(attend, leave);
 
-          const nameFromFile = (nameIdx>=0)? String(row[nameIdx]||'').trim() : '';
-          const t=TEACHER_BY_CIVIL[civil] || null;
-          const name = (t?.name) || nameFromFile || 'غير مسجل في القائمة';
+const outTypeRaw = (outTypeIdx>=0)? String(row[outTypeIdx]||'').trim() : '';
+const autoOut = isAutoOutText(outTypeRaw);
 
-          HADORY_LOGS.push({
-            date: dateStr, civil, name,
-            attend, leave, workMinutes, outType: outTypeRaw, autoOut,
-            _srcFile:f.name, _sheet:sn
-          });
-        }
+const t = (civil ? (TEACHER_BY_CIVIL[civil] || null) : null);
+const displayName = (t?.name) || fileName || 'غير مسجل في القائمة';
+
+HADORY_LOGS.push({
+  date: dateStr,
+  civil: (civil || empNo || ''),
+  name: displayName,
+  attend, leave, workMinutes,
+  outType: outTypeRaw, autoOut,
+  _srcFile:f.name, _sheet:sn
+});
+
+       }
       });
     }catch(err){ console.error(err); }
   }
@@ -1833,8 +1952,10 @@ function applyHadoryForManualDate(iso){
   hadoryCases.onchange = ()=>{
     if(!requireDateGuard('تطبيق حالة من حضوري')) return;
 
-    const idx = +hadoryCases.value;
-    if(!Number.isInteger(idx) || !HADORY_CASES[idx]) return;
+   if(hadoryCases.value==='') return;      // ✅ يمنع الفارغ = 0
+const idx = Number(hadoryCases.value);
+if(!Number.isInteger(idx) || !HADORY_CASES[idx]) return;
+
     const c=HADORY_CASES[idx];
 
     const tIdx = TEACHERS.findIndex(x=>x.civil===c.civil);
@@ -1874,7 +1995,9 @@ function setChipActive(containerId, key){
 document.getElementById('btnWA').addEventListener('click', ()=>{
   if(!requireDateGuard('إرسال واتساب')) return;
 
-  const i=+selTeacher.value; if(!Number.isInteger(i)) return alert('اختر معلماً أولاً');
+if(selTeacher.value==='') return alert('اختر معلماً أولاً');
+const i = Number(selTeacher.value);
+if(!Number.isInteger(i) || !TEACHERS[i]) return alert('اختر معلماً أولاً');
   const t=TEACHERS[i]; const kind=STATE.kind;
 
   const kindLabel={late:'تنبيه تأخر',absent:'تنبيه عدم تواجد',gaib:'مساءلة غياب',note:'لفت نظر'}[kind];
