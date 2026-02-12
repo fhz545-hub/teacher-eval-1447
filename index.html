@@ -1069,11 +1069,15 @@ function buildHijriPicker(){
 }
 function syncFromHijri(){
   const y=+hY.value, m=+hM.value, d=+hD.value;
-const g=hijriToGregorian(y,m,d);
-if(!g){
-  alert('اليوم المختار غير موجود في تقويم أم القرى لهذا الشهر. اختر يومًا آخر.');
-  return;
-}
+  const g=hijriToGregorian(y,m,d);
+  if(!g){
+    alert('اليوم المختار غير موجود في تقويم أم القرى لهذا الشهر. اختر يومًا آخر.');
+    return;
+  }
+
+  // ✅ تعريف المتغيرات المفقودة (سبب توقف السكربت)
+  const dayName = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{weekday:'long'}).format(g);
+  const hij = new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{year:'numeric',month:'2-digit',day:'2-digit'}).format(g);
 
   metaDay.textContent=dayName; metaHijri.textContent=hij;
   dynDay.textContent=dayName; dynHijri.textContent=hij;
@@ -1094,6 +1098,8 @@ if(!g){
 
   updatePrincipalAbs();
 }
+
+
 ['gY','gM','gD'].forEach(id=>document.getElementById(id).addEventListener('input',syncFromGregInputs));
 function syncFromGregInputs(){
   const y=+gY.value||new Date().getFullYear(), m=+gM.value||new Date().getMonth()+1, d=+gD.value||new Date().getDate();
@@ -1569,11 +1575,18 @@ function normalizeDate(raw){
   if(!isNaN(Number(s)) && !s.includes(':') && !s.includes('/') && !s.includes('-')){
     const n = Number(s);
     if(n > 20000 && n < 70000){
-      const dt = new Date(Math.round((n - 25569) * 86400 * 1000));
-      const y = dt.getFullYear();
-      const m = String(dt.getMonth()+1).padStart(2,'0');
-      const d = String(dt.getDate()).padStart(2,'0');
-      return `${y}-${m}-${d}`;
+     const dc = XLSX?.SSF?.parse_date_code ? XLSX.SSF.parse_date_code(n) : null;
+if(dc && dc.y && dc.m && dc.d){
+  return `${dc.y}-${String(dc.m).padStart(2,'0')}-${String(dc.d).padStart(2,'0')}`;
+}
+
+// fallback (عند الحاجة فقط)
+const dt = new Date(Math.round((n - 25569) * 86400 * 1000));
+const y = dt.getFullYear();
+const m = String(dt.getMonth()+1).padStart(2,'0');
+const d = String(dt.getDate()).padStart(2,'0');
+return `${y}-${m}-${d}`;
+
     }
   }
 
@@ -1754,9 +1767,18 @@ hadoryFiles.addEventListener('change', async (e)=>{
   const datesFromNames=new Set();
 
   for(const f of files){
-    try{
-      const ab=await f.arrayBuffer();
-      const wb=XLSX.read(ab,{type:'array'});
+  try{
+    const ext = (f.name.split('.').pop()||'').toLowerCase();
+    let wb;
+
+    if(ext === 'csv'){
+      const text = await f.text();
+      wb = XLSX.read(text, { type:'string' });
+    }else{
+      const ab = await f.arrayBuffer();
+      wb = XLSX.read(ab, { type:'array' });
+    }
+
       const fnDate=guessDateFromFileName(f.name);
       if(fnDate) datesFromNames.add(fnDate);
 
@@ -1794,7 +1816,12 @@ if(!fileName && !empNo && !civil) continue;
 
 let dateStr = '';
 if(dateIdx>=0) dateStr = normalizeDate(row[dateIdx]);
+
+// ✅ إذا لم يوجد تاريخ في الخلية: خذ التاريخ من اسم الملف
+if(!dateStr && fnDate) dateStr = fnDate;
+
 if(dateStr) datesFromCells.add(dateStr);
+
 
 const attend = (inIdx>=0) ? normalizeTime(row[inIdx]) : '';
 const leave  = (outIdx>=0) ? normalizeTime(row[outIdx]) : '';
@@ -1866,7 +1893,7 @@ function applyHadoryForManualDate(iso){
 
   const byCivil={};
   HADORY_LOGS.forEach(r=>{
-    if(r.date && r.date!==iso) return;
+if(r.date !== iso) return;
 
     const prev=byCivil[r.civil];
     if(!prev){ byCivil[r.civil]=r; return; }
@@ -2141,7 +2168,7 @@ function init(){
     });
   }
 }
-init();
+try{ init(); }catch(err){ console.error(err); alert('حدث خطأ برمجي منع تشغيل بعض الأزرار. افتح Console للتفاصيل.'); }
 </script>
 </body>
 </html>
