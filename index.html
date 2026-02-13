@@ -261,7 +261,7 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
           <option>قصور في الحضور أثناء الإشراف وقت الفسحة مما أدى إلى ضعف متابعة السلوك الطلابي</option>
           <option>عدم الإشراف على صلاة الظهر في المصلى المدرسي.</option>
           <option>عدم التحضير الإلكتروني في منصة مدرستي حسب المتطلبات.</option>
-          <option>الخروج من الحصة قبل انتهائها دون مبرر نظامي.</option>
+          <option>الخروج من الحصة قبل انتهيتها دون مبرر نظامي.</option>
           <option>التأخر عن دخول الحصة وفق الجدول الزمني.</option>
           <option>عدم الحضور للطابور الصباحي دون عذر.</option>
           <option>التغيب عن اجتماع المدرسة الرسمي دون عذر.</option>
@@ -1541,30 +1541,88 @@ function normalizeDate(raw){
   if(m){ return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`; }
   return '';
 }
+
+/* ✅ (تعديل مطلوب) normalizeTime: يدعم AM/PM بشكل صحيح + أرقام إكسل (serial) */
 function normalizeTime(raw){
   if(raw===undefined||raw===null) return '';
+
+  // رقم إكسل (وقت أو تاريخ+وقت): نأخذ الجزء الكسري كوقت
+  if(typeof raw === 'number' && !isNaN(raw)){
+    let v = raw % 1;
+    if(v < 0) v += 1;
+    const total = Math.round(v * 24 * 60);
+    const h = String(Math.floor(total/60)).padStart(2,'0');
+    const m = String(total%60).padStart(2,'0');
+    return `${h}:${m}`;
+  }
+
   let s=String(raw).trim(); if(!s) return '';
-  const dt = s.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?/);
-  if(dt){ return `${String(parseInt(dt[1],10)).padStart(2,'0')}:${dt[2]}`; }
+  s = ar2en(s);
+
+  // AM/PM أو ص/م
+  const mer = s.match(/(\d{1,2})\s*:\s*(\d{2})(?:\s*:\s*(\d{2}))?\s*(AM|PM|A\.M\.|P\.M\.|ص|م)\b/i);
+  if(mer){
+    let h=parseInt(mer[1],10), mm=parseInt(mer[2],10);
+    let ap=String(mer[4]||'').toUpperCase();
+    if(ap==='ص' || ap.startsWith('A')) ap='AM';
+    if(ap==='م' || ap.startsWith('P')) ap='PM';
+    if(ap==='PM' && h<12) h+=12;
+    if(ap==='AM' && h===12) h=0;
+    if(h>=0 && h<=23 && mm>=0 && mm<=59) return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+    return '';
+  }
+
+  // HH:MM (24h) أو تاريخ+وقت
+  const dt = s.match(/(\d{1,2})\s*:\s*(\d{2})(?::\d{2})?/);
+  if(dt){
+    const h=parseInt(dt[1],10), mm=parseInt(dt[2],10);
+    if(h>=0 && h<=23 && mm>=0 && mm<=59) return `${String(h).padStart(2,'0')}:${String(mm).padStart(2,'0')}`;
+  }
+
+  // رقم كنص (وقت/تاريخ+وقت)
   if(!isNaN(Number(s)) && !s.includes(':')){
     const v=Number(s);
-    if(v>=0 && v<1){
-      const total=Math.round(v*24*60);
+    if(v>=0){
+      let f=v%1;
+      const total=Math.round(f*24*60);
       const h=String(Math.floor(total/60)).padStart(2,'0');
       const m=String(total%60).padStart(2,'0');
       return `${h}:${m}`;
     }
   }
-  s=s.replace(/\s+/g,'').toUpperCase();
-  let m=s.match(/^(\d{1,2}):(\d{2})(AM|PM)?$/);
-  if(m){
-    let h=parseInt(m[1],10), mm=m[2], ap=m[3];
-    if(ap==='PM' && h<12) h+=12;
-    if(ap==='AM' && h===12) h=0;
-    return `${String(h).padStart(2,'0')}:${mm}`;
-  }
+
   return '';
 }
+
+/* ✅ (تعديل مطلوب) قراءة "عدد الساعات" كمدة بالدقائق عند وجودها */
+function normalizeDuration(raw){
+  if(raw===undefined||raw===null) return 0;
+
+  if(typeof raw === 'number' && !isNaN(raw)){
+    let v = raw % 1;
+    if(v < 0) v += 1;
+    return Math.round(v * 24 * 60);
+  }
+
+  let s=String(raw).trim(); if(!s) return 0;
+  s=ar2en(s);
+
+  // HH:MM
+  let m=s.match(/^(\d{1,2})\s*:\s*(\d{2})$/);
+  if(m){
+    const h=parseInt(m[1],10), mm=parseInt(m[2],10);
+    if(h>=0 && mm>=0 && mm<=59) return h*60+mm;
+    return 0;
+  }
+
+  // رقم ساعات (مثلاً 7.5)
+  if(!isNaN(Number(s))){
+    return Math.round(Number(s)*60);
+  }
+
+  return 0;
+}
+
 function diffMin(start,end){
   const s=toMin(start), e=toMin(end);
   if(s==null||e==null) return 0;
@@ -1581,11 +1639,16 @@ function isAutoOutText(s){
   const v=String(s||'').toLowerCase();
   return /تلقائي|آلي|الي|auto|system|default/.test(v);
 }
+
+/* ✅ (تعديل مطلوب) normH: توحيد الإسم/الاسم والإنصراف/الانصراف لتحسين اكتشاف الأعمدة */
 function normH(s){
   return String(s||'')
     .trim()
     .toLowerCase()
     .replace(/\u200f|\u200e/g,'')
+    .replace(/[إأآٱ]/g,'ا')      // ✅ توحيد الألف
+    .replace(/ؤ/g,'و').replace(/ئ/g,'ي') // ✅ تخفيف اختلافات الهمزات
+    .replace(/ى/g,'ي')           // ✅ توحيد الياء
     .replace(/[^\p{L}\p{N}\s:\/\-]/gu,' ')
     .replace(/\s+/g,' ')
     .trim();
@@ -1597,6 +1660,8 @@ function findIdxByAny(headers, patterns){
   }
   return -1;
 }
+
+/* ✅ (تعديل مطلوب) أنماط الأعمدة لتوافق ملفاتك المرفقة */
 const ID_PATS = [
   /السجل المدني/,
   /رقم السجل المدني/,
@@ -1609,17 +1674,70 @@ const ID_PATS = [
   /\bid\b/,
   /national id/,
   /civil/
-];function bestHeaderRow(rows){
+];
+const NAME_PATS = [
+  /اسم الموظف/,
+  /اسم المعلم/,
+  /الاسم/,
+  /employee name/,
+  /\bname\b/
+];
+const IN_PATS = [
+  /توقيت الحضور/,
+  /وقت الحضور/,
+  /توقيت الدخول/,
+  /وقت الدخول/,
+  /الحضور/,
+  /check in/,
+  /clock in/,
+  /time in/,
+  /\bin\b/
+];
+const OUT_PATS = [
+  /توقيت الانصراف/,
+  /وقت الانصراف/,
+  /توقيت الخروج/,
+  /وقت الخروج/,
+  /الانصراف/,
+  /check out/,
+  /clock out/,
+  /time out/,
+  /\bout\b/
+];
+const DATE_PATS = [
+  /تاريخ/,
+  /\bdate\b/
+];
+const DUR_PATS = [
+  /عدد الساعات/,
+  /مدة العمل/,
+  /ساعات العمل/,
+  /duration/,
+  /total hours/,
+  /work hours/
+];
+const OUTTYPE_PATS = [
+  /نوع الانصراف/,
+  /طريقة الانصراف/,
+  /حالة الانصراف/,
+  /ملاحظة/,
+  /ملاحظات/,
+  /note/,
+  /status/
+];
+
+function bestHeaderRow(rows){
   let best={i:-1,score:-1,headers:[]};
   const max=Math.min(25, rows.length);
   for(let i=0;i<max;i++){
     const r=rows[i]||[];
     const headers=r.map(x=>String(x||''));
-    const idIdx=findIdxByAny(headers,[/هوية/,/رقم الموظف/,/الرقم الوظيفي/,/\bid\b/]);
-    const inIdx=findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
-    const outIdx=findIdxByAny(headers,[/الانصراف/,/وقت الانصراف/,/توقيت الانصراف/,/وقت الخروج/,/توقيت الخروج/]);
-    const nameIdx=findIdxByAny(headers,[/اسم الموظف/,/اسم المعلم/,/الاسم/]);
-    const score=(idIdx>-1?5:0)+(inIdx>-1?3:0)+(outIdx>-1?2:0)+(nameIdx>-1?2:0);
+    const idIdx=findIdxByAny(headers, ID_PATS);
+    const inIdx=findIdxByAny(headers, IN_PATS);
+    const outIdx=findIdxByAny(headers, OUT_PATS);
+    const nameIdx=findIdxByAny(headers, NAME_PATS);
+    const durIdx=findIdxByAny(headers, DUR_PATS);
+    const score=(idIdx>-1?6:0)+(inIdx>-1?3:0)+(outIdx>-1?2:0)+(nameIdx>-1?2:0)+(durIdx>-1?1:0);
     if(score>best.score){ best={i,score,headers}; }
   }
   return best.i>-1?best.i:0;
@@ -1658,14 +1776,15 @@ hadoryFiles.addEventListener('change', async (e)=>{
         const headerRowIndex = bestHeaderRow(rows);
         const headers=(rows[headerRowIndex]||[]).map(h=>String(h||'').trim());
 
-        const nameIdx=findIdxByAny(headers,[/اسم الموظف/,/اسم المعلم/,/الاسم/]);
-        const idIdx=findIdxByAny(headers,[/هوية/,/الرقم الوظيفي/,/رقم الموظف/,/رقم المعلم/,/\bid\b/]);
-        const dateIdx=findIdxByAny(headers,[/تاريخ/]);
+        const nameIdx=findIdxByAny(headers, NAME_PATS);
+        const idIdx=findIdxByAny(headers, ID_PATS);
+        const dateIdx=findIdxByAny(headers, DATE_PATS);
 
-        const inIdx=findIdxByAny(headers,[/الحضور/,/وقت الحضور/,/توقيت الحضور/,/وقت الدخول/,/توقيت الدخول/]);
-        const outIdx=findIdxByAny(headers,[/الانصراف/,/وقت الانصراف/,/توقيت الانصراف/,/وقت الخروج/,/توقيت الخروج/]);
+        const inIdx=findIdxByAny(headers, IN_PATS);
+        const outIdx=findIdxByAny(headers, OUT_PATS);
 
-        const outTypeIdx=findIdxByAny(headers,[/نوع الانصراف/,/طريقة الانصراف/,/حالة الانصراف/,/ملاحظة/,/ملاحظات/,/note/]);
+        const durIdx=findIdxByAny(headers, DUR_PATS);
+        const outTypeIdx=findIdxByAny(headers, OUTTYPE_PATS);
 
         if(idIdx<0) return;
 
@@ -1683,8 +1802,13 @@ hadoryFiles.addEventListener('change', async (e)=>{
           let attend= (inIdx>=0) ? normalizeTime(row[inIdx]) : '';
           let leave = (outIdx>=0) ? normalizeTime(row[outIdx]) : '';
 
+          // ✅ أولوية "عدد الساعات" إن وجد وصالح، وإلا نحسب من الحضور/الانصراف
           let workMinutes=0;
-          if(attend && leave) workMinutes = diffMin(attend,leave);
+          if(durIdx>=0){
+            const durM = normalizeDuration(row[durIdx]);
+            if(durM>0) workMinutes = durM;
+          }
+          if(!workMinutes && attend && leave) workMinutes = diffMin(attend,leave);
 
           const outTypeRaw = (outTypeIdx>=0)? String(row[outTypeIdx]||'').trim() : '';
           const autoOut = isAutoOutText(outTypeRaw);
