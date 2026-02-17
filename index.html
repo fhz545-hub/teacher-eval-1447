@@ -245,12 +245,21 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
       </div>
 
       <div class="f">
-        <label>توقيت الدوام</label>
-        <div class="chips" id="seasonChips">
-          <button class="chip active" data-season="winter">الشتوي (07:00–14:00)</button>
-          <button class="chip" data-season="summer">الصيفي (06:45–13:45)</button>
-        </div>
-      </div>
+  <label>توقيت الدوام</label>
+  <div class="chips" id="seasonChips">
+    <button class="chip active" data-season="winter">الشتوي</button>
+    <button class="chip" data-season="summer">الصيفي</button>
+    <button class="chip" data-season="ramadan">رمضان</button>
+  </div>
+</div>
+
+<!-- ✅ جديد: تمديد نصف ساعة -->
+<div class="f" id="extendBox" style="display:none">
+  <label>تمديد نهاية الدوام</label>
+  <button id="btnExtend" class="btn ghost" style="width:100%">تفعيل التمديد +30 دقيقة</button>
+  <div class="mini">لكل وضع يمكن تمديد نهاية الدوام حتى نصف ساعة فقط.</div>
+</div>
+
 
       <div class="f">
         <label>سبب لفت النظر</label>
@@ -950,15 +959,114 @@ const lineAbs=document.getElementById('lineAbs');
 const kindTitle=document.getElementById('kindTitle');
 const statsDlg=document.getElementById('statsDlg');
 
-const WORK_RANGE={ winter:{start:'07:00',end:'14:00'}, summer:{start:'06:45',end:'13:45'} };
+/* ====== توقيت الدوام (صيفي/شتوي/رمضان) + تمديد نصف ساعة ====== */
+const KEY_SHIFT_EXT='shift_extend_v1';
+
+/* البداية + مدة الدوام الأساسية (بالدقائق) */
+const SHIFT_CFG={
+  summer:{ start:'06:45', baseMin: 7*60 },    // 7 ساعات
+  winter:{ start:'07:00', baseMin: 7*60 },    // 7 ساعات
+  ramadan:{ start:'09:30', baseMin: 5*60 }    // 5 ساعات
+};
+const EXT_MAX_MIN=30;
+
+/* حالة التمديد لكل وضع */
+let SHIFT_EXT = { summer:false, winter:false, ramadan:false };
+try{ SHIFT_EXT = {...SHIFT_EXT, ...(JSON.parse(localStorage.getItem(KEY_SHIFT_EXT)||'{}'))}; }catch(e){}
+
+/* النتيجة النهائية المستخدمة في الحسابات */
+let WORK_RANGE = {
+  summer:{start:'06:45',end:'13:45'},
+  winter:{start:'07:00',end:'14:00'},
+  ramadan:{start:'09:30',end:'14:30'}
+};
+
+function saveShiftExt(){
+  localStorage.setItem(KEY_SHIFT_EXT, JSON.stringify(SHIFT_EXT));
+}
+
+/* يعتمد على toMin الموجودة لاحقاً في ملفك */
+function addMinutesHHMM(hhmm, addMin){
+  const base = toMin(hhmm);
+  if(base==null) return hhmm;
+  let t = (base + addMin) % (24*60);
+  if(t<0) t += 24*60;
+  const h = String(Math.floor(t/60)).padStart(2,'0');
+  const m = String(t%60).padStart(2,'0');
+  return `${h}:${m}`;
+}
+
+function rebuildWorkRange(){
+  Object.keys(SHIFT_CFG).forEach(k=>{
+    const extra = SHIFT_EXT[k] ? EXT_MAX_MIN : 0;
+    const total = SHIFT_CFG[k].baseMin + extra;
+    WORK_RANGE[k] = {
+      start: SHIFT_CFG[k].start,
+      end: addMinutesHHMM(SHIFT_CFG[k].start, total)
+    };
+  });
+}
 let SEASON='winter';
 
 document.getElementById('seasonChips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
-  [...e.currentTarget.children].forEach(x=>x.classList.remove('active')); b.classList.add('active');
+
+  [...e.currentTarget.querySelectorAll('.chip')].forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+
   SEASON=b.dataset.season;
+
+  refreshExtendUI();
+  refreshSeasonChipLabels();
   recalc();
+
+  // إذا كان حضوري مطبق على تاريخ يدوي، أعد التحليل حسب بداية الدوام الجديدة
+  const iso = document.getElementById('hadoryManualDate')?.value || '';
+  if(iso) applyHadoryForManualDate(iso);
 });
+const extendBox=document.getElementById('extendBox');
+const btnExtend=document.getElementById('btnExtend');
+
+function refreshSeasonChipLabels(){
+  const wrap=document.getElementById('seasonChips');
+  if(!wrap) return;
+
+  wrap.querySelectorAll('.chip').forEach(btn=>{
+    const s=btn.dataset.season;
+    if(!WORK_RANGE[s]) return;
+
+    const label =
+      (s==='winter')?'الشتوي':
+      (s==='summer')?'الصيفي':
+      (s==='ramadan')?'رمضان':'الدوام';
+
+    btn.textContent = `${label} (${WORK_RANGE[s].start}–${WORK_RANGE[s].end})`;
+  });
+}
+
+function refreshExtendUI(){
+  if(!extendBox || !btnExtend) return;
+  const can = !!SHIFT_CFG[SEASON];
+  extendBox.style.display = can ? '' : 'none';
+  const on = !!SHIFT_EXT[SEASON];
+  btnExtend.textContent = on ? 'إلغاء التمديد (+30 دقيقة)' : 'تفعيل التمديد +30 دقيقة';
+}
+
+if(btnExtend){
+  btnExtend.addEventListener('click', ()=>{
+    if(!SHIFT_CFG[SEASON]) return;
+    SHIFT_EXT[SEASON]=!SHIFT_EXT[SEASON];
+    saveShiftExt();
+    rebuildWorkRange();
+    refreshSeasonChipLabels();
+    refreshExtendUI();
+    recalc();
+
+    const iso = document.getElementById('hadoryManualDate')?.value || '';
+    if(iso) applyHadoryForManualDate(iso);
+  });
+}
+
 
 /* ============= إعداد الباكيت ============= */
 function setPack(kind){
@@ -2117,14 +2225,31 @@ document.getElementById('btnReportPrint').addEventListener('click', async ()=>{
 
 /* تهيئة */
 function init(){
+  // ✅ تفعيل نطاق الدوام + تحديث أزرار صيفي/شتوي/رمضان
+  rebuildWorkRange();
+  SEASON = 'winter';
+  refreshSeasonChipLabels();
+  refreshExtendUI();
+
+  // ✅ تهيئة التاريخ وباقة النموذج
   buildHijriPicker();
   setPack('late');
-  SEASON='winter';
-  statsDlg.style.display='none';
-  document.getElementById('clockDlg').style.display='none';
+  recalc();
+
+  // ✅ إغلاق النوافذ المنبثقة افتراضيًا
+  statsDlg.style.display = 'none';
+  statsDlg.setAttribute('aria-hidden','true');
+
+  hadoryReportDlg.style.display='none';
+  hadoryReportDlg.setAttribute('aria-hidden','true');
+
+  clockDlg.style.display='none';
+  clockDlg.setAttribute('aria-hidden','true');
+
   closeDateGuard();
   updatePrincipalAbs();
 
+  // ✅ حضوري
   hadoryManualDate.value='';
   hadoryDateWarn.style.display='none';
   hadoryDateOk.style.display='none';
@@ -2141,7 +2266,10 @@ function init(){
     });
   }
 }
-init();
+
+// ✅ تأكد أن init تعمل بعد تحميل الصفحة
+document.addEventListener('DOMContentLoaded', init);
+
 </script>
 </body>
 </html>
