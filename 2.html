@@ -35,27 +35,35 @@
     html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,-apple-system,Segoe UI,Roboto,Arial}
     button,input,select,textarea{font-family:inherit}
     a{color:inherit}
-    .topbar{
-      position:sticky; top:0; z-index:50;
-      background:rgba(245,250,251,.86);
-      backdrop-filter:blur(10px);
-      border-bottom:1px solid var(--line);
-      padding:10px 14px;
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-    }
-    .title{font-weight:1000; letter-spacing:.2px; font-size:18px}
-    .btns{display:flex; gap:8px; flex-wrap:wrap}
-    .btn{
-      border:1px solid var(--line);
-      background:#eef7f8;
-      padding:9px 12px;
-      border-radius:999px;
-      font-weight:900;
-      cursor:pointer;
-      box-shadow:0 6px 16px rgba(7, 38, 43, .05);
-      user-select:none;
-      display:inline-flex; align-items:center; gap:8px;
-    }
+/* شريط الأزرار (سطر واحد + تمرير أفقي) */
+.btns{
+  display:flex;
+  gap:8px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:2px;
+  scrollbar-width:none;
+}
+.btns::-webkit-scrollbar{display:none}
+
+/* مهم: نخلي flex/nowrap فقط لأزرار الشريط العلوي */
+.btns .btn{flex:0 0 auto; white-space:nowrap;}
+
+.title{font-weight:1000; letter-spacing:.2px; font-size:18px}
+
+.btn{
+  border:1px solid var(--line);
+  background:#eef7f8;
+  padding:9px 12px;
+  border-radius:999px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 6px 16px rgba(7, 38, 43, .05);
+  user-select:none;
+  display:inline-flex; align-items:center; gap:8px;
+}
+
     .btn:active{transform:translateY(1px)}
     .btn.primary{background:linear-gradient(180deg, #e8fbfb, #eaf6f6); border-color:#d9f0f0}
     .btn.wa{background:linear-gradient(180deg,#eafff5,#e9fff4); border-color:#c9f2dd}
@@ -612,6 +620,43 @@ table[aria-label="بيانات المعلم"] td{
   const SHIFT_START = "07:00";
   const CLAMP_MIN  = "06:30";
   const CLAMP_MAX  = "14:25";
+// =========================
+// ✅ منطق رمضان (18–26) لنفس الشهر الميلادي
+// =========================
+const RAMADAN_FROM_DAY = 18;
+const RAMADAN_TO_DAY   = 26;
+
+// عدّل هذه القيم حسب دوامكم في رمضان
+const SHIFT_PROFILES = {
+  winter:  { start: SHIFT_START, baseMin: 420 }, // 7 ساعات (420 دقيقة)
+  ramadan: { start: "09:30",     baseMin: 240 }  // مثال: 4 ساعات (240 دقيقة)
+};
+
+const CLAMP_BEFORE_MIN = 30; // سماحية قبل بداية الدوام
+
+function isRamadanDayKey(dateKey){
+  const d = keyToDate(dateKey);
+  if(!d) return false;
+  const day = d.getDate(); // يوم الشهر الميلادي
+  return day >= RAMADAN_FROM_DAY && day <= RAMADAN_TO_DAY;
+}
+
+function getShiftContextForDate(dateKey){
+  // ✅ رمضان تلقائيًا للأيام 18–26
+  const key = (dateKey && isRamadanDayKey(dateKey)) ? "ramadan" : "winter";
+
+  const p = SHIFT_PROFILES[key] || SHIFT_PROFILES.winter;
+  const fullMin = p.baseMin;
+  const halfMin = Math.round(fullMin / 2);
+
+  const shiftStartM = hhmmToMinutes(p.start);
+
+  // مجال التقريب: قبل بداية الدوام بـ 30 دقيقة وحتى نهاية الدوام
+  const clampMinM = shiftStartM - CLAMP_BEFORE_MIN;
+  const clampMaxM = shiftStartM + fullMin;
+
+  return { key, start:p.start, fullMin, halfMin, shiftStartM, clampMinM, clampMaxM };
+}
 
   // ✅ نصف دوام عند عدم تسجيل الانصراف (نصف 7 ساعات)
   const HALF_SHIFT_MIN = 210; // 3:30
@@ -899,8 +944,12 @@ updateTeacherSelect(); // ✅ إظهار الأسماء فور فتح الصفح
     excelReadEl.textContent = "0";
 
     try{
-      const onlyExcel = files.filter(isExcelFile);
-      const skipped = files.length - onlyExcel.length;
+   const onlyExcel = files.filter(isExcelFile);
+
+// ✅ ترتيب الملفات لضمان قراءة مرتبة وثابتة
+onlyExcel.sort((a,b)=> (a.name||"").localeCompare(b.name||"", "ar"));
+
+const skipped = files.length - onlyExcel.length;
 
       lastSourceLabel = (meta.source === "folder" && meta.folderName)
         ? `المجلد: ${meta.folderName}`
@@ -928,11 +977,16 @@ updateTeacherSelect(); // ✅ إظهار الأسماء فور فتح الصفح
     }
   }
 
-  function isExcelFile(f){
-    const name = (f && f.name) ? f.name.toLowerCase() : "";
-    return name.endsWith(".xlsx") || name.endsWith(".xls") || name.endsWith(".csv");
-  }
-<!-- ===================== PART 5 / 7 ===================== -->
+ function isExcelFile(fileOrName){
+  const name =
+    (typeof fileOrName === "string")
+      ? fileOrName
+      : (fileOrName && fileOrName.name) ? fileOrName.name : "";
+
+  return /\.(xlsx|xls|xlsm|xlsb|csv)$/i.test(name);
+}
+
+
   /* =========================
      الاستيراد (بالهوية كمفتاح فريد)
   ========================== */
@@ -1037,17 +1091,27 @@ if (parsedPerm && parsedPerm.rows.length){
   }
 
   function parseAttendanceMatrix(matrix, ctx){
-    const keys = {
-      name:  ["الاسم","الاسم الكامل","اسم الموظف","اسم المعلم","المعلم","Name","Employee Name","Employee"],
-      id:    ["رقم الهوية","الهوية","الرقم الوظيفي","رقم الموظف","National ID","Employee ID","ID"],
-      phone: ["الجوال","رقم الجوال","الهاتف","Mobile","Phone","Cell"],
-      date:  ["التاريخ","اليوم","تاريخ الحركة","Date","Day","التاريخ الميلادي","تاريخ"],
-      inTime:["الحضور","وقت الحضور","وقت الدخول","بصمة الدخول","دخول","Check in","Check-in","In","وقت الدوام"],
-      outTime:["الانصراف","وقت الانصراف","وقت الخروج","بصمة الخروج","خروج","Check out","Check-out","Out"],
-      status:["الحالة","البيان","الوضع","Status","حالة"],
-      spec:  ["التخصص","القسم","Specialty","Department"],
-      rank:  ["المرتبة","الدرجة","Rank","Grade"]
-    };
+  const keys = {
+  name: ["الاسم","الإسم","الاسم الكامل","اسم الموظف","اسم المعلم","المعلم","Name","Employee Name","Employee"],
+  id: [
+    "رقم الهوية","الهوية","الرقم الوظيفي","رقم الموظف",
+    "السجل المدني","رقم السجل المدني","السجل المدنى","رقم السجل المدنى",
+    "الهوية الوطنية","رقم الهوية الوطنية",
+    "National ID","Employee ID","ID","Civil ID","Civil Registry"
+  ],
+
+  // ✅ أضف هذا
+  phone: ["الجوال","رقم الجوال","الهاتف","Phone","Mobile"],
+
+  inTime: ["الحضور","وقت الحضور","وقت الدخول","بصمة الدخول","دخول","Check in","Check-in","In","وقت الدوام"],
+  outTime: ["الانصراف","وقت الانصراف","وقت الخروج","بصمة الخروج","خروج","Check out","Check-out","Out"],
+  status: ["الحالة","البيان","الوضع","Status","حالة"],
+  date: ["التاريخ","اليوم","تاريخ الحركة","Date","Day","التاريخ الميلادي","تاريخ"],
+  spec: ["التخصص","القسم","Specialty","Department"],
+  rank: ["المرتبة","الدرجة","Rank","Grade"]
+};
+
+
 
     let headerRowIndex = -1;
     let colMap = null;
@@ -1075,7 +1139,7 @@ if (parsedPerm && parsedPerm.rows.length){
 
       const name = colMap.name !== null ? getCell(row, colMap.name) : "";
       const id   = colMap.id   !== null ? getCell(row, colMap.id)   : "";
-      const phone= colMap.phone!== null ? getCell(row, colMap.phone): "";
+const phone = (colMap.phone != null) ? getCell(row, colMap.phone) : "";
 
       if (!String(name||"").trim() && !String(id||"").trim()) continue;
 
@@ -1123,14 +1187,17 @@ if (parsedPerm && parsedPerm.rows.length){
 }
 
 
-  function normHeader(s){
-    return (s||"")
-      .toString()
-      .toLowerCase()
-      .replace(/\s+/g," ")
-      .replace(/[^\p{L}\p{N} ]/gu,"")
-      .trim();
-  }
+ function normHeader(s){
+  return (s||"").toString().trim().toLowerCase()
+    .replace(/[\u064B-\u065F\u0670]/g,"")     // تشكيل
+    .replace(/[إأآٱ]/g,"ا")                  // همزات إلى ألف
+    .replace(/[ىي]/g,"ي")                   // ياء/ألف مقصورة
+    .replace(/ة/g,"ه")                      // تاء مربوطة
+    .replace(/\s+/g," ")
+    .replace(/[^\p{L}\p{N} ]/gu,"")
+    .trim();
+}
+
 
   function getCell(row, i){
     if (i === null || i === undefined) return "";
@@ -1150,35 +1217,63 @@ if (parsedPerm && parsedPerm.rows.length){
 ========================== */
 function parsePermissionMatrix(matrix, ctx){
   const keys = {
-    id:       ["السجل المدني","رقم الهوية","الهوية","National ID","ID"],
-    name:     ["الموظف","الاسم","اسم الموظف","Employee","Employee Name"],
-    fromTime: ["من وقت","من الوقت","From Time","Start Time"],
-    toTime:   ["إلى وقت","الى وقت","To Time","End Time"],
-    fromDate: ["من تاريخ","From Date","التاريخ","Date"],
-    toDate:   ["إلى تاريخ","الى تاريخ","To Date"],
-    duration: ["مدة الاستئذان","المدة","Duration"],
-    status:   ["حالة الطلب","الحالة","Status"],
-    type:     ["نوع الاستئذان","النوع","Type"]
+    name: [
+      "اسم الموظف","الاسم","الإسم","الاسم بالكامل","الاسم الرباعي","الموظف","اسم","Employee Name","Name"
+    ],
+    id: [
+      "رقم الموظف","الرقم الوظيفي","الرقم الوظيفى","هوية","الهوية","رقم الهوية",
+      "السجل المدني","الهوية الوطنية","Employee ID","ID","National ID"
+    ],
+
+    // ✅ تاريخ الاستئذان
+    date: [
+      "التاريخ","تاريخ","تاريخ الحركة","التاريخ الميلادي","Date","Day"
+    ],
+
+    // ✅ أوقات الاستئذان (إن وجدت)
+    fromTime: [
+      "من","من الساعة","وقت البداية","بداية الاستئذان","من وقت","From","Start Time","وقت الخروج"
+    ],
+    toTime: [
+      "إلى","الى","إلى الساعة","وقت النهاية","نهاية الاستئذان","To","End Time","وقت العودة"
+    ],
+
+    // ✅ مدة الاستئذان (إن وجدت)
+    duration: [
+      "المدة","مدة الاستئذان","مده","Duration","الزمن"
+    ],
+
+    // ✅ حالة الطلب/الاعتماد (اختياري)
+    status: [
+      "الحالة","حالة الطلب","الاعتماد","الموافقة","Status","Approval"
+    ],
+
+    // ✅ نوع الطلب/السبب (اختياري)
+    type: [
+      "النوع","نوع الاستئذان","نوع الطلب","السبب","Type","Reason"
+    ]
   };
 
   let headerRowIndex = -1;
   let colMap = null;
 
-  for (let i=0;i<matrix.length;i++){
+  for (let i=0; i<matrix.length; i++){
     const row = matrix[i].map(v => (v ?? "").toString().trim());
     if (!row.join("").trim()) continue;
 
     const map = buildColMap(row, keys);
-    const okIdentity = (map.id !== null) || (map.name !== null);
-    const okDates = (map.fromDate !== null);
-    const okTimes = (map.fromTime !== null) || (map.toTime !== null) || (map.duration !== null);
 
-    if (okIdentity && okDates && okTimes){
+    const okIdentity = (map.id !== null) || (map.name !== null);
+    const okDate     = (map.date !== null);
+    const okTime     = (map.duration !== null) || (map.fromTime !== null) || (map.toTime !== null);
+
+    if (okIdentity && okDate && okTime){
       headerRowIndex = i;
       colMap = map;
       break;
     }
   }
+
   if (headerRowIndex < 0 || !colMap) return null;
 
   const rows = [];
@@ -1191,33 +1286,41 @@ function parsePermissionMatrix(matrix, ctx){
     const id   = colMap.id   !== null ? getCell(row, colMap.id)   : "";
     if (!String(name||"").trim() && !String(id||"").trim()) continue;
 
-    const fromDateVal = colMap.fromDate !== null ? getCell(row, colMap.fromDate) : "";
-    const toDateVal   = colMap.toDate   !== null ? getCell(row, colMap.toDate)   : "";
+    const statusVal = colMap.status !== null ? getCell(row, colMap.status) : "";
+    const stN = normName(statusVal || "");
+
+    // ✅ إن وُجدت حالة، نقبل (مقبول/معتمد/تم الاعتماد/approved/accepted)
+    if (stN){
+      const ok =
+        stN.includes("مقبول") ||
+        stN.includes("معتمد") ||
+        stN.includes("اعتماد") ||
+        stN.includes("تم اعتماد") ||
+        stN.includes("approved") ||
+        stN.includes("accepted");
+      if (!ok) continue;
+    }
+
+    const dateVal = colMap.date !== null ? getCell(row, colMap.date) : "";
+    const d = normalizeDateWithContext(dateVal, ctx) || normalizeDate(dateVal);
+    if (!d) continue;
+
+    const dateKey = dateToKey(d);
+
     const fromTimeVal = colMap.fromTime !== null ? getCell(row, colMap.fromTime) : "";
     const toTimeVal   = colMap.toTime   !== null ? getCell(row, colMap.toTime)   : "";
     const durationVal = colMap.duration !== null ? getCell(row, colMap.duration) : "";
-    const statusVal   = colMap.status   !== null ? getCell(row, colMap.status)   : "";
-    const typeVal     = colMap.type     !== null ? getCell(row, colMap.type)     : "";
 
-    const stN = normName(statusVal || "");
-    if (stN && !(stN.includes("مقبول") || stN.includes("معتمد") || stN.includes("approved"))){
-      continue;
-    }
-
-    const dFrom = normalizeDate(fromDateVal);
-    const dTo   = normalizeDate(toDateVal) || dFrom;
-    if (!dFrom) continue;
-
-    const dateKey = dateToKey(dFrom);
-
-    const durMin = parseDurationToMinutes(durationVal);
     const fromM = parseTimeToMinutes(fromTimeVal);
     const toM   = parseTimeToMinutes(toTimeVal);
+    const durMin = parseDurationToMinutes(durationVal);
 
     let min = (durMin !== null) ? durMin : computeDiffMinutes(fromM, toM);
     if (!min || min < 0) min = 0;
 
-    const kind = classifyPermissionKind(fromM, toM);
+    const typeVal = colMap.type !== null ? getCell(row, colMap.type) : "";
+
+    const kind = classifyPermissionKind(dateKey, fromM, toM);
 
     rows.push({
       id, name,
@@ -1232,6 +1335,7 @@ function parsePermissionMatrix(matrix, ctx){
 
   return { rows };
 }
+
 
 function parseDurationToMinutes(v){
   if (v === null || v === undefined || v === "") return null;
@@ -1268,14 +1372,16 @@ function computeDiffMinutes(fromM, toM){
   return Math.max(0, diff);
 }
 
-function classifyPermissionKind(fromM, toM){
+function classifyPermissionKind(dateKey, fromM, toM){
+  const sc = getShiftContextForDate(dateKey);
   const START_WINDOW = 60;
   const END_WINDOW   = 60;
 
-  if (fromM !== null && fromM <= (shiftStartM + START_WINDOW)) return "start";
-  if (toM !== null && toM >= (clampMaxM - END_WINDOW)) return "end";
+  if (fromM !== null && fromM <= (sc.shiftStartM + START_WINDOW)) return "start";
+  if (toM !== null && toM >= (sc.clampMaxM - END_WINDOW)) return "end";
   return "mid";
 }
+
 
 function addPermissionToTeacher(teacher, dateKey, p){
   const cur = teacher.perms.get(dateKey) || { totalMin:0, startMin:0, midMin:0, endMin:0, items:[] };
@@ -1328,7 +1434,6 @@ function buildPermText(perm){
   return `${minsToHM(perm.totalMin)}${parts.length ? " (" + parts.join(" + ") + ")" : ""}`;
 }
 
-<!-- ===================== PART 6 / 7 ===================== -->
   /* =========================
      الشهر من اسم المجلد
   ========================== */
@@ -1485,7 +1590,23 @@ function buildPermText(perm){
 
     if (current && teachers.has(current)) teacherSelect.value = current;
   }
+function getGlobalPeriod(){
+  const keys = Array.from(importedDates).sort(); // تصاعدي
+  if (!keys.length){
+    return { fromKey:"", toKey:"", fromTxt:"—", toTxt:"—" };
+  }
 
+  const fromKey = keys[0];
+  const toKey   = keys[keys.length - 1];
+
+  const fromD = keyToDate(fromKey);
+  const toD   = keyToDate(toKey);
+
+  const fromTxt = fromD ? `${weekdayAr(fromD)} ${formatHijriDate(fromD)}` : fromKey;
+  const toTxt   = toD   ? `${weekdayAr(toD)} ${formatHijriDate(toD)}`   : toKey;
+
+  return { fromKey, toKey, fromTxt, toTxt };
+}
   function updateNotice(skippedCount){
     const period = getGlobalPeriod();
     const skipTxt = skippedCount ? ` — تم تجاهل ${skippedCount} ملف غير Excel` : "";
@@ -1494,7 +1615,7 @@ function buildPermText(perm){
     const monthLine = (m && y) ? ` — شهر ${toArNumber(m)} من عام ${toArNumber(y)}` : "";
 
     notice.textContent =
-      `تم استيراد ${importedExcelCount} ملف Excel من ${lastSourceLabel}${skipTxt}${monthLine} — الأيام من ${period.toTxt} حتى ${period.fromTxt} — (يُستبعد الجمعة والسبت والإجازات الرسمية تلقائياً) — اختر معلماً لعرض كشفه الشهري.`;
+      `تم استيراد ${importedExcelCount} ملف Excel من ${lastSourceLabel}${skipTxt}${monthLine} — الأيام من ${period.fromTxt} حتى ${period.toTxt} — (يُستبعد الجمعة والسبت والإجازات الرسمية تلقائياً) — اختر معلماً لعرض كشفه الشهري.`;
   }
 
   /* =========================
@@ -1541,7 +1662,7 @@ function renderSelectedTeacher(){
     const dayLabel = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dateKey;
 
     const status = computeStatus(day);
-    const calc = computeTimes(day);
+const calc = computeTimes(day, dateKey);
 
     totalWork += calc.workMin;
     totalLate += calc.lateMin;
@@ -1704,49 +1825,38 @@ if (sumExcuse) sumExcuse.textContent = "—";
     return {isAbsent, notClosed, label};
   }
 
-  function computeTimes(day){
-    const status = computeStatus(day);
-    if (status.isAbsent){
-      return {inTxt:"—", outTxt:"—", workMin:0, lateMin:0};
-    }
-
-    let inM = (day.inM !== null) ? clamp(day.inM, clampMinM, clampMaxM) : null;
-    let outM = (day.outM !== null) ? clamp(day.outM, clampMinM, clampMaxM) : null;
-
-    let inTxt = (inM !== null) ? minutesToHHMM(inM) : "—";
-    let outTxt = (outM !== null) ? minutesToHHMM(outM) : "—";
-
-    // ✅ إذا لم يُغلق الدوام: الانصراف "—" ويُحتسب نصف دوام فقط (3:30)
-    if (status.notClosed){
-      outTxt = "—";
-      let lateMin = 0;
-      if (inM !== null) lateMin = Math.max(0, inM - shiftStartM);
-      return {inTxt, outTxt, workMin:HALF_SHIFT_MIN, lateMin};
-    }
-
-    let workMin = 0;
-    if (inM !== null && outM !== null){
-      workMin = Math.max(0, outM - inM);
-    }
-
-    let lateMin = 0;
-    if (inM !== null){
-      lateMin = Math.max(0, inM - shiftStartM);
-    }
-
-    return {inTxt, outTxt, workMin, lateMin};
+  function computeTimes(day, dateKey){
+  const status = computeStatus(day);
+  if (status.isAbsent){
+    return {workMin:0, lateMin:0, inTxt:"—", outTxt:"—", status, openMinutes:0};
   }
 
-  function getGlobalPeriod(){
-    const keys = Array.from(importedDates).sort();
-    if (!keys.length) return {fromTxt:"--", toTxt:"--"};
-    const from = keyToDate(keys[0]);
-    const to = keyToDate(keys[keys.length-1]);
-    return {
-      fromTxt: from ? formatHijriDate(from) : keys[0],
-      toTxt: to ? formatHijriDate(to) : keys[keys.length-1]
-    };
+  const sc = getShiftContextForDate(dateKey);
+
+  const inM  = (day.inM!==null)  ? clamp(day.inM,  sc.clampMinM, sc.clampMaxM) : null;
+  const outM = (day.outM!==null) ? clamp(day.outM, sc.clampMinM, sc.clampMaxM) : null;
+
+  const inTxt  = inM===null ? "—" : minutesToHHMM(inM);
+  let outTxt   = outM===null ? "—" : minutesToHHMM(outM);
+
+  // ✅ لم يُغلق الدوام: نصف دوام حسب دوام ذلك اليوم
+  if (status.notClosed){
+    outTxt = "—";
+    const lateMin = (inM!==null) ? Math.max(0, inM - sc.shiftStartM) : 0;
+    return {workMin: sc.halfMin, lateMin, inTxt, outTxt, status, openMinutes:(sc.fullMin - sc.halfMin)};
   }
+
+  let workMin = 0;
+  let lateMin = 0;
+
+  if (inM!==null && outM!==null && outM>=inM){
+    workMin = outM - inM;
+    lateMin = Math.max(0, inM - sc.shiftStartM);
+  }
+
+  return {workMin, lateMin, inTxt, outTxt, status, openMinutes:0};
+}
+
 <!-- ===================== PART 7 / 7 ===================== -->
   /* =========================
      مؤشرات الانضباط
@@ -2215,7 +2325,7 @@ async function exportCurrentTeacherPDF(){
     const label = dObj ? `${weekdayAr(dObj)} ${formatHijriDate(dObj)}` : dk;
 
     const st = computeStatus(day);
-    const c  = computeTimes(day);
+const c  = computeTimes(day, dk);
     const perm = teacher.perms.get(dk) || null;
 
     return {
@@ -2234,7 +2344,7 @@ async function exportCurrentTeacherPDF(){
 
   for (const [dk, day] of days){
     const st = computeStatus(day);
-    const c  = computeTimes(day);
+const c  = computeTimes(day, dk);
     totalWork += c.workMin;
     totalLate += c.lateMin;
     if (st.isAbsent) abs++;
