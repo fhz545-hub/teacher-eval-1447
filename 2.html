@@ -456,6 +456,43 @@ table[aria-label="بيانات المعلم"] td{
             <option value="">— اختر —</option>
           </select>
         </div>
+
+        <div class="field small" title="الدوام الأساسي للأيام غير المشمولة بفترات خاصة">
+          <label>الدوام الأساسي</label>
+          <select id="shiftModeSelect">
+            <option value="summer">صيفي — 06:45</option>
+            <option value="winter" selected>شتوي — 07:00</option>
+            <option value="ramadan">رمضان — 09:30</option>
+          </select>
+        </div>
+
+        <div class="field small" title="بداية الفترة الخاصة">
+          <label>من</label>
+          <input id="shiftPeriodStart" type="date" />
+        </div>
+
+        <div class="field small" title="نهاية الفترة الخاصة">
+          <label>إلى</label>
+          <input id="shiftPeriodEnd" type="date" />
+        </div>
+
+        <div class="field small" title="نوع الدوام خلال هذه الفترة الخاصة">
+          <label>الفترة الخاصة</label>
+          <select id="shiftPeriodModeSelect">
+            <option value="summer">صيفي — 06:45</option>
+            <option value="winter">شتوي — 07:00</option>
+            <option value="ramadan" selected>رمضان — 09:30</option>
+          </select>
+        </div>
+
+        <button class="btn primary" id="btnAddShiftPeriod" type="button">إضافة فترة</button>
+        <button class="btn danger" id="btnClearShiftPeriods" type="button">مسح الفترات</button>
+      </div>
+    </div>
+
+    <div class="row" id="shiftPeriodsRow">
+      <div class="chips" id="shiftPeriodsChips" aria-label="فترات الدوام الخاصة">
+        <span class="chip">الفترات الخاصة: <b>لا توجد</b></span>
       </div>
     </div>
   </div>
@@ -487,7 +524,7 @@ table[aria-label="بيانات المعلم"] td{
             <th>الجوال</th>
             <th>التخصص</th>
             <th>المرتبة</th>
-            <th>بداية الدوام: <span id="shiftStartTxt">07:00</span></th>
+            <th>الدوام الأساسي: <span id="shiftStartTxt">شتوي — 07:00</span></th>
           </tr>
         </thead>
         <tbody>
@@ -617,50 +654,236 @@ table[aria-label="بيانات المعلم"] td{
   /* =========================
      إعدادات الدوام
   ========================== */
-  const SHIFT_START = "07:00";
-  const CLAMP_MIN  = "06:30";
-  const CLAMP_MAX  = "14:25";
-// =========================
-// ✅ منطق رمضان (18–26) لنفس الشهر الميلادي
-// =========================
-const RAMADAN_FROM_DAY = 18;
-const RAMADAN_TO_DAY   = 26;
+  const DEFAULT_SHIFT_MODE = "winter";
+  const SHIFT_STORAGE_KEY = "yaqoubi-monthly-attendance-shifts-v2";
+  const SHIFT_PROFILES = {
+    summer:  { label:"صيفي",  start:"06:45", baseMin:420 },
+    winter:  { label:"شتوي",  start:"07:00", baseMin:420 },
+    ramadan: { label:"رمضان", start:"09:30", baseMin:240 }
+  };
 
-// عدّل هذه القيم حسب دوامكم في رمضان
-const SHIFT_PROFILES = {
-  winter:  { start: SHIFT_START, baseMin: 420 }, // 7 ساعات (420 دقيقة)
-  ramadan: { start: "09:30",     baseMin: 240 }  // مثال: 4 ساعات (240 دقيقة)
-};
+  let currentShiftMode = DEFAULT_SHIFT_MODE;
+  let shiftPeriods = [];
+  const CLAMP_BEFORE_MIN = 30; // سماحية قبل بداية الدوام
 
-const CLAMP_BEFORE_MIN = 30; // سماحية قبل بداية الدوام
+  function getCurrentShiftProfile(){
+    return SHIFT_PROFILES[currentShiftMode] || SHIFT_PROFILES[DEFAULT_SHIFT_MODE];
+  }
 
-function isRamadanDayKey(dateKey){
-  const d = keyToDate(dateKey);
-  if(!d) return false;
-  const day = d.getDate(); // يوم الشهر الميلادي
-  return day >= RAMADAN_FROM_DAY && day <= RAMADAN_TO_DAY;
-}
+  function getShiftProfileByMode(mode){
+    return SHIFT_PROFILES[mode] || SHIFT_PROFILES[DEFAULT_SHIFT_MODE];
+  }
 
-function getShiftContextForDate(dateKey){
-  // ✅ رمضان تلقائيًا للأيام 18–26
-  const key = (dateKey && isRamadanDayKey(dateKey)) ? "ramadan" : "winter";
+  function normalizeShiftPeriods(periods){
+    if (!Array.isArray(periods)) return [];
+    return periods
+      .map(p => ({
+        start: String((p && p.start) || "").trim(),
+        end: String((p && p.end) || "").trim(),
+        mode: String((p && p.mode) || DEFAULT_SHIFT_MODE).trim()
+      }))
+      .filter(p => /^\d{4}-\d{2}-\d{2}$/.test(p.start) && /^\d{4}-\d{2}-\d{2}$/.test(p.end) && p.start <= p.end && SHIFT_PROFILES[p.mode])
+      .sort((a,b) => (a.start + a.end).localeCompare(b.start + b.end));
+  }
 
-  const p = SHIFT_PROFILES[key] || SHIFT_PROFILES.winter;
-  const fullMin = p.baseMin;
-  const halfMin = Math.round(fullMin / 2);
+  function dateInPeriod(dateKey, period){
+    return !!dateKey && !!period && dateKey >= period.start && dateKey <= period.end;
+  }
 
-  const shiftStartM = hhmmToMinutes(p.start);
+  function findShiftPeriodForDate(dateKey){
+    if (!dateKey) return null;
+    for (const period of shiftPeriods){
+      if (dateInPeriod(dateKey, period)) return period;
+    }
+    return null;
+  }
 
-  // مجال التقريب: قبل بداية الدوام بـ 30 دقيقة وحتى نهاية الدوام
-  const clampMinM = shiftStartM - CLAMP_BEFORE_MIN;
-  const clampMaxM = shiftStartM + fullMin;
+  function getShiftContextForDate(dateKey){
+    const period = findShiftPeriodForDate(dateKey);
+    const mode = (period && period.mode) || currentShiftMode;
+    const p = getShiftProfileByMode(mode);
+    const fullMin = p.baseMin;
+    const halfMin = Math.round(fullMin / 2);
+    const shiftStartM = hhmmToMinutes(p.start);
 
-  return { key, start:p.start, fullMin, halfMin, shiftStartM, clampMinM, clampMaxM };
-}
+    const clampMinM = shiftStartM - CLAMP_BEFORE_MIN;
+    const clampMaxM = shiftStartM + fullMin;
 
-  // ✅ نصف دوام عند عدم تسجيل الانصراف (نصف 7 ساعات)
-  const HALF_SHIFT_MIN = 210; // 3:30
+    return {
+      key: mode,
+      label: p.label,
+      start: p.start,
+      fullMin,
+      halfMin,
+      shiftStartM,
+      clampMinM,
+      clampMaxM,
+      isFromPeriod: !!period,
+      periodStart: (period && period.start) || "",
+      periodEnd: (period && period.end) || ""
+    };
+  }
 
+  function getShiftDisplayText(){
+    const p = getCurrentShiftProfile();
+    return `${p.label} — ${p.start}`;
+  }
+
+  function getShiftPeriodDisplayText(period){
+    if (!period) return "";
+    const p = getShiftProfileByMode(period.mode);
+    return `${p.label} — ${p.start} | ${period.start} ← ${period.end}`;
+  }
+
+  function getTeacherShiftSummary(teacher){
+    if (!teacher) return getShiftDisplayText();
+
+    const used = new Map();
+    const dates = Array.from(teacher.days.keys()).sort();
+    for (const dateKey of dates){
+      const day = teacher.days.get(dateKey);
+      if (isExcludedDayKey(dateKey, day && day.statusRaw).excluded) continue;
+      const sc = getShiftContextForDate(dateKey);
+      const token = `${sc.key}|${sc.start}`;
+      if (!used.has(token)) used.set(token, `${sc.label} — ${sc.start}`);
+    }
+
+    if (!used.size) return `الأساسي: ${getShiftDisplayText()}`;
+    if (used.size === 1) return Array.from(used.values())[0];
+    return `مختلط — ${Array.from(used.values()).join(" / ")}`;
+  }
+
+  function hasShiftPeriodOverlap(start, end, ignoreIndex = -1){
+    for (let i=0; i<shiftPeriods.length; i++){
+      if (i === ignoreIndex) continue;
+      const p = shiftPeriods[i];
+      const separated = end < p.start || start > p.end;
+      if (!separated) return p;
+    }
+    return null;
+  }
+
+  function saveShiftSettings(){
+    try{
+      localStorage.setItem(SHIFT_STORAGE_KEY, JSON.stringify({
+        currentShiftMode,
+        shiftPeriods
+      }));
+    }catch(_){ }
+  }
+
+  function loadShiftSettings(){
+    try{
+      const raw = localStorage.getItem(SHIFT_STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      if (data && SHIFT_PROFILES[data.currentShiftMode]) currentShiftMode = data.currentShiftMode;
+      shiftPeriods = normalizeShiftPeriods((data && data.shiftPeriods) || []);
+    }catch(_){
+      shiftPeriods = [];
+      currentShiftMode = DEFAULT_SHIFT_MODE;
+    }
+  }
+
+  function removeShiftPeriod(index){
+    if (index < 0 || index >= shiftPeriods.length) return;
+    shiftPeriods.splice(index, 1);
+    saveShiftSettings();
+    updateShiftUI();
+    renderSelectedTeacher();
+  }
+
+  function renderShiftPeriods(){
+    const wrap = document.getElementById("shiftPeriodsChips");
+    if (!wrap) return;
+
+    if (!shiftPeriods.length){
+      wrap.innerHTML = `<span class="chip">الفترات الخاصة: <b>لا توجد</b></span>`;
+      return;
+    }
+
+    wrap.innerHTML = shiftPeriods.map((period, index) => {
+      const p = getShiftProfileByMode(period.mode);
+      return `
+        <span class="chip" title="فترة خاصة تطبق على الأيام الواقعة بين التاريخين">
+          ${escapeHtml(p.label)}
+          <b>${escapeHtml(period.start)}</b>
+          <b>إلى</b>
+          <b>${escapeHtml(period.end)}</b>
+          <button class="btn danger" type="button" data-shift-remove="${index}" style="padding:4px 9px">حذف</button>
+        </span>
+      `;
+    }).join("");
+
+    wrap.querySelectorAll("[data-shift-remove]").forEach(btn => {
+      btn.addEventListener("click", () => removeShiftPeriod(parseInt(btn.getAttribute("data-shift-remove"), 10)));
+    });
+  }
+
+  function addShiftPeriodFromUI(){
+    const startEl = document.getElementById("shiftPeriodStart");
+    const endEl = document.getElementById("shiftPeriodEnd");
+    const modeEl = document.getElementById("shiftPeriodModeSelect");
+
+    const start = String((startEl && startEl.value) || "").trim();
+    const end = String((endEl && endEl.value) || "").trim();
+    const mode = String((modeEl && modeEl.value) || DEFAULT_SHIFT_MODE).trim();
+
+    if (!start || !end){
+      alert("حدد تاريخ البداية والنهاية للفترة الخاصة.");
+      return;
+    }
+    if (start > end){
+      alert("تاريخ بداية الفترة يجب أن يكون قبل أو مساوياً لتاريخ النهاية.");
+      return;
+    }
+    if (!SHIFT_PROFILES[mode]){
+      alert("نوع الدوام المحدد غير صالح.");
+      return;
+    }
+
+    const conflict = hasShiftPeriodOverlap(start, end);
+    if (conflict){
+      alert(`يوجد تداخل مع فترة خاصة أخرى: ${getShiftPeriodDisplayText(conflict)}`);
+      return;
+    }
+
+    shiftPeriods.push({ start, end, mode });
+    shiftPeriods = normalizeShiftPeriods(shiftPeriods);
+    saveShiftSettings();
+    updateShiftUI();
+    renderSelectedTeacher();
+
+    if (startEl) startEl.value = "";
+    if (endEl) endEl.value = "";
+
+    toast(`تمت إضافة فترة ${getShiftProfileByMode(mode).label}.`);
+  }
+
+  function clearShiftPeriods(){
+    shiftPeriods = [];
+    saveShiftSettings();
+    updateShiftUI();
+    renderSelectedTeacher();
+    toast("تم مسح جميع الفترات الخاصة.");
+  }
+
+  function updateShiftUI(){
+    const shiftStartEl = document.getElementById("shiftStartTxt");
+    if (shiftStartEl) shiftStartEl.textContent = getShiftDisplayText();
+
+    const shiftModeSelect = document.getElementById("shiftModeSelect");
+    if (shiftModeSelect && shiftModeSelect.value !== currentShiftMode){
+      shiftModeSelect.value = currentShiftMode;
+    }
+
+    const shiftPeriodModeSelect = document.getElementById("shiftPeriodModeSelect");
+    if (shiftPeriodModeSelect && !SHIFT_PROFILES[shiftPeriodModeSelect.value]){
+      shiftPeriodModeSelect.value = "ramadan";
+    }
+
+    renderShiftPeriods();
+  }
   /* =========================
      إعداد البنر داخل الكشف
      ضع ملف الصورة shree.png بجانب ملف HTML
@@ -714,15 +937,18 @@ function getShiftContextForDate(dateKey){
     { start:"2026-06-26", end:"2026-07-25", label:"إجازة نهاية العام" }
   ];
 
-  const shiftStartM = hhmmToMinutes(SHIFT_START);
-  const clampMinM   = hhmmToMinutes(CLAMP_MIN);
-  const clampMaxM   = hhmmToMinutes(CLAMP_MAX);
 
   const el = (id) => document.getElementById(id);
 
   const fileInput = el("fileInput");
   const folderInput = el("folderInput");
   const teacherSelect = el("teacherSelect");
+  const shiftModeSelect = el("shiftModeSelect");
+  const shiftPeriodStart = el("shiftPeriodStart");
+  const shiftPeriodEnd = el("shiftPeriodEnd");
+  const shiftPeriodModeSelect = el("shiftPeriodModeSelect");
+  const btnAddShiftPeriod = el("btnAddShiftPeriod");
+  const btnClearShiftPeriods = el("btnClearShiftPeriods");
   const idInput = el("idInput");
   const notice = el("notice");
   const daysImportedEl = el("daysImported");
@@ -775,12 +1001,8 @@ const sumOpen = el("sumOpen");
 const daysBody= el("daysBody");
 
 
-  el("shiftStartTxt").textContent = SHIFT_START;
-  const clampMinEl = el("clampMin");
-if (clampMinEl) clampMinEl.textContent = CLAMP_MIN;
-
-const clampMaxEl = el("clampMax");
-if (clampMaxEl) clampMaxEl.textContent = CLAMP_MAX;
+  loadShiftSettings();
+  updateShiftUI();
 
   setTodayHeader();
 
@@ -871,6 +1093,20 @@ updateTeacherSelect(); // ✅ إظهار الأسماء فور فتح الصفح
   el("btnPDF").addEventListener("click", exportCurrentTeacherPDF);
 
   teacherSelect.addEventListener("change", renderSelectedTeacher);
+  if (shiftModeSelect){
+    shiftModeSelect.addEventListener("change", () => {
+      currentShiftMode = shiftModeSelect.value || DEFAULT_SHIFT_MODE;
+      saveShiftSettings();
+      updateShiftUI();
+      renderSelectedTeacher();
+      toast(`تم اعتماد الدوام الأساسي ${getCurrentShiftProfile().label} للأيام غير المشمولة بفترات خاصة.`);
+    });
+  }
+  if (btnAddShiftPeriod) btnAddShiftPeriod.addEventListener("click", addShiftPeriodFromUI);
+  if (btnClearShiftPeriods) btnClearShiftPeriods.addEventListener("click", clearShiftPeriods);
+  if (shiftPeriodEnd) shiftPeriodEnd.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter") addShiftPeriodFromUI();
+  });
 
   // بحث بالهوية ثم Enter
   idInput.addEventListener("keydown", (ev) => {
@@ -1635,7 +1871,7 @@ function renderSelectedTeacher(){
   tPhone.textContent= normalizeKsaMobile(teacher.phone || "") || "—";
   tSpec.textContent = teacher.spec || "—";
   tRank.textContent = teacher.rank || "—";
-  tShift.textContent= SHIFT_START;
+  tShift.textContent= getTeacherShiftSummary(teacher);
 
   let totalWork = 0;
   let totalLate = 0;
