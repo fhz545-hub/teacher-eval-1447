@@ -246,11 +246,11 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 
       <div class="f">
   <label>توقيت الدوام</label>
-  <div class="chips" id="seasonChips">
-    <button class="chip active" data-season="winter">الشتوي</button>
-    <button class="chip" data-season="summer">الصيفي</button>
-    <button class="chip" data-season="ramadan">رمضان</button>
-  </div>
+<div class="chips" id="seasonChips">
+  <button class="chip" data-season="winter">الشتوي</button>
+  <button class="chip active" data-season="summer">الصيفي</button>
+  <button class="chip" data-season="ramadan">رمضان</button>
+</div>
 </div>
 
 <!-- ✅ جديد: تمديد نصف ساعة -->
@@ -1005,8 +1005,7 @@ function rebuildWorkRange(){
     };
   });
 }
-let SEASON='winter';
-
+let SEASON='summer';
 document.getElementById('seasonChips').addEventListener('click',e=>{
   const b=e.target.closest('.chip'); if(!b) return;
 
@@ -2226,7 +2225,7 @@ document.getElementById('btnReportPrint').addEventListener('click', async ()=>{
 function init(){
   // ✅ تفعيل نطاق الدوام + تحديث أزرار صيفي/شتوي/رمضان
   rebuildWorkRange();
-  SEASON = 'winter';
+  SEASON = 'summer';
   refreshSeasonChipLabels();
   refreshExtendUI();
 
