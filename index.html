@@ -287,13 +287,49 @@ p,li,span,strong,b{letter-spacing:0;word-spacing:.25px}
 <div class="f" id="lessonBox" style="display:none">
   <label id="lessonTitle">تفاصيل الحصة</label>
 
-  <div class="row">
-  <input id="className" class="inp" type="text" placeholder="اسم الفصل" style="width:34%">
+ <div class="row">
+ <select id="classLevel" class="sel" style="width:30%">
+  <option value="">— الفصل —</option>
+  <option value="أول ثانوي">أول ثانوي</option>
+  <option value="ثاني ثانوي">ثاني ثانوي</option>
+  <option value="ثالث ثانوي">ثالث ثانوي</option>
+</select>
 
-  <select id="periodNo" class="sel" style="width:26%">
+  <select id="sectionNo" class="sel" style="width:22%">
+    <option value="">— الشعبة —</option>
+    <option value="1">١</option>
+    <option value="2">٢</option>
+    <option value="3">٣</option>
+    <option value="4">٤</option>
+    <option value="5">٥</option>
+    <option value="6">٦</option>
+    <option value="7">٧</option>
+    <option value="8">٨</option>
+    <option value="9">٩</option>
+    <option value="10">١٠</option>
+    <option value="11">١١</option>
+    <option value="12">١٢</option>
+    <option value="13">١٣</option>
+    <option value="14">١٤</option>
+    <option value="15">١٥</option>
+    <option value="16">١٦</option>
+    <option value="17">١٧</option>
+    <option value="18">١٨</option>
+    <option value="19">١٩</option>
+    <option value="20">٢٠</option>
+  </select>
+
+  <input id="className" type="hidden" value="">
+
+  <select id="periodNo" class="sel" style="width:18%">
     <option value="">— الحصة —</option>
-    <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
-    <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+    <option value="1">١</option>
+    <option value="2">٢</option>
+    <option value="3">٣</option>
+    <option value="4">٤</option>
+    <option value="5">٥</option>
+    <option value="6">٦</option>
+    <option value="7">٧</option>
   </select>
 
   <span class="pill" style="flex:1;justify-content:center">
@@ -776,6 +812,8 @@ const gM=document.getElementById('gM');
 const gD=document.getElementById('gD');
 /* ✅ تفاصيل الحصة داخل لفت النظر */
 const lessonBox = document.getElementById('lessonBox');
+const classLevel = document.getElementById('classLevel');
+const sectionNo = document.getElementById('sectionNo');
 const className = document.getElementById('className');
 const periodNo = document.getElementById('periodNo');
 const lessonTitle = document.getElementById('lessonTitle');
@@ -794,6 +832,22 @@ const noteLessonMin = document.getElementById('noteLessonMin');
 const noteMinutesWrap = document.getElementById('noteMinutesWrap');
 
 let NOTE_LESSON_MODE = ''; // 'enter' أو 'exit'
+
+function syncClassName(){
+  if(!className) return;
+
+  const lvl = classLevel?.value?.trim() || '';
+  const sec = sectionNo?.value?.trim() || '';
+
+  if(lvl && sec){
+    className.value = `${lvl} / شعبة ${en2ar(sec)}`;
+  }else if(lvl){
+    className.value = lvl;
+  }else{
+    className.value = '';
+  }
+}
+
 /* ================= بيانات المعلمين ================= */
 const TEACHERS_CSV=`موسى صلبان عبده عسيري	1093013116	966507058931	فيزيا	معلم ممارس
 يوسف  عيسى العيد	1012646822	966592038351	اللغة العربية	معلم ممارس
@@ -1280,8 +1334,10 @@ function detectLessonMode(reason){
 }
 
 function resetLessonFields(){
-  if(className) className.value='';
-  if(periodNo) periodNo.value='';
+ if(classLevel) classLevel.value='';
+if(sectionNo) sectionNo.value='';
+if(className) className.value='';
+if(periodNo) periodNo.value='';
   if(lessonA){ lessonA.textContent='--:--'; lessonA.classList.add('empty'); }
   if(lessonB){ lessonB.textContent='--:--'; lessonB.classList.add('empty'); }
   if(lessonMins) lessonMins.textContent='0';
@@ -1352,13 +1408,14 @@ function updateLessonUI(){
   }
 
   if(noteMinutesWrap){
-    noteMinutesWrap.style.display = (NOTE_LESSON_MODE === 'slot') ? 'none' : 'inline';
-  }
+  noteMinutesWrap.style.display = (NOTE_LESSON_MODE === 'slot') ? 'none' : 'inline';
+}
 
-  if(noteClassName) noteClassName.textContent = (className?.value.trim() || '—');
-  if(notePeriodNo) notePeriodNo.textContent = (periodNo?.value ? en2ar(periodNo.value) : '—');
+syncClassName();
+if(noteClassName) noteClassName.textContent = (className?.value.trim() || '—');
+if(notePeriodNo) notePeriodNo.textContent = (periodNo?.value ? en2ar(periodNo.value) : '—');
 
-  recalcLesson();
+recalcLesson();
 }
 function recalc(){
   const wsM=toMin(WORK_RANGE[SEASON].start);
@@ -1394,8 +1451,18 @@ if(periodNo){
   periodNo.addEventListener('change', updateLessonUI);
 }
 
-if(className){
-  className.addEventListener('input', updateLessonUI);
+if(classLevel){
+  classLevel.addEventListener('change', ()=>{
+    syncClassName();
+    updateLessonUI();
+  });
+}
+
+if(sectionNo){
+  sectionNo.addEventListener('change', ()=>{
+    syncClassName();
+    updateLessonUI();
+  });
 }
 
 /* اختيار معلم */
@@ -1451,7 +1518,8 @@ document.getElementById('btnPrintSave').addEventListener('click', async (e)=>{
   : '',
 className: (STATE.kind==='note' ? (className?.value.trim() || '') : ''),
 period: (STATE.kind==='note' ? (periodNo?.value || '') : ''),
-lessonMode: (STATE.kind==='note' ? (NOTE_LESSON_MODE || '') : ''),onMins: (STATE.kind==='note' ? ar2en(lessonMins?.textContent || '0') : ''),
+lessonMode: (STATE.kind==='note' ? (NOTE_LESSON_MODE || '') : ''),
+lessonMins: (STATE.kind==='note' ? ar2en(lessonMins?.textContent || '0') : ''),
     lessonA: (STATE.kind==='note' ? (lessonA?.textContent.trim() || '') : ''),
     lessonB: (STATE.kind==='note' ? (lessonB?.textContent.trim() || '') : '')
   });
